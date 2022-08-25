@@ -1,0 +1,185 @@
+import React, { useContext } from "react"
+import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Pressable, GestureResponderEvent } from 'react-native';
+import { GameContext, GameContextProps } from "../../GameContext"
+import MenuNavButtons from "../../components/MenuNavButtons";
+import FadeContainer from "../../components/FadeContainer";
+import { useNavigation } from "@react-navigation/native";
+import { StartMenuStackNavProps } from "../..";
+
+/* 
+const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
+[...Array(Math.ceil(list.length / chunkSize))].map(_ => list.splice(0,chunkSize))
+*/
+const LifeMenu = () => {
+    const navigation = useNavigation<StartMenuStackNavProps>()
+    const { setStartingLife, startingLife, setGameType, gameType } = useContext(GameContext) as GameContextProps
+    const options = [20, 40, 60, 80, 100]
+    const chunk = 2
+    const totalChunks = Math.ceil(options.length / chunk)
+    const chunkedOptions = [...Array(totalChunks)].map((_) => options.splice(0, chunk))
+
+    const handleSelectTotal = (val: string | number) => {
+        setStartingLife(Number(val))
+        navigation.navigate("TotalPlayers")
+    }
+
+    return (
+        <View style={styles.container}>
+            <View testID="gametype_container" 
+            style={{
+                width:'100%',
+                height:'30%',
+                justifyContent: 'space-evenly'
+            }}
+            >
+                <Text style={{
+                    color: 'white',
+                    textAlign: 'center',
+                    fontSize: 40,
+                    fontFamily:'Beleren'
+                }}>Game Type</Text>
+                <View style={{
+                    width:'100%',
+                    height:'80%',
+                    justifyContent: 'space-evenly',
+                    alignItems:'center'
+                }}>
+                    <Pressable onPress={() => setGameType('commander')}
+                        style={{
+                            borderColor: 'white',
+                            borderRadius: 5,
+                            borderWidth: 2,
+                            width:'80%'
+                        }}
+                    >
+                        <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
+                    </Pressable>
+                    <Pressable onPress={() => setGameType('normal')}
+                        style={{
+                            borderColor: 'white',
+                            borderRadius: 5,
+                            borderWidth: 2,
+                            width:'80%'
+                        }}
+                    >
+                        <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
+                    </Pressable>
+                </View>
+            </View>
+
+            <Text style={styles.title_text} >Starting Life Total</Text>
+            <View style={styles.options_wrapper}>
+                {chunkedOptions.map((chunks: number[], index: number) => {
+                    {
+                        return index !== chunkedOptions.length - 1 ? <View key={index} style={styles.options_subcontainer}>
+                            {chunks.map((c: number) => {
+                                return <TouchableOpacity key={c}
+                                    style={styles.option_touch}
+                                    onPress={() => handleSelectTotal(c)}
+                                >
+                                    <Text key={`${c}_text`} style={styles.option_text} >{c}</Text>
+                                </TouchableOpacity>
+                            })}
+                        </View> :
+                            <View key={index} style={styles.options_subcontainer}>
+                                {chunks.map((c: number) => {
+                                    return <TouchableOpacity key={c}
+                                        style={styles.option_touch}
+                                        onPress={() => handleSelectTotal(c)}
+                                    >
+                                        <Text key={`${c}_text`} testID={`${c}_text`} 
+                                        style={styles.option_text} >{c}</Text>
+                                    </TouchableOpacity>
+                                })}
+                                <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
+                                    <TouchableOpacity testID="life_input_touch" style={styles.input_wrapper}>
+                                        <TextInput testID="life_input" style={styles.input_text}
+                                            keyboardType='numeric'
+                                            onBlur={(e) => handleSelectTotal(e.nativeEvent.text)}
+                                        ></TextInput>
+                                    </TouchableOpacity>
+                                </KeyboardAvoidingView>
+                            </View>
+                    }
+                })}
+            </View>
+
+            {startingLife > 0 &&
+                <FadeContainer style={styles.fade_container}>
+                    <MenuNavButtons navTo="TotalPlayers" />
+                </FadeContainer>
+            }
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        height: '100%',
+        width: '100%',
+        backgroundColor: 'black',
+        alignItems: 'center',
+    },
+    title_text: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 40,
+        fontFamily:'Beleren'
+    },
+    option_touch: {
+        borderColor: 'white',
+        borderRadius: 5,
+        borderWidth: 2,
+        width: '30%',
+    },
+    option_text: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 36,
+        fontFamily:'Beleren'
+    },
+    options_wrapper: {
+        alignContent: 'center',
+        justifyContent: 'space-evenly',
+        width: '70%',
+        height: '40%'
+    },
+    options_subcontainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
+    },
+    input_wrapper: {
+        flex: 1,
+        flexDirection: 'row',
+        alignContent: 'center',
+        justifyContent: 'center',
+    },
+    input_text: {
+        color: 'white',
+        textAlign: 'center',
+        width: '100%',
+        fontSize: 36,
+        borderBottomColor: 'white',
+        borderWidth: 0,
+        borderBottomWidth: 2,
+        fontFamily:'Beleren'
+    },
+    input_container: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '33%',
+    },
+    fade_container: {
+        height: '20%',
+        width: '100%',
+    },
+    selected_option :{
+        backgroundColor:'white',
+        color: 'black',
+        textAlign: 'center',
+        fontSize: 36,
+        fontFamily:'Beleren'
+    }
+})
+
+export default LifeMenu

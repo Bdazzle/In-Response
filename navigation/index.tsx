@@ -1,49 +1,112 @@
-/**
- * If you are not familiar with React Navigation, refer to the "Fundamentals" guide:
- * https://reactnavigation.org/docs/getting-started
- *
- */
-import { FontAwesome } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+
+import { NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { Game } from '../screens/Game';
+import { CounterCardProps, CountersProps, DungeonData } from '..';
+import LifeMenu from '../screens/StartMenus/StartingLife';
+import TotalPlayers from '../screens/StartMenus/TotalPlayers';
+import PlayerOptions from '../screens/StartMenus/PlayerOptions';
+import ColorMenu, { ColorMenuProps } from '../screens/StartMenus/ColorMenu';
+import ColorSelector, { ColorSelectorProps } from '../screens/StartMenus/ColorSelector';
+import Dungeon from '../screens/Dungeon';
+import CounterCard from '../screens/CounterCard';
+import GlobalMenu from '../screens/GlobalMenu';
+import CoinFlipper from '../screens/MainMenu/CoinFlipper';
+import DiceRoller from '../screens/MainMenu/DiceRoller';
+import Planechase from '../screens/MainMenu/Planechase';
+import Counters from '../screens/Counters';
 
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
-import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
-import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
-import LinkingConfiguration from './LinkingConfiguration';
-
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+export default function Navigation() {
   return (
     <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      // linking={LinkingConfiguration}
+      // theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+      >
       <RootNavigator />
+      
     </NavigationContainer>
   );
 }
 
-/**
- * A root stack navigator is often used for displaying modals on top of all other content.
- * https://reactnavigation.org/docs/modal
- */
+/*
+Stack Navigator params are made like
+{
+  Screen name : initialParams | undefined (if no initial params)
+}
+for each screen
+*/
+
+export type RootStackParamList = {
+  StartMenu: undefined;
+  GlobalMenu: undefined;
+  Game: undefined;
+  Dungeon: DungeonData;
+  Card: CounterCardProps;
+  Counters: CountersProps
+}
+
+export type StartMenuStackParamList = {
+  Life : undefined;
+  TotalPlayers: undefined;
+  PlayerOptions: undefined;
+  ColorMenu: ColorMenuProps;
+  ColorSelector: ColorSelectorProps;
+}
+
+const StartMenuStack = createNativeStackNavigator<StartMenuStackParamList>();
+
+function StartMenuNavigator() {
+  return (
+    <StartMenuStack.Navigator screenOptions={{
+      headerShown: false
+    }}>
+      <StartMenuStack.Screen name="Life" component={LifeMenu}  />
+      <StartMenuStack.Screen name="TotalPlayers" component={TotalPlayers} />
+      <StartMenuStack.Screen name='PlayerOptions' component={PlayerOptions} />
+      <StartMenuStack.Screen name='ColorMenu' component={ColorMenu} />
+      <StartMenuStack.Screen name="ColorSelector" component={ColorSelector} />
+      
+    </StartMenuStack.Navigator>
+  )
+}
+
+export type GlobalMenuParamsList = {
+  MainMenu: undefined,
+  CoinFlipper: undefined,
+  DiceRoller : undefined,
+  Planechase: undefined
+}
+
+const GlobalMenuStack = createNativeStackNavigator<GlobalMenuParamsList>()
+
+function GlobalMenuNavigator() {
+  return (
+    <GlobalMenuStack.Navigator screenOptions={{
+      headerShown: false
+    }}>
+      <GlobalMenuStack.Screen name="MainMenu" component={GlobalMenu} />
+      <GlobalMenuStack.Screen name="CoinFlipper" component={CoinFlipper} />
+      <GlobalMenuStack.Screen name="DiceRoller" component={DiceRoller} />
+      <GlobalMenuStack.Screen name="Planechase" component={Planechase} />
+    </GlobalMenuStack.Navigator>
+  )
+}
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
-    </Stack.Navigator>
+      <Stack.Navigator screenOptions={{
+        headerShown: false
+      }}>
+        <Stack.Screen name="GlobalMenu" component={GlobalMenuNavigator} />
+        <Stack.Screen name="StartMenu" component={StartMenuNavigator} />
+        <Stack.Screen name="Game" component={Game} />
+        <Stack.Screen name="Dungeon" component={Dungeon} initialParams={{}} />
+        <Stack.Screen name="Card" component={CounterCard} initialParams={{}}/>
+        <Stack.Screen name="Counters" component={Counters} />
+      </Stack.Navigator>
   );
 }
 
@@ -51,57 +114,3 @@ function RootNavigator() {
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
  */
-const BottomTab = createBottomTabNavigator<RootTabParamList>();
-
-function BottomTabNavigator() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <BottomTab.Navigator
-      initialRouteName="TabOne"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-      }}>
-      <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
-        })}
-      />
-      <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </BottomTab.Navigator>
-  );
-}
-
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
-}

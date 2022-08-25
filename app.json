@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "mtg_companion",
-    "slug": "mtg_companion",
+    "name": "Mtg Counter",
+    "slug": "mtg_counter",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon":"./assets/appIcons/mtg_counter_icon_1024.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/appIcons/Color_Wheel.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,12 +23,15 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.beedazzle.mtg_counter"
     },
-    "web": {
-      "favicon": "./assets/images/favicon.png"
+    "extra": {
+      "eas": {
+        "projectId": "ad35e359-1730-444c-b0f7-b666b0f84e5c"
+      }
     }
   }
 }

@@ -1,22 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native';
+import Navigation from './navigation/index';
+import { GameProvider } from './GameContext';
+import { useFonts } from "expo-font";
 
-import useCachedResources from './hooks/useCachedResources';
-import useColorScheme from './hooks/useColorScheme';
-import Navigation from './navigation';
 
 export default function App() {
-  const isLoadingComplete = useCachedResources();
-  const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    "Beleren": require('./assets/fonts/Beleren2016SmallCaps-Bold.ttf')
+})
 
-  if (!isLoadingComplete) {
-    return null;
-  } else {
-    return (
-      <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-      </SafeAreaProvider>
-    );
-  }
+if(!fontsLoaded){
+  return null
+}
+
+  return (
+    <>
+      <StatusBar hidden={true} />
+      <GameProvider>
+        <Navigation />
+      </GameProvider>
+    </>
+  );
 }
