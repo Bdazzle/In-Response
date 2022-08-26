@@ -30,7 +30,6 @@ export const PlayerProvider: React.FC = ({ children }) => {
     const [colorTheme, setColorTheme] = useState<ColorTheme>({ primary: '', secondary:''})
     const [playerID, setPlayerID] = useState<number | undefined>()
 
-    // console.log('player dimensions w/h', dimensions)
     return <PlayerContext.Provider value={{
         dungeonCompleted: dungeonCompleted,
         setDungeonComplete: setDungeonComplete,

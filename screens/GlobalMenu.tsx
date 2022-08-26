@@ -4,16 +4,16 @@ import React, { useContext } from "react"
 import { View, StyleSheet, Text, TouchableOpacity, Pressable } from "react-native"
 import Svg, { Path } from "react-native-svg"
 import { AllScreenNavProps } from ".."
-import { GameContext, GameContextProps } from "../GameContext"
 import { iconData } from "../reducers/imageResources"
 import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
 import { textScaler } from "../functions/textScaler"
+import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 
 const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase"]
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { setTotalPlayers } = useContext(GameContext) as GameContextProps
+    const { setTotalPlayers } = useContext(OptionsContext) as OptionsContextProps
 
     const closeMenu = () => {
         navigation.navigate('Game')

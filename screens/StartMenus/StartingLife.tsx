@@ -1,10 +1,10 @@
 import React, { useContext } from "react"
-import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Pressable, GestureResponderEvent } from 'react-native';
-import { GameContext, GameContextProps } from "../../GameContext"
+import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import MenuNavButtons from "../../components/MenuNavButtons";
 import FadeContainer from "../../components/FadeContainer";
 import { useNavigation } from "@react-navigation/native";
 import { StartMenuStackNavProps } from "../..";
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext";
 
 /* 
 const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
@@ -12,7 +12,7 @@ const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
 */
 const LifeMenu = () => {
     const navigation = useNavigation<StartMenuStackNavProps>()
-    const { setStartingLife, startingLife, setGameType, gameType } = useContext(GameContext) as GameContextProps
+    const { setStartingLife, startingLife, setGameType, gameType } = useContext(OptionsContext) as OptionsContextProps
     const options = [20, 40, 60, 80, 100]
     const chunk = 2
     const totalChunks = Math.ceil(options.length / chunk)
@@ -45,22 +45,12 @@ const LifeMenu = () => {
                     alignItems:'center'
                 }}>
                     <Pressable onPress={() => setGameType('commander')}
-                        style={{
-                            borderColor: 'white',
-                            borderRadius: 5,
-                            borderWidth: 2,
-                            width:'80%'
-                        }}
+                        style={styles.game_option}
                     >
                         <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
                     </Pressable>
                     <Pressable onPress={() => setGameType('normal')}
-                        style={{
-                            borderColor: 'white',
-                            borderRadius: 5,
-                            borderWidth: 2,
-                            width:'80%'
-                        }}
+                        style={styles.game_option}
                     >
                         <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
                     </Pressable>
@@ -77,7 +67,9 @@ const LifeMenu = () => {
                                     style={styles.option_touch}
                                     onPress={() => handleSelectTotal(c)}
                                 >
-                                    <Text key={`${c}_text`} style={styles.option_text} >{c}</Text>
+                                    <Text key={`${c}_text`} 
+                                    style={startingLife === c ? styles.selected_option : styles.option_text} 
+                                    >{c}</Text>
                                 </TouchableOpacity>
                             })}
                         </View> :
@@ -88,14 +80,15 @@ const LifeMenu = () => {
                                         onPress={() => handleSelectTotal(c)}
                                     >
                                         <Text key={`${c}_text`} testID={`${c}_text`} 
-                                        style={styles.option_text} >{c}</Text>
+                                        style={startingLife === c ? styles.selected_option : styles.option_text} 
+                                        >{c}</Text>
                                     </TouchableOpacity>
                                 })}
                                 <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
                                     <TouchableOpacity testID="life_input_touch" style={styles.input_wrapper}>
                                         <TextInput testID="life_input" style={styles.input_text}
                                             keyboardType='numeric'
-                                            onBlur={(e) => handleSelectTotal(e.nativeEvent.text)}
+                                            onSubmitEditing={(e) => handleSelectTotal(e.nativeEvent.text)}
                                         ></TextInput>
                                     </TouchableOpacity>
                                 </KeyboardAvoidingView>
@@ -106,7 +99,7 @@ const LifeMenu = () => {
 
             {startingLife > 0 &&
                 <FadeContainer style={styles.fade_container}>
-                    <MenuNavButtons navTo="TotalPlayers" />
+                    <MenuNavButtons navTo="TotalPlayers" labelTo="Total Players"/>
                 </FadeContainer>
             }
         </View>
@@ -126,6 +119,12 @@ const styles = StyleSheet.create({
         fontSize: 40,
         fontFamily:'Beleren'
     },
+    game_option:{
+        borderColor: 'white',
+        borderRadius: 5,
+        borderWidth: 2,
+        width:'80%'
+    },
     option_touch: {
         borderColor: 'white',
         borderRadius: 5,
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'space-evenly',
         width: '70%',
-        height: '40%'
+        height: '37%'
     },
     options_subcontainer: {
         flexDirection: 'row',

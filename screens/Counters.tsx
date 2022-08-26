@@ -31,7 +31,12 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
     const changeTotal = (amount: number) => {
         const total = globalPlayerData[route.params.playerID].counterData![counterType] === undefined ? 0 : globalPlayerData[route.params.playerID].counterData![counterType]
         if (total + amount <= 0) {
-            delete globalPlayerData[route.params.playerID].counterData![counterType]
+            dispatchGlobalPlayerData({
+                playerID: route.params.playerID,
+                field: 'remove counter',
+                subField: counterType,
+                value:0
+            })
             setDisplayTotal(0)
         } else {
             dispatchGlobalPlayerData({
@@ -47,8 +52,6 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
     useEffect(() => {
         globalPlayerData[route.params.playerID].counterData![counterType] && setDisplayTotal(globalPlayerData[route.params.playerID].counterData![counterType])
     }, [])
-
-    
 
     return (
         <View testID='row_container'

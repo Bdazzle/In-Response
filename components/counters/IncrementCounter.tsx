@@ -9,6 +9,8 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
+import { textScaler } from "../../functions/textScaler"
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 interface IncrementCounterProps {
     counterType: string
@@ -25,28 +27,29 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorT
             SvgViewbox: undefined
         })
     const { dimensions } = useContext(PlayerContext) as PlayerContextProps
-    const { globalPlayerData, totalPlayers } = useContext(GameContext) as GameContextProps
-    const [textSize, dispatchTextSize] = useReducer<(state: TextSizes, action: TextActionParams) => TextSizes>(textSizeReducer, {})
+    const { globalPlayerData } = useContext(GameContext) as GameContextProps
+    // const { totalPlayers} = useContext(OptionsContext) as OptionsContextProps
+    // const [textSize, dispatchTextSize] = useReducer<(state: TextSizes, action: TextActionParams) => TextSizes>(textSizeReducer, {})
     const [total, setTotal] = useState<number>()
 
     useEffect(() => {
         dispatchResources(counterType)
-        dispatchTextSize({ 
-            playerNumber: totalPlayers, 
-            parentWidth: dimensions.width,
-            parentHeight: dimensions.height, 
-            decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
-        })
+        // dispatchTextSize({ 
+        //     playerNumber: totalPlayers, 
+        //     parentWidth: dimensions.width,
+        //     parentHeight: dimensions.height, 
+        //     decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
+        // })
     }, [dimensions])
 
-    useEffect(() => {
-        dispatchTextSize({ 
-            playerNumber: Object.keys(globalPlayerData).length, 
-            parentWidth: dimensions.width,
-            parentHeight: dimensions.height, 
-            decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
-        })
-    }, [globalPlayerData[playerID].counterData![counterType]])
+    // useEffect(() => {
+    //     dispatchTextSize({ 
+    //         playerNumber: Object.keys(globalPlayerData).length, 
+    //         parentWidth: dimensions.width,
+    //         parentHeight: dimensions.height, 
+    //         decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
+    //     })
+    // }, [globalPlayerData[playerID].counterData![counterType]])
 
     const handleCounterPress = (counter: string) => {
         navigation.navigate("Card", {
@@ -89,7 +92,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorT
                     <View testID="counter_total_container"
                     style={styles.counter_total_container}>
                             <Text style={[styles.total_text, {
-                                fontSize: textSize[playerID] && textSize[playerID].counters.textSize,
+                                fontSize:textScaler(32, dimensions.width),
                                 color: colorTheme.secondary,
                             }]}>
                                 {total}

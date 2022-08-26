@@ -4,7 +4,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { StartMenuStackNavProps } from "../..";
 import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
-import { GameContext, GameContextProps } from "../../GameContext"
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext";
 
 /* 
 const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
@@ -12,7 +12,7 @@ const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
 */
 const TotalPlayers = () => {
     const navigation = useNavigation<StartMenuStackNavProps>()
-    const { setTotalPlayers, totalPlayers } = useContext(GameContext) as GameContextProps
+    const { setTotalPlayers, totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const options = [...Array(4)].map((_, i: number) => i + 1)
     const chunk = 2
     const totalChunks = Math.ceil(options.length / chunk)
@@ -22,6 +22,7 @@ const TotalPlayers = () => {
         setTotalPlayers(Number(val))
         navigation.navigate("PlayerOptions")
     }
+    
 
     return (
         <View style={styles.container}>
@@ -34,16 +35,18 @@ const TotalPlayers = () => {
                                 style={styles.option_touch}
                                 onPress={() => handleSelectPlayers(c)}
                             >
-                                <Text key={`${c}_text`} style={styles.option_text} >{c}</Text>
+                                <Text key={`${c}_text`} 
+                                style={totalPlayers === c ? styles.selected_option : styles.option_text} 
+                                >{c}</Text>
                             </TouchableOpacity>
                         })}
                     </View>
                 })}
             </View>
-            {   totalPlayers > 0 &&
+            {totalPlayers > 0 &&
                 <FadeContainer style={styles.fade_container}>
-                <MenuNavButtons navTo="PlayerOptions" navBack="Life" />
-            </FadeContainer>
+                    <MenuNavButtons navTo="PlayerOptions" navBack="Life" labelTo="Player Options" labelBack="Life Totals" />
+                </FadeContainer>
             }
         </View>
     )
@@ -54,7 +57,6 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
         backgroundColor: 'black',
-        alignItems: 'center',
     },
     title_text: {
         color: 'white',
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
     options_wrapper: {
         alignContent: 'center',
         justifyContent: 'space-evenly',
-        width: '70%',
+        width: '100%',
         height: '50%'
     },
     options_subcontainer: {
@@ -108,6 +110,13 @@ const styles = StyleSheet.create({
     fade_container: {
         height: '20%',
         width: '100%',
+    },
+    selected_option :{
+        backgroundColor:'white',
+        color: 'black',
+        textAlign: 'center',
+        fontSize: 36,
+        fontFamily:'Beleren'
     }
 })
 

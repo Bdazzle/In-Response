@@ -58,7 +58,7 @@ const ColorMenu: React.FC<ColorMenuProps> = ({ }) => {
             </View>
 
             <FadeContainer style={styles.fade_container}>
-                <MenuNavButtons navBack="PlayerOptions" />
+                <MenuNavButtons navBack="PlayerOptions" labelBack="Player Options" />
             </FadeContainer>
         </View>
 

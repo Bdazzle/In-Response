@@ -9,11 +9,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation';
 import { textScaler } from '../../functions/textScaler';
 
-/*
-1) horizontal view, like 1 player gmae setup.
-2) add to GameContext to maintain state between screen navigations
-3)deck and discard. when die roll is planeswalker, put currentPlane into discard, deck = deck slice(currentPlane)
-*/
 const Planechase = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { setPlanarData, planarData } = useContext(GameContext) as GameContextProps
@@ -189,8 +184,6 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 5,
-        // width: 100,
-        // height: 100,
         alignItems: 'center',
         justifyContent: 'center'
     },

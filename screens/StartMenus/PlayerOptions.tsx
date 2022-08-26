@@ -89,7 +89,7 @@ const PlayerOptions = ({ }) => {
                 return <PlayerRow playerID={Number(p)} key={`Player ${p}`} />
             })}
             <FadeContainer style={styles.fade_container}>
-                <MenuNavButtons navTo="Game" navBack="TotalPlayers" />
+                <MenuNavButtons navTo="Game" navBack="TotalPlayers" labelBack="Total Players" labelTo="Start Game" />
             </FadeContainer>
         </View>
     )

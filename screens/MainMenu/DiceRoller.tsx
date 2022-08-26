@@ -170,7 +170,6 @@ const DiceRoller = () => {
                     onPressIn={() => handlePressIn()}
                     onPressOut={() => roll()}
                 >
-                    {/* <Text style={styles.all_text}>Roll Dice</Text> */}
                     <D20 />
 
                 </Pressable>
@@ -226,13 +225,11 @@ const styles = StyleSheet.create({
         fontFamily: "Beleren"
     },
     all_text: {
-        // fontSize: 28,
         fontSize: textScaler(24),
         textAlign: 'center',
         fontFamily: "Beleren"
     },
     number_text:{
-        // fontSize:36,
         fontSize: textScaler(24),
         color:'white',
         textAlign: 'center',

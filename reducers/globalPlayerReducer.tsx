@@ -61,6 +61,9 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
                 }
             }
         };
+        case 'remove counter':{
+            delete state[action.playerID].counterData![action.subField as string]
+        };
         case 'commanderDamage' :{
             return {
                 ...state,

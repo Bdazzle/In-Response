@@ -11,8 +11,10 @@ npm-debug.*
 web-build/
 *.apk
 *.aab
+assets/
+.vscode/
+*.log
 # macOS
 .DS_Store
-assets/
 .vscode/
 *.log

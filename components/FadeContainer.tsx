@@ -2,7 +2,7 @@ import { CSSProperties } from 'react';
 import Animated, { useAnimatedStyle, withTiming, Easing, useSharedValue, useDerivedValue } from 'react-native-reanimated';
 
 interface FadeContainerProps {
-    style : CSSProperties
+    style : CSSProperties,
 }
 
 const FadeContainer : React.FC<FadeContainerProps> = ({ children }, style ) =>{

@@ -6,9 +6,13 @@ const {
 } = Dimensions.get('window');
 
 //320 is from iphone 5 scale, smallest phone baseline. idk how this number is calculated
-const scale = width / 320;
+// const scale = width / 320;
 
-export function textScaler(size: number): number {
+/*
+scale needs to be based of parent size, not screen size
+*/
+export function textScaler(size: number, parentWidth?: number): number {
+  const scale = parentWidth !== undefined ? parentWidth / 320 : width / 320
   const newSize = size * scale
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(newSize))

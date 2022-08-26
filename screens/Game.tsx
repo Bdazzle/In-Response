@@ -6,11 +6,13 @@ import { GameContext, GameContextProps } from '../GameContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AllScreenNavProps } from '..';
+import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 
 
 export const Game = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { totalPlayers, globalPlayerData } = useContext(GameContext) as GameContextProps
+    const { totalPlayers} = useContext(OptionsContext) as OptionsContextProps
+    const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
     const panActivationWidth = useRef(Math.round(Dimensions.get('window').width /3 ) )
     const pan = useRef(new Animated.ValueXY()).current

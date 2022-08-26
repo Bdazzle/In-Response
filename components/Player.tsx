@@ -12,6 +12,7 @@ import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { lifeTotalScaler, textScaler } from '../functions/textScaler';
+import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 
 interface PlayerProps {
     playerName: string,
@@ -26,7 +27,8 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { dimensions, setDimensions, setPlayerName, setDungeonData,
         setDungeonComplete, setColorTheme, setPlayerID } = useContext(PlayerContext) as PlayerContextProps
-    const { totalPlayers, globalPlayerData, dispatchGlobalPlayerData, gameType } = useContext(GameContext) as GameContextProps
+    const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
+    const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
     const [textSize, dispatchTextSize] = useReducer<(state: TextSizes, action: TextActionParams) => TextSizes>(textSizeReducer, {})
 
     useEffect(() => {
@@ -161,12 +163,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     </View>
 
                     {/* Life Total */}
-                    <View testID='life_total_text_container' style={{
-                        width: '60%',
-                        height: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
+                    <View testID='life_total_text_container' style={styles.life_total_text_container}>
                         <Text testID='life_total'
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
@@ -196,11 +193,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             <View style={styles.increment_counters_container}>
                 <Pressable
                     testID='counter_pressable'
-                    style={{
-                        width:'100%',
-                        height:'20%',
-                        justifyContent:'center'
-                    }}
+                    style={styles.counter_pressable}
                     onPress={() => toCounters()}
                 >
                     <Text 
@@ -208,7 +201,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     adjustsFontSizeToFit
                     style={{
                         color: theme.secondary,
-                        fontSize: textScaler(14),
+                        fontSize: textScaler(14, dimensions.width),
                         fontFamily:'Beleren',
                         textAlign:'center'
                     }}>Counters</Text>
@@ -245,6 +238,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-end',
         width: '100%'
+    },
+    life_total_text_container:{
+        width: '60%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     life_total: {
         color: 'black',
@@ -301,6 +300,11 @@ const styles = StyleSheet.create({
         height: '90%',
         width: '20%',
         marginTop: '2%'
+    },
+    counter_pressable:{
+        width:'100%',
+        height:'20%',
+        justifyContent:'center'
     },
     commander_damage_tracker: {
         position: 'absolute',
