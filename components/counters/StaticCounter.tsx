@@ -16,13 +16,6 @@ interface StaticCounterProps {
     }
 }
 
-/* 
-Check
-Dungeon
-Monarch
-Initiative
-City's Blessing
-*/
 const staticCounterList = ['dungeon','blessing', 'initiative', 'monarch']
 
 const StaticCounterContainer: React.FC<StaticCounterProps> = ({ colorTheme }) => {

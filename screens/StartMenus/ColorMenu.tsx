@@ -6,7 +6,6 @@ import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
 import { StartMenuStackParamList } from "../../navigation";
 
-
 export interface ColorMenuProps {
     playerID: number;
     primary: string;

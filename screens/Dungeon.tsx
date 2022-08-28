@@ -132,9 +132,7 @@ const Dungeon: React.FC = ({ }) => {
     )
     const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [promptComplete, setPromptComplete] = useState<boolean>(false)
-    const [promptCancel, setPromptCancel] = useState<boolean>(false)
     const marker_radius = 75
-    const height = Dimensions.get('screen').height
     const width = Dimensions.get('screen').width
 
     useEffect(() => {
@@ -195,7 +193,7 @@ const Dungeon: React.FC = ({ }) => {
             field: 'dungeon',
             value: {
                 currentDungeon: currentDungeon.name,
-                dungeonCoords:{
+                dungeonCoords: {
                     x: marker_coords.x,
                     y: marker_coords.y
                 }
@@ -206,12 +204,7 @@ const Dungeon: React.FC = ({ }) => {
 
     const cancelDungeon = () => {
         dispatchDungeon("Completed")
-        setPromptCancel(false)
     }
-
-    // const keepDungeon = () => {
-    //     setPromptCancel(false)
-    // }
 
     return (
         <>
@@ -265,7 +258,6 @@ const Dungeon: React.FC = ({ }) => {
 
                             {/* Cancel Dungeon */}
                             <TouchableOpacity style={styles.cancel_icon}
-                                // onPress={() => setPromptCancel(true)}
                                 onPress={() => cancelDungeon()}
                             >
                                 <Svg viewBox='0 0 512 512' style={{ height: '100%', width: '100%' }}>
@@ -274,10 +266,6 @@ const Dungeon: React.FC = ({ }) => {
                                     />
                                 </Svg>
                             </TouchableOpacity>
-                            {/* {
-                                promptCancel && <CancelDungeonModal OnCancel={cancelDungeon} OnAccept={keepDungeon} />
-                            } */}
-
 
                             {/* Dungeon Image/pointer */}
                             <View style={styles.dungeon_wrapper}
@@ -291,7 +279,6 @@ const Dungeon: React.FC = ({ }) => {
                                     <ImageBackground
                                         testID='dungeon_image'
                                         source={currentDungeon.uri as ImageSourcePropType}
-                                        // resizeMode="cover"
                                         resizeMode="contain"
                                         resizeMethod='scale'
                                         style={styles.dungeon_image}
@@ -307,16 +294,15 @@ const Dungeon: React.FC = ({ }) => {
                             </View>
                         </>
                 }
-
             </View>
         </>
     )
 }
 
 const styles = StyleSheet.create({
-    dungeon_name_text:{
-        fontFamily:'Beleren',
-        fontSize:textScaler(24)
+    dungeon_name_text: {
+        fontFamily: 'Beleren',
+        fontSize: textScaler(24)
     },
     dungeon_container: {
         position: 'absolute',
@@ -352,8 +338,8 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     dungeon_image: {
-        height:'100%',
-        width:'100%',
+        height: '100%',
+        width: '100%',
         flex: 1,
         justifyContent: "flex-end",
     },
@@ -364,7 +350,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        
+
     },
     pulse_container: {
         position: 'absolute',

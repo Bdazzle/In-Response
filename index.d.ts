@@ -41,7 +41,6 @@ export type CounterData = {
 }
 
 export interface PlayerData {
-    // completedDungeon: boolean,
     colors: ColorScheme,
     screenName: string,
     dungeonData?: Partial<DungeonData>,
@@ -56,7 +55,6 @@ export interface PlayerData {
 export type CounterCardProps = {
     counterType: string
     playerID: number
-    // imageSource: ImageSourcePropType,
     currentCounters?: number
 }
 
@@ -68,13 +66,6 @@ export type GlobalPlayerData = {
     [key: number] : PlayerData
 }
 
-
-// export type PlayerStackParamList = {
-//     [key: string]: undefined;
-//     // Card: undefined
-// }
-
-// NativeStackNavigationProp<MenuStackParamList, keyof MenuStackParamList> | NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 export type AllScreenNavProps = CompositeNavigationProp<
 NativeStackNavigationProp<StartMenuStackParamList, keyof StartMenuStackParamList>,
 NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>,

@@ -22,6 +22,7 @@ export const GameContext = React.createContext<GameContextProps | null>(null)
 TO DO
 *)build command for apk: eas build -p android --profile preview
 *) background life buttons don't work on all devices?
+*) change commander damage player names to colors for visibility? or add color?
 */
 
 /*

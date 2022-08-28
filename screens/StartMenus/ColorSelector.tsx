@@ -11,8 +11,8 @@ export interface ColorSelectorProps {
     currentColor: string;
     colorPosition: string
 }
-// { playerID, currentColor, colorPosition }
-const ColorSelector: React.FC<ColorSelectorProps> = ({ currentColor, colorPosition }) => {
+
+const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
     const { globalPlayerData,
         dispatchGlobalPlayerData
     } = useContext(GameContext) as GameContextProps

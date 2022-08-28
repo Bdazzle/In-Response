@@ -11,15 +11,41 @@ interface CommanderDamageProps {
 }
 
 interface TrackerProps {
+    position: number;
     oppponentID: number;
     opponentName: string;
     textColor: string;
 }
 
-const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor }) => {
+/*
+position is index order(starts @ 0) from top to bottom, 
+componentHeight is height of element being scaled
+*/
+function scaleY(totalPlayers: number, position: number, componentHeight: number) : number {
+    switch(totalPlayers){
+        case 2 : {
+            return -componentHeight
+        };
+        case 3 : {
+            return position === 0 ? componentHeight/4 : -componentHeight
+        }
+        case 4 : {
+            return position === 0 ? componentHeight/1.5 
+            :
+            position === 1 ? -componentHeight/3
+            :
+            -componentHeight * 1.4
+        }
+        default: return componentHeight
+    }
+}
+/*
+scale and translateY need to change depending on number of players and opponentID
+*/
+const Tracker: React.FC<TrackerProps> = ({ position, oppponentID, opponentName, textColor }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
     const { playerID } = useContext(PlayerContext) as PlayerContextProps
-    const [longPressed, setLongPressed] = useState<boolean>(false)
+    const [isPressed, setIsPressed] = useState<boolean>(false)
     const [componentDimensions, setComponentDimensions] = useState<{ width: number, height: number }>()
     const scaleVal = useSharedValue(0)
     const translateXVal = useSharedValue(0)
@@ -35,14 +61,14 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
     }
 
     const handlePress = () => {
-        setLongPressed(!longPressed)
+        setIsPressed(!isPressed)
     }
 
     useEffect(() => {
-        scaleVal.value = longPressed === false ? 1 : 3.5
-        translateXVal.value = longPressed === false ? 0 :  (componentDimensions!.width * 2)
-        translateYVal.value = longPressed === false ? 0 : -componentDimensions!.height
-    }, [longPressed])
+        scaleVal.value = isPressed === false ? 1 : 3.5
+        translateXVal.value = isPressed === false ? 0 : componentDimensions!.width * 2
+        translateYVal.value = isPressed === false ? 0 : scaleY(Object.keys(globalPlayerData).length, position, componentDimensions!.height)
+    }, [isPressed])
 
     const scaleStyles = useAnimatedStyle(() => {
         return {
@@ -66,14 +92,13 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
                     })
                 },
             ],
-            
+
         }
     })
 
     /* 
-  dimensions get set to 0 when navigating between screens?
-  keep check here so any components referencing it won't break
-  */
+    keep check here so any components referencing componentDimensions won't break
+    */
     const getDimensions = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout
         if (width !== 0 && height !== 0) {
@@ -84,7 +109,14 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
     return (
         <Animated.View testID={`${opponentName}_damage_container`}
             style={[scaleStyles,
-                longPressed !== false && styles.active_damage_container
+                {
+                    backgroundColor: globalPlayerData[oppponentID].colors.primary,
+                    height: `${100 / (Object.keys(globalPlayerData).length - 1)}%`,
+                    maxHeight: `33%`,// 100/maximum # of potential players - 1
+                    margin: '2%',
+                    zIndex: isPressed === true ? 10 : 0,
+                    borderRadius:5
+                }
             ]}>
             <Pressable testID={`${opponentName}_pressable`} style={styles.player_pressable}
                 onPress={() => handlePress()}
@@ -92,7 +124,7 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
             >
 
                 <Text style={[styles.all_text, {
-                    color: textColor,
+                    color: globalPlayerData[oppponentID].colors.secondary,
                 }]}>
                     {opponentName}
                 </Text>
@@ -101,7 +133,7 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
                     alignContent: 'center',
                     justifyContent: 'center',
                 }}>
-                    {longPressed === true &&
+                    {isPressed === true &&
                         <Pressable
                             testID={`${opponentName}_plus`}
                             onPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] + 1)}
@@ -123,8 +155,9 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
                     }
 
                     {
-                        globalPlayerData[playerID!] && <Text style={[styles.all_text,{
-                            color: textColor,
+                        globalPlayerData[playerID!] && <Text style={[styles.all_text, {
+                            color: globalPlayerData[oppponentID].colors.secondary,
+                            fontSize: textScaler(20),
                             width: componentDimensions?.width ? componentDimensions.width / 3 : 20,
                             height: componentDimensions?.height ? componentDimensions.height / 2 : 20
                         }]} >
@@ -133,7 +166,7 @@ const Tracker: React.FC<TrackerProps> = ({ oppponentID, opponentName, textColor 
                     }
 
 
-                    {longPressed === true &&
+                    {isPressed === true &&
                         <Pressable
                             testID={`${opponentName}_minus`}
                             onPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] - 1)}
@@ -164,11 +197,15 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID }) => {
 
     return (
         <View style={styles.cdamage_container}>
-            {Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID).map((id) => {
-                return <Tracker key={`${globalPlayerData[Number(id)].screenName}_tracker`} opponentName={globalPlayerData[Number(id)].screenName}
-                    textColor={globalPlayerData[playerID].colors.secondary}
-                    oppponentID={Number(id)} />
-            })}
+            {Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
+                .map((id, index) => {
+                    return <Tracker key={`${globalPlayerData[Number(id)].screenName}_tracker`}
+                        opponentName={globalPlayerData[Number(id)].screenName}
+                        textColor={globalPlayerData[playerID].colors.secondary}
+                        oppponentID={Number(id)}
+                        position={index}
+                    />
+                })}
         </View>
     )
 }
@@ -179,18 +216,16 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         alignContent: 'center',
-        marginLeft:5
+        marginLeft: 5,
+        paddingBottom: 5
     },
     player_pressable: {
         justifyContent: 'center',
-        alignContent: 'center'
+        alignContent: 'center',
+        height: '100%'
     },
-    active_damage_container: {
-        backgroundColor: 'black',
-        zIndex:10
-    },
-    all_text:{
-        textAlign:'center',
+    all_text: {
+        textAlign: 'center',
         fontFamily: 'Beleren',
         fontSize: textScaler(11),
     }

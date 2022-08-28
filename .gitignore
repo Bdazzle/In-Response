@@ -18,3 +18,7 @@ assets/
 .DS_Store
 .vscode/
 *.log
+hooks/useCachedResources.ts
+hooks/useColorScheme.ts
+hooks/useDebounce.tsx
+hooks/useSwipe.tsx

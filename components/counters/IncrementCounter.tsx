@@ -4,13 +4,11 @@ import { PlayerContext, PlayerContextProps } from "../../PlayerContext"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { ColorTheme, CounterCardProps } from "../.."
-import { TextActionParams, textSizeReducer, TextSizes } from "../../reducers/textStyles"
 import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
 import { textScaler } from "../../functions/textScaler"
-import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 interface IncrementCounterProps {
     counterType: string
@@ -28,28 +26,11 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorT
         })
     const { dimensions } = useContext(PlayerContext) as PlayerContextProps
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
-    // const { totalPlayers} = useContext(OptionsContext) as OptionsContextProps
-    // const [textSize, dispatchTextSize] = useReducer<(state: TextSizes, action: TextActionParams) => TextSizes>(textSizeReducer, {})
     const [total, setTotal] = useState<number>()
 
     useEffect(() => {
         dispatchResources(counterType)
-        // dispatchTextSize({ 
-        //     playerNumber: totalPlayers, 
-        //     parentWidth: dimensions.width,
-        //     parentHeight: dimensions.height, 
-        //     decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
-        // })
     }, [dimensions])
-
-    // useEffect(() => {
-    //     dispatchTextSize({ 
-    //         playerNumber: Object.keys(globalPlayerData).length, 
-    //         parentWidth: dimensions.width,
-    //         parentHeight: dimensions.height, 
-    //         decimalPlaces: `${globalPlayerData[playerID].counterData![counterType]}`.length 
-    //     })
-    // }, [globalPlayerData[playerID].counterData![counterType]])
 
     const handleCounterPress = (counter: string) => {
         navigation.navigate("Card", {

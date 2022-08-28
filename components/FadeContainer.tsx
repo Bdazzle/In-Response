@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import Animated, { useAnimatedStyle, withTiming, Easing, useSharedValue, useDerivedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming, Easing, useSharedValue } from 'react-native-reanimated';
 
 interface FadeContainerProps {
     style : CSSProperties,

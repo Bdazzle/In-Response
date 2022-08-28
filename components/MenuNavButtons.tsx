@@ -44,8 +44,6 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                         <Svg viewBox="-50 -50 600 600" style={{
                             height:'100%',
                             width:'100%',
-                            // borderColor:'white',
-                            // borderWidth:1,
                             transform: [
                                 { rotate: '180deg' }
                             ]
@@ -76,8 +74,6 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                         style={{
                             height:'100%',
                             width:'100%',
-                            // borderColor:'white',
-                            // borderWidth:1,
                         }}
                          >
                             <Path d="M206.78,341.58v-47.04l-81.44,47.04V153.42l81.44,47.04v-47.04l40.72,23.52V0   C110.81,0,0,110.81,0,247.5S110.81,495,247.5,495V318.06L206.78,341.58z"
