@@ -22,13 +22,12 @@ export const GameContext = React.createContext<GameContextProps | null>(null)
 TO DO
 *)build command for apk: eas build -p android --profile preview
 *) background life buttons don't work on all devices?
-*) change commander damage player names to colors for visibility? or add color?
 */
 
 /*
 Dungeon data tracked in globalPlayerData to pass to Dungeon Screen, since only 1 screen
 */
-export const GameProvider: React.FC = ({ children }) => {
+export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { totalPlayers, startingLife } = useContext(OptionsContext) as OptionsContextProps
   const [currentMonarch, setCurrentMonarch] = useState<string>()
   const [currentInitiative, setCurrentInitiative] = useState<string>()
@@ -73,6 +72,25 @@ export const GameProvider: React.FC = ({ children }) => {
     })
 
   }, [totalPlayers])
+
+  /*
+  put this in StartingLife.tsx?
+  */
+  useEffect(() => {
+    if(Object.keys(globalPlayerData).length){
+      let playersObj = globalPlayerData
+      for (let playerID in playersObj) {
+        playersObj[playerID].lifeTotal = startingLife
+      }
+      dispatchGlobalPlayerData({
+        field: 'init',
+        value: playersObj as GlobalPlayerData,
+        playerID: 0
+      })
+    }
+  }, [startingLife])
+
+  
 
   return <GameContext.Provider value={{
     currentMonarch: currentMonarch,

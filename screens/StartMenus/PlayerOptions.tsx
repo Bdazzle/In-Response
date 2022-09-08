@@ -68,6 +68,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
                 <TextInput style={styles.player_name}
                     defaultValue={globalPlayerData[playerID].screenName}
                     onSubmitEditing={(e) => handleNameChange(e)}
+                    onEndEditing={(e) => handleNameChange(e)}
                 ></TextInput>
             </TouchableOpacity>
         </KeyboardAvoidingView>

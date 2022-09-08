@@ -11,9 +11,9 @@ export interface OptionsContextProps {
 
 export const OptionsContext = React.createContext<OptionsContextProps | null>(null)
 
-export const OptionsProvider: React.FC = ({ children }) => {
-    const [gameType, setGameType] = useState<string>('commander')
-    const [totalPlayers, setTotalPlayers] = useState<number>(4)
+export const OptionsProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+    const [gameType, setGameType] = useState<string>('normal')
+    const [totalPlayers, setTotalPlayers] = useState<number>(2)
     const [startingLife, setStartingLife] = useState<number>(20)
 
     return <OptionsContext.Provider value={{

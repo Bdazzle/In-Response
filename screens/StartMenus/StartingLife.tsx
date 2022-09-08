@@ -23,6 +23,12 @@ const LifeMenu = () => {
         navigation.navigate("TotalPlayers")
     }
 
+    const handleOptionDefault  = (val: string) =>{
+        setGameType(val)
+        val === "commander" ? setStartingLife(40) : setStartingLife(20)
+        navigation.navigate("TotalPlayers")
+    }
+
     return (
         <View style={styles.container}>
             <View testID="gametype_container" 
@@ -44,12 +50,14 @@ const LifeMenu = () => {
                     justifyContent: 'space-evenly',
                     alignItems:'center'
                 }}>
-                    <Pressable onPress={() => setGameType('commander')}
+                    <Pressable 
+                    onPress={() => handleOptionDefault('commander')}
                         style={styles.game_option}
                     >
                         <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
                     </Pressable>
-                    <Pressable onPress={() => setGameType('normal')}
+                    <Pressable 
+                    onPress={() => handleOptionDefault('normal')}
                         style={styles.game_option}
                     >
                         <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>

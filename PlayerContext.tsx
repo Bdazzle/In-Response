@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useState } from "react"
 import { ColorTheme, DungeonData } from "."
 
 
@@ -19,10 +19,7 @@ export interface PlayerContextProps {
 
 export const PlayerContext = React.createContext<PlayerContextProps | null>(null)
 
-/*
-Dungeon data is tracked in Game Context to pass to Dungeon screen
-*/
-export const PlayerProvider: React.FC = ({ children }) => {
+export const PlayerProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const [dungeonCompleted, setDungeonComplete] = useState<boolean>(true)
     const [dimensions, setDimensions] = useState<{ width: number, height: number }>({ width: 0, height: 0 })
     const [playerName, setPlayerName] = useState<string>('')

@@ -22,7 +22,6 @@ const TotalPlayers = () => {
         setTotalPlayers(Number(val))
         navigation.navigate("PlayerOptions")
     }
-    
 
     return (
         <View style={styles.container}>
@@ -43,11 +42,13 @@ const TotalPlayers = () => {
                     </View>
                 })}
             </View>
-            {totalPlayers > 0 &&
                 <FadeContainer style={styles.fade_container}>
-                    <MenuNavButtons navTo="PlayerOptions" navBack="Life" labelTo="Player Options" labelBack="Life Totals" />
+                    <MenuNavButtons 
+                    navTo = {totalPlayers > 0 ? "PlayerOptions" : undefined}
+                    labelTo ={ totalPlayers > 0 ? "Player Options" : undefined} 
+                    navBack="Life" labelBack="Life Totals" 
+                    />
                 </FadeContainer>
-            }
         </View>
     )
 }

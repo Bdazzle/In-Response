@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, LayoutChangeEvent, Pressable, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import React, { useContext, useEffect, useReducer} from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { PlayerContext, PlayerContextProps } from '../PlayerContext'
@@ -116,9 +116,15 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     <View
                         testID='background_increment_wrapper'
                         style={styles.background_increment_wrapper}>
-                        <TouchableOpacity
+                        <Pressable
                             testID='background_plus'
-                            style={styles.background_plus}
+                            style={({ pressed }) => [
+                               {
+                                // backgroundColor: pressed ? theme.primary : '#00000000',
+                                opacity: pressed ? .5 : 1,
+                               },
+                               styles.background_plus
+                            ]}
                             onPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal + 1)}
                             onLongPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal + 10)}
                         >
@@ -136,10 +142,16 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                                     />
                                 </Svg>
                             </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
+                        </Pressable>
+                        <Pressable
                             testID='background_minus'
-                            style={styles.background_minus}
+                            style={({ pressed }) => [
+                                {
+                                 // backgroundColor: pressed ? theme.primary : '#00000000',
+                                 opacity: pressed ? .5 : 1,
+                                },
+                                styles.background_minus
+                             ]}
                             onPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal - 1)}
                             onLongPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal - 10)}
                             // delayLongPress={100}
@@ -159,7 +171,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                                     />
                                 </Svg>
                             </View>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
 
                     {/* Life Total */}
@@ -249,7 +261,7 @@ const styles = StyleSheet.create({
         color: 'black',
         textAlign: 'center',
         width: '100%',
-        zIndex: -1,
+        // zIndex: -1,
     },
     player_name_container: {
         height: '15%',
