@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react"
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Pressable } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg'
 import { AllScreenNavProps } from "..";
 import { textScaler } from "../functions/textScaler";
@@ -37,8 +37,8 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                 style={styles.buttons_wrapper}>
                 {/* Back */}
                 {navBack !== undefined &&
-                    <TouchableOpacity style={styles.back_touchable}
-                        onPress={() => handleBack()}
+                    <Pressable style={styles.back_touchable}
+                        onPressIn={() => handleBack()}
                         testID="back_press"
                     >
                         <Svg viewBox="-50 -50 600 600" style={{
@@ -62,13 +62,13 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                             />
                         </Svg>
                         <Text style={styles.label_text}>{labelBack}</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 }
                 {/* Next*/}
                 {navTo !== undefined &&
-                    <TouchableOpacity style={styles.next_touchable}
+                    <Pressable style={styles.next_touchable}
                         testID="next_press"
-                        onPress={() => handleNext()}
+                        onPressIn={() => handleNext()}
                     >
                         <Svg viewBox="-50 -50 600 600"
                         style={{
@@ -90,7 +90,7 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                             />
                         </Svg>
                         <Text style={styles.label_text}>{labelTo}</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 }
             </View>
 

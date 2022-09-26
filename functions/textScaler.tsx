@@ -9,7 +9,8 @@ const {
 // const scale = width / 320;
 
 /*
-scale needs to be based of parent size, not screen size
+scale needs to be based of parent size, not screen size,
+TODO:change to parentheight instead of width?
 */
 export function textScaler(size: number, parentWidth?: number): number {
   const scale = parentWidth !== undefined ? parentWidth / 320 : width / 320

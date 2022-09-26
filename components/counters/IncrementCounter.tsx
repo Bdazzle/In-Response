@@ -13,9 +13,13 @@ import { textScaler } from "../../functions/textScaler"
 interface IncrementCounterProps {
     counterType: string
     colorTheme: ColorTheme
-    playerID: number
+    playerID: number,
+    parentDimensions :{
+        height: number,
+        width: number
+    }
 }
-const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorTheme, counterType }) => {
+const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions, playerID, colorTheme, counterType }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
         {
@@ -24,13 +28,13 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorT
             SvgPaths: undefined,
             SvgViewbox: undefined
         })
-    const { dimensions } = useContext(PlayerContext) as PlayerContextProps
+    // const { dimensions } = useContext(PlayerContext) as PlayerContextProps
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const [total, setTotal] = useState<number>()
 
     useEffect(() => {
         dispatchResources(counterType)
-    }, [dimensions])
+    }, [parentDimensions])
 
     const handleCounterPress = (counter: string) => {
         navigation.navigate("Card", {
@@ -73,7 +77,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ playerID, colorT
                     <View testID="counter_total_container"
                     style={styles.counter_total_container}>
                             <Text style={[styles.total_text, {
-                                fontSize:textScaler(32, dimensions.width),
+                                fontSize:textScaler(32, parentDimensions.height),
                                 color: colorTheme.secondary,
                             }]}>
                                 {total}

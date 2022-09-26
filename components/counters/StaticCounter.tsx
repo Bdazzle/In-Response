@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { LayoutChangeEvent, View, StyleSheet, Pressable } from 'react-native';
 import Animated, { Easing, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from '../../GameContext';
-import { PlayerContext, PlayerContextProps } from '../../PlayerContext';
+// import { PlayerContext, PlayerContextProps } from '../../PlayerContext';
 import Svg, { Path } from 'react-native-svg'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation';
@@ -13,16 +13,19 @@ interface StaticCounterProps {
     colorTheme: {
         primary: string,
         secondary: string
-    }
+    },
+    playerName: string,
+    playerID: number,
+    dungeonCompleted: boolean,
 }
 
 const staticCounterList = ['dungeon','blessing', 'initiative', 'monarch']
 
-const StaticCounterContainer: React.FC<StaticCounterProps> = ({ colorTheme }) => {
+const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted, playerName, playerID, colorTheme }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const {
-        playerName,
-        playerID, dungeonCompleted } = useContext(PlayerContext) as PlayerContextProps
+    // const {
+    //     playerName,
+    //     playerID, dungeonCompleted } = useContext(PlayerContext) as PlayerContextProps
     const { currentMonarch, setCurrentMonarch, currentInitiative, setCurrentInitiative, globalPlayerData } = useContext(GameContext) as GameContextProps
     const [cityBlessing, setCityBlessing] = useState<boolean>(false)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
@@ -133,7 +136,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ colorTheme }) =>
             >
                 {
                     dungeonCompleted &&
-                    <Svg viewBox='-10 -9  30 30'>
+                    <Svg viewBox='-10 -5  30 30'>
                         <Path d="M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27   c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0   L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z"
                             fill={colorTheme.primary === 'rgba(0,0,0,1)' ? 'white' : 'rgba(0,0,0,1)'} />
                     </Svg>
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
         width: '80%',
         flexDirection: 'row',
         paddingTop: '1%',
-        zIndex: 10,
+        zIndex: 50,
         justifyContent: 'space-evenly'
     },
     dungeon_complete_touch: {

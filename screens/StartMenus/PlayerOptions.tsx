@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, TouchableOpacity, View, TouchableWithoutFeedback, TextInputSubmitEditingEventData } from "react-native"
+import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, View, Pressable, TextInputSubmitEditingEventData } from "react-native"
 import MenuNavButtons from "../../components/MenuNavButtons"
 import { GameContext, GameContextProps } from "../../GameContext"
 import { StartMenuStackNavProps } from "../.."
@@ -11,9 +11,7 @@ interface ColorSquareParams {
     secondary: string,
     playerID: number
 }
-/*
-make sure you can't pick the same colors for primary and secondary
-*/
+
 const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID }) => {
     const navigation = useNavigation<StartMenuStackNavProps>()
 
@@ -26,8 +24,8 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
     }
 
     return (
-        <TouchableWithoutFeedback style={styles.color_touch}
-            onPress={() => showColorMenu()}
+        <Pressable style={styles.color_touch}
+            onPressIn={() => showColorMenu()}
         >
             <View style={[styles.color_square_outter,{
                 backgroundColor: secondary
@@ -38,7 +36,7 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
                 </View>
             </View>
 
-        </TouchableWithoutFeedback>
+        </Pressable>
     )
 }
 
@@ -64,13 +62,13 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
                 secondary={globalPlayerData[playerID].colors.secondary}
                 playerID={playerID}
             />
-            <TouchableOpacity style={styles.name_toucheable}>
+            <Pressable style={styles.name_toucheable}>
                 <TextInput style={styles.player_name}
                     defaultValue={globalPlayerData[playerID].screenName}
                     onSubmitEditing={(e) => handleNameChange(e)}
                     onEndEditing={(e) => handleNameChange(e)}
                 ></TextInput>
-            </TouchableOpacity>
+            </Pressable>
         </KeyboardAvoidingView>
     )
 }
@@ -133,14 +131,13 @@ const styles = StyleSheet.create({
     },
     color_touch: {
         height: '100%',
-        
+        width:'25%',
     },
     color_square_outter :{
         borderColor: 'white',
         borderWidth: .5,
         borderRadius: 5,
         height: '100%',
-        width: '25%',
         justifyContent:'center',
         alignItems:'center'
     },

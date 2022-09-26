@@ -85,7 +85,7 @@ const Planechase = ({ }) => {
             >
                 {/* Image container */}
                 <Pressable testID='plane_image_container'
-                    onPress={() => handleNav()}
+                    onPressIn={() => handleNav()}
                     style={[styles.image_container, {
                         height: width,
                         width: height * .8,
@@ -118,11 +118,11 @@ const Planechase = ({ }) => {
                         <Text style={styles.die_text}>Roll them planar bones!</Text>
                         <Pressable style={[styles.die,
                         {
-                            width: dieContainerWidth as number * .7,
-                            height: dieContainerWidth as number * .7,
+                            width:dieContainerWidth && dieContainerWidth as number * .7,
+                            height:dieContainerWidth && dieContainerWidth as number * .7,
                         }]}
                             testID="die"
-                            onPress={() => rollDie()}
+                            onPressIn={() => rollDie()}
                         >
                             {
                                 currentRoll === 'planeswalker' ?
@@ -141,8 +141,8 @@ const Planechase = ({ }) => {
                     </View>
                     <View testID='mana_cost_container'
                         style={[styles.mana_cost_container,{
-                            width: dieContainerWidth as number/2,
-                            height: dieContainerWidth as number/2,
+                            width: dieContainerWidth && dieContainerWidth as number/2,
+                            height: dieContainerWidth && dieContainerWidth as number/2,
                         }]}
                     >
                         <Text style={styles.text_style}>{rollCost}</Text>

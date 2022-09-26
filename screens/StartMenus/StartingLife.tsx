@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, Pressable } from 'react-native';
 import MenuNavButtons from "../../components/MenuNavButtons";
 import FadeContainer from "../../components/FadeContainer";
 import { useNavigation } from "@react-navigation/native";
@@ -51,13 +51,13 @@ const LifeMenu = () => {
                     alignItems:'center'
                 }}>
                     <Pressable 
-                    onPress={() => handleOptionDefault('commander')}
+                    onPressIn={() => handleOptionDefault('commander')}
                         style={styles.game_option}
                     >
                         <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
                     </Pressable>
                     <Pressable 
-                    onPress={() => handleOptionDefault('normal')}
+                    onPressIn={() => handleOptionDefault('normal')}
                         style={styles.game_option}
                     >
                         <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
@@ -71,34 +71,34 @@ const LifeMenu = () => {
                     {
                         return index !== chunkedOptions.length - 1 ? <View key={index} style={styles.options_subcontainer}>
                             {chunks.map((c: number) => {
-                                return <TouchableOpacity key={c}
+                                return <Pressable key={c}
                                     style={styles.option_touch}
-                                    onPress={() => handleSelectTotal(c)}
+                                    onPressIn={() => handleSelectTotal(c)}
                                 >
                                     <Text key={`${c}_text`} 
                                     style={startingLife === c ? styles.selected_option : styles.option_text} 
                                     >{c}</Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             })}
                         </View> :
                             <View key={index} style={styles.options_subcontainer}>
                                 {chunks.map((c: number) => {
-                                    return <TouchableOpacity key={c}
+                                    return <Pressable key={c}
                                         style={styles.option_touch}
-                                        onPress={() => handleSelectTotal(c)}
+                                        onPressIn={() => handleSelectTotal(c)}
                                     >
                                         <Text key={`${c}_text`} testID={`${c}_text`} 
                                         style={startingLife === c ? styles.selected_option : styles.option_text} 
                                         >{c}</Text>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 })}
                                 <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
-                                    <TouchableOpacity testID="life_input_touch" style={styles.input_wrapper}>
+                                    <Pressable testID="life_input_touch" style={styles.input_wrapper}>
                                         <TextInput testID="life_input" style={styles.input_text}
                                             keyboardType='numeric'
                                             onSubmitEditing={(e) => handleSelectTotal(e.nativeEvent.text)}
                                         ></TextInput>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 </KeyboardAvoidingView>
                             </View>
                     }

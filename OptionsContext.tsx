@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { createContext, useState } from "react"
 
 export interface OptionsContextProps {
     startingLife: number,
@@ -9,7 +9,7 @@ export interface OptionsContextProps {
     setTotalPlayers: React.Dispatch<React.SetStateAction<number>>,
 }
 
-export const OptionsContext = React.createContext<OptionsContextProps | null>(null)
+export const OptionsContext = createContext({} as OptionsContextProps)
 
 export const OptionsProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const [gameType, setGameType] = useState<string>('normal')

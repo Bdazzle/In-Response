@@ -108,7 +108,7 @@ const DiceRoller = () => {
         <View style={styles.container}>
             {/* Back Button */}
             <Pressable style={styles.back_button}
-                onPress={() => handleBack()}
+                onPressIn={() => handleBack()}
             >
                 <Svg viewBox="0 0 800 800" style={{
                     width: 60,

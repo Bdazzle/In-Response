@@ -1,34 +1,25 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React, { useEffect, useState } from "react"
-import {Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
+import { Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
 import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated"
-import Svg, { Path, Polygon } from "react-native-svg"
 import { AllScreenNavProps } from "../.."
 import { textScaler } from "../../functions/textScaler"
-
+import Svg, { Path, Polygon } from "react-native-svg"
 
 const Heads = () => {
     return (
-        <Image style={{
-            resizeMode:'contain',
-            width:'100%',
-            height:'100%'
-        }}
-        source={require('../../assets/images/heads.png')} />
+        <Image style={styles.coin}
+            source={require('../../assets/images/heads.png')} />
     )
 }
 
 const Tails = () => {
     return (
 
-        <Image 
-        style={{
-            resizeMode:'contain',
-            width:'100%',
-            height:'100%'
-        }}
-        source={require('../../assets/images/tails.png')} />
+        <Image
+            style={styles.coin}
+            source={require('../../assets/images/tails.png')} />
     )
 }
 
@@ -85,7 +76,7 @@ const CoinFlipper = () => {
         const result = [...Array(quantity)].map((_, i) => Math.random() < 0.5 ? "Heads" : "Tails")
         setResults(results => [...result])
         resultSpin.value = 1800
-        if(result[0] === 'Tails') zIndex.value = withDelay(animationTime, withTiming(1))
+        if (result[0] === 'Tails') zIndex.value = withDelay(animationTime, withTiming(1))
     }
 
     /*
@@ -93,13 +84,13 @@ const CoinFlipper = () => {
     */
     useEffect(() => {
         setTimeout(() => resultSpin.value = 0, 1200)
-    },[results])
+    }, [results])
 
     return (
         <View style={styles.flipper_container}>
             {/* Back Button */}
             <Pressable style={styles.back_button}
-                onPress={() => handleBack()}
+                onPressIn={() => handleBack()}
             >
                 <Svg viewBox="0 0 800 800" style={{
                     width: 60,
@@ -129,7 +120,7 @@ const CoinFlipper = () => {
                 style={styles.input_wrapper}
             >
                 <Text style={styles.all_text}>How many flips?</Text>
-                
+
                 <Pressable style={styles.input_touch}>
                     <TextInput style={[styles.input_text, styles.all_text]}
                         defaultValue={`${quantity}`}
@@ -140,16 +131,16 @@ const CoinFlipper = () => {
             </KeyboardAvoidingView>
 
             {/* Coins/flip button */}
-            <Animated.View style={[styles.coins_container]}>
+            <Animated.View style={styles.coins_container}>
                 <Pressable style={styles.coin_button}
-                    onPress={() => handleFlip()}
+                    onPressIn={() => handleFlip()}
                 >
                     <View style={{
                         height: '100%'
                     }}>
 
-                        <Animated.View 
-                        style={[styles.tails_wrapper, rotateStyle, zStyle]}
+                        <Animated.View
+                            style={[styles.tails_wrapper, rotateStyle, zStyle]}
                         >
                             <Tails />
                         </Animated.View>
@@ -174,7 +165,7 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
         backgroundColor: "#753BA5",
-        justifyContent:'center',
+        justifyContent: 'center',
     },
     back_button: {
         position: "absolute",
@@ -187,7 +178,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'center',
-        top: 10,  
+        top: 10,
     },
     input_touch: {
         width: '20%',
@@ -201,7 +192,7 @@ const styles = StyleSheet.create({
     all_text: {
         fontSize: textScaler(24),
         textAlign: 'center',
-        color:'white',
+        color: 'white',
         fontFamily: "Beleren"
     },
     coins_container: {
@@ -212,6 +203,11 @@ const styles = StyleSheet.create({
     },
     coin_button: {
         height: '10%',
+    },
+    coin:{
+        resizeMode: 'contain',
+        width: '100%',
+        height: '100%'
     },
     heads_wrapper: {
         position: 'absolute',

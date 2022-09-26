@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useContext } from "react"
-import { StyleSheet, View, TouchableOpacity} from "react-native"
+import { StyleSheet, View, Pressable} from "react-native"
 import { AllScreenNavProps } from "../..";
 import { ColorLibrary } from "../../constants/Colors";
 import { GameContext, GameContextProps } from "../../GameContext";
@@ -53,15 +53,15 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
                         height: `${80 / rows}%`
                     }]}>
                         {colorsArr.map(color => {
-                            return <TouchableOpacity key={color[0]} style={[styles.color_touch, {
+                            return <Pressable key={color[0]} style={[styles.color_touch, {
                                 width: `${squareWidth}%`
                             }]}
-                                onPress={() => colorPress(color[1])}
+                                onPressIn={() => colorPress(color[1])}
                             >
                                 <View style={[styles.color_square, {
                                     backgroundColor: color[1]
                                 }]}></View>
-                            </TouchableOpacity>
+                            </Pressable>
                         })}
                     </View>
                 })

@@ -10,7 +10,7 @@ export const ColorLibrary: { [key: string]: string } = {
     vapePurple: "#753BA5",
     vapeBlue: "#11FFFF",
     vapeOrange: '#E68E35',
-    vapePink: '#fc0398',//'#DD517E'
+    vapePink: '#fc0398',
     blood : 'rgba(82, 0, 0, 1)',
     pink: 'rgba(250, 90, 200, 1)',
     navy: 'rgba(0,0,80, 1)',
@@ -20,7 +20,6 @@ export const ColorLibrary: { [key: string]: string } = {
 export const startingColors = [
     { primary: "#753BA5", secondary: 'rgba(255,255,255,1)' },
     { primary: "#11FFFF", secondary: 'rgba(255,255,255,1)' },
-    // { primary: "rgba(0,0,0,1)", secondary: 'rgba(255,255,255,1)' },
     { primary: '#E68E35', secondary: 'rgba(255,255,255,1)' },
     { primary: '#fc0398', secondary: 'rgba(255,255,255,1)' }
   ]

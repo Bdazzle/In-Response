@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useContext } from "react"
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Pressable } from 'react-native';
 import { StartMenuStackNavProps } from "../..";
 import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
@@ -30,14 +30,14 @@ const TotalPlayers = () => {
                 {chunkedOptions.map((chunks: number[], index: number) => {
                     return <View key={index} style={styles.options_subcontainer}>
                         {chunks.map((c: number) => {
-                            return <TouchableOpacity key={c}
+                            return <Pressable key={c}
                                 style={styles.option_touch}
-                                onPress={() => handleSelectPlayers(c)}
+                                onPressIn={() => handleSelectPlayers(c)}
                             >
                                 <Text key={`${c}_text`} 
                                 style={totalPlayers === c ? styles.selected_option : styles.option_text} 
                                 >{c}</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         })}
                     </View>
                 })}

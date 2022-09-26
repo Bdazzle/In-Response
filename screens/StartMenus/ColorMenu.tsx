@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React from "react"
-import { Text, StyleSheet, View, TouchableWithoutFeedback } from "react-native"
+import { Text, StyleSheet, View, Pressable } from "react-native"
 import { StartMenuStackNavProps } from "../..";
 import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
@@ -31,27 +31,27 @@ const ColorMenu: React.FC<ColorMenuProps> = ({ }) => {
                 {/* Primary */}
                 <View style={styles.option_container}>
                     <Text style={styles.option_label}>Background {'\n'} Color</Text>
-                    <TouchableWithoutFeedback style={styles.color_touch} 
-                    onPress={() => handleColorSelect('primary', route.params.primary)}
+                    <Pressable style={styles.color_touch} 
+                    onPressIn={() => handleColorSelect('primary', route.params.primary)}
                     >
                         <View style={[styles.color_square, {
                             backgroundColor: route.params.primary,
                         }]}>
                         </View>
-                    </TouchableWithoutFeedback>
+                    </Pressable>
                 </View>
 
                 {/* Secondary */}
                 <View style={styles.option_container}>
                     <Text style={styles.option_label}>Text {'\n'} Color</Text>
-                    <TouchableWithoutFeedback style={styles.color_touch} 
-                    onPress={() => handleColorSelect('secondary', route.params.secondary)}
+                    <Pressable style={styles.color_touch} 
+                    onPressIn={() => handleColorSelect('secondary', route.params.secondary)}
                     >
                         <View style={[styles.color_square, {
                             backgroundColor: route.params.secondary,
                         }]}>
                         </View>
-                    </TouchableWithoutFeedback>
+                    </Pressable>
                 </View>
 
             </View>

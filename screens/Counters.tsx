@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
@@ -160,12 +160,12 @@ const Counters: React.FC = ({ }) => {
                 })}
                 <Pressable key={"storm"}
                     style={styles.storm_container}
-                    onPress={() => toStorm()}
+                    onPressIn={() => toStorm()}
                 >
                     <Text style={[styles.type_text,{
                         fontSize:textScaler(28)
                     }]} >Storm</Text>
-                    <Svg viewBox='0 0 600 600' style={{
+                    <Svg viewBox='-20 0 600 600' style={{
                         height:'80%',
                         width:'100%'
                     }}>
@@ -176,8 +176,8 @@ const Counters: React.FC = ({ }) => {
                 </Pressable>
 
             </KeyboardAvoidingView>
-            <TouchableOpacity style={styles.close_icon}
-                onPress={() => closeCounters()}
+            <Pressable style={styles.close_icon}
+                onPressIn={() => closeCounters()}
             >
                 <Svg height="60" width="60" viewBox='0 0 512 512'
                     style={styles.close_icon}
@@ -186,7 +186,7 @@ const Counters: React.FC = ({ }) => {
                         fill="white"
                     />
                 </Svg>
-            </TouchableOpacity>
+            </Pressable>
         </>
     )
 }

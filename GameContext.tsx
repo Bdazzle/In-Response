@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from "react"
+import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
 import { GlobalPlayerData, PlanarData } from "."
 import { startingColors } from "./constants/Colors";
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
@@ -16,12 +16,15 @@ export interface GameContextProps {
   setPlanarData: React.Dispatch<React.SetStateAction<PlanarData>>,
 }
 
-export const GameContext = React.createContext<GameContextProps | null>(null)
+export const GameContext = createContext({} as GameContextProps)
+// export const GameContext = React.createContext<GameContextProps | null>(null)
 
 /*
 TO DO
 *)build command for apk: eas build -p android --profile preview
-*) background life buttons don't work on all devices?
+*) Animated.View prevents any child components onPress and onLongPress from firing normally,
+  Because the touch event is intercepted by the Animated API. 
+  This may be fixable in the future when I know more about Animated api events.
 */
 
 /*

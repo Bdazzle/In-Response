@@ -3,6 +3,7 @@ import Navigation from './navigation/index';
 import { GameProvider } from './GameContext';
 import { OptionsProvider } from './OptionsContext';
 import { useFonts } from "expo-font";
+import React from 'react';
 
 
 export default function App() {
@@ -13,7 +14,7 @@ export default function App() {
   if (!fontsLoaded) {
     return null
   }
-
+  
   return (
     <>
       <StatusBar hidden={true} />

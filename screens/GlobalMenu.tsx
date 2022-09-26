@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React, { useContext } from "react"
-import { View, StyleSheet, Text, TouchableOpacity, Pressable } from "react-native"
+import { View, StyleSheet, Text, Pressable } from "react-native"
 import Svg, { Path } from "react-native-svg"
 import { AllScreenNavProps } from ".."
 import { iconData } from "../reducers/imageResources"
@@ -43,9 +43,9 @@ const GlobalMenu: React.FC = ({ }) => {
     return (
         <View style={styles.menu_container}>
             {/* Close Button */}
-            <TouchableOpacity
+            <Pressable
                 style={styles.close_icon}
-                onPress={() => closeMenu()}
+                onPressIn={() => closeMenu()}
             >
                 <Svg viewBox='0 0 512 512'
                     style={styles.close_icon}
@@ -54,14 +54,14 @@ const GlobalMenu: React.FC = ({ }) => {
                         fill="white"
                     />
                 </Svg>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.icons_container}  >
                 {options.map(option => {
                     return (
                         <View key={option} style={styles.button_wrapper} >
-                            <Pressable style={styles.button_touch} testID="iconPress"
-                                onPress={() =>
+                            <Pressable style={styles.button_touch} testID="iconPressIn"
+                                onPressIn={() =>
                                     option === "New Game" ? resetGame() :
                                         option === 'Players' ? toPlayerOptions() :
                                             option === 'Coin Flip' ? toCoin() :
@@ -78,7 +78,9 @@ const GlobalMenu: React.FC = ({ }) => {
                                         >
                                             {iconData[option].pathData.map((p, i) => {
                                                 return (
-                                                    <Path key={`${option} path ${i}`} d={p.path} fill={p.fill} />
+                                                    <Path key={`${option} path ${i}`} d={p.path} 
+                                                    fill={p.fill} 
+                                                    />
                                                 )
                                             })}
                                         </Svg>

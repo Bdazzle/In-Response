@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { Pressable, StyleSheet, Text, View, LayoutChangeEvent } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
-import { PlayerContext, PlayerContextProps } from "../PlayerContext";
+// import { PlayerContext, PlayerContextProps } from "../PlayerContext";
 import Svg, { Path } from "react-native-svg";
 import { textScaler } from "../functions/textScaler";
 
@@ -11,6 +11,7 @@ interface CommanderDamageProps {
 }
 
 interface TrackerProps {
+    playerID: number;
     position: number;
     oppponentID: number;
     opponentName: string;
@@ -42,11 +43,12 @@ function scaleY(totalPlayers: number, position: number, componentHeight: number)
 /*
 scale and translateY need to change depending on number of players and opponentID
 */
-const Tracker: React.FC<TrackerProps> = ({ position, oppponentID, opponentName, textColor }) => {
+const Tracker: React.FC<TrackerProps> = ({playerID, position, oppponentID, opponentName, textColor }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
-    const { playerID } = useContext(PlayerContext) as PlayerContextProps
+    // const { playerID } = useContext(PlayerContext) as PlayerContextProps
     const [isPressed, setIsPressed] = useState<boolean>(false)
     const [componentDimensions, setComponentDimensions] = useState<{ width: number, height: number }>()
+    const [total, setTotal] = useState<number>(0)
     const scaleVal = useSharedValue(0)
     const translateXVal = useSharedValue(0)
     const translateYVal = useSharedValue(0)
@@ -157,10 +159,13 @@ const Tracker: React.FC<TrackerProps> = ({ position, oppponentID, opponentName, 
                     {
                         globalPlayerData[playerID!] && <Text style={[styles.all_text, {
                             color: globalPlayerData[oppponentID].colors.secondary,
-                            fontSize: textScaler(20),
+                            lineHeight:26,
+                            fontSize:String(globalPlayerData[playerID!].commander_damage![oppponentID]).length < 2 ? textScaler(25) : textScaler(19) ,
                             width: componentDimensions?.width ? componentDimensions.width / 3 : 20,
                             height: componentDimensions?.height ? componentDimensions.height / 2 : 20
-                        }]} >
+                        }]} 
+                        adjustsFontSizeToFit={true}
+                        >
                             {globalPlayerData[playerID!].commander_damage![oppponentID]}
                         </Text>
                     }
@@ -200,6 +205,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID }) => {
             {Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
                 .map((id, index) => {
                     return <Tracker key={`${globalPlayerData[Number(id)].screenName}_tracker`}
+                        playerID={playerID} 
                         opponentName={globalPlayerData[Number(id)].screenName}
                         textColor={globalPlayerData[playerID].colors.secondary}
                         oppponentID={Number(id)}
