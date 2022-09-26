@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
-import { PlayerContext, PlayerContextProps } from "../../PlayerContext"
+// import { PlayerContext, PlayerContextProps } from "../../PlayerContext"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { ColorTheme, CounterCardProps } from "../.."
@@ -77,7 +77,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions,
                     <View testID="counter_total_container"
                     style={styles.counter_total_container}>
                             <Text style={[styles.total_text, {
-                                fontSize:textScaler(32, parentDimensions.height),
+                                fontSize:textScaler(38, parentDimensions.height),
                                 color: colorTheme.secondary,
                             }]}>
                                 {total}
@@ -112,7 +112,6 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     total_text:{
-        textAlignVertical: 'top',
         width: '100%',
         height:'100%',
         fontFamily: 'Beleren',

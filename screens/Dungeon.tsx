@@ -86,25 +86,25 @@ const dungeonReducer = (state: dungeonInfo, action: string) => {
             return {
                 name: "Undercity",
                 uri: require("../assets/dungeons/Undercity.jpg"),
-                lastroom_height: '27%'
+                lastroom_height: '33%'
             };
         case "Dungeon of the Mad Mage":
             return {
                 name: "Dungeon of the Mad Mage",
                 uri: require("../assets/dungeons/Dungeon-of-the-Mad-Mage.jpg"),
-                lastroom_height: '24%'
+                lastroom_height: '32%'
             };
         case "Tomb of Annihilation":
             return {
                 name: "Tomb of Annihilation",
                 uri: require("../assets/dungeons/Tomb-of-Annihilation.jpg"),
-                lastroom_height: '33%'
+                lastroom_height: '37%'
             };
         case "Lost Mines of Phandelver":
             return {
                 name: "Lost Mines of Phandelver",
                 uri: require("../assets/dungeons/Lost-Mine-of-Phandelver.jpg"),
-                lastroom_height: '29%'
+                lastroom_height: '35%'
             };
         case "Completed":
             return {
@@ -167,8 +167,8 @@ const Dungeon: React.FC = ({ }) => {
 
     /*
     on dungeon complete, have to reset dungeon data, and set dungeonComplete to true  
-    in active player PlayerContext
-    need active player's name
+    in globalPlayerData for active player.
+    reset marker coords to x = width/2, y = top of page (0) + marker radius
     */
     const completeDungeon = () => {
         dispatchDungeon("Completed")
@@ -178,6 +178,10 @@ const Dungeon: React.FC = ({ }) => {
             value: true
         })
         setPromptComplete(false)
+        setMarker_coords({
+            x: width / 2,
+            y: marker_radius
+        })
     }
 
     const cancelCompleteModal = () => {

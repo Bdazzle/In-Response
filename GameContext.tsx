@@ -17,10 +17,10 @@ export interface GameContextProps {
 }
 
 export const GameContext = createContext({} as GameContextProps)
-// export const GameContext = React.createContext<GameContextProps | null>(null)
 
 /*
 TO DO
+1) change commander damage line height
 *)build command for apk: eas build -p android --profile preview
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
