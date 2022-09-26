@@ -73,6 +73,7 @@ export const Game = () => {
                 })
             }
         }
+        setSwipeStart(undefined)
     }
 
     const debounceSwipeEnd = debounce(swipeEnd, 100)
