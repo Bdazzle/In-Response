@@ -29,7 +29,6 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     //     setDungeonComplete, setColorTheme, setPlayerID } = useContext(PlayerContext) as PlayerContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
     const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
-    // const [textSize, dispatchTextSize] = useReducer<(state: TextSizes, action: TextActionParams) => TextSizes>(textSizeReducer, {})
     // const [dungeonData, setDungeonData] = useState<DungeonData | undefined>()
     // const [dungeonCompleted, setDungeonComplete] = useState<boolean>(true)
     const [dimensions, setDimensions] = useState<{ width: number, height: number }>({ width: 0, height: 0 })

@@ -7,7 +7,13 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AllScreenNavProps } from '..';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
+import { debounce } from '../hooks/useDebounce';
 
+
+/*
+PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
+Fixable?
+*/
 export const Game = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
@@ -15,7 +21,7 @@ export const Game = () => {
     const [swipeStart, setSwipeStart] = useState<number>()
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
     const panActivationWidth = useRef(Math.round(Dimensions.get('window').width / 3))
-    const pan = useRef(new Animated.ValueXY()).current
+    // const pan = useRef(new Animated.ValueXY()).current
 
     // const panResponder = useRef(PanResponder.create({
     //     // onMoveShouldSetPanResponder: () => true,
@@ -53,19 +59,26 @@ export const Game = () => {
     //     },
     // })).current
 
+    const debounceSwipe = debounce(setSwipeStart, 100)
 
     const handleSwipe = (event: GestureResponderEvent) => {
-        setSwipeStart(event.nativeEvent.pageX)
+        debounceSwipe(event.nativeEvent.pageX)
     }
 
-    const handleSwipeEnd = (event: GestureResponderEvent) => {
+    const swipeEnd = (input: number) => {
         if (swipeStart) {
-            if (event.nativeEvent.pageX - swipeStart > panActivationWidth.current || swipeStart - event.nativeEvent.pageX > panActivationWidth.current) {
+            if (input - swipeStart > panActivationWidth.current || swipeStart - input > panActivationWidth.current) {
                 navigation.navigate('GlobalMenu', {
                     screen: "MainMenu"
                 })
             }
         }
+    }
+
+    const debounceSwipeEnd = debounce(swipeEnd, 100)
+
+    const handleSwipeEnd = (event: GestureResponderEvent) => {
+        debounceSwipeEnd(event.nativeEvent.pageX)
     }
 
     return (
