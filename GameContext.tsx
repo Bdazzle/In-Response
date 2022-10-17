@@ -20,8 +20,8 @@ export const GameContext = createContext({} as GameContextProps)
 
 /*
 TO DO
-1) change commander damage line height
 *)build command for apk: eas build -p android --profile preview
+  -eas build uses .gitignore to access files, so change access to assets files after build so it's not uploaded to github
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
@@ -56,7 +56,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           counterData: {},
           lifeTotal: startingLife,
           commander_damage: cdamage
-          // dungeonCompleted : true
         }
       }
     }, {} as GlobalPlayerData)

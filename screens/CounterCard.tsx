@@ -59,9 +59,11 @@ const ManaCounter: React.FC<ManaCounterProps> = ({ source }) => {
     )
 }
 /* 
-Can do 2 different things. Show a non-incrementing counter image onLongPress from StaticCounter component,
+Can do 2 different things:
+1) Show a non-incrementing counter image onLongPress from StaticCounter component,
 in which case it SHOULD NOT render plus, minus, and total components.
-if navigated from an IncrementCounter component, SHOULD render plus, minus, and total components, 
+
+2)if navigated from an IncrementCounter component, SHOULD render plus, minus, and total components, 
 in which case, when closed, should save the total to globalPlayerData -> playerID -> counter, 
 which should update corresponding Player component
 */
@@ -145,7 +147,8 @@ const CounterCard: React.FC = ({ }) => {
 
                         <Pressable
                             testID='plus'
-                            onPressIn={() => setTotal(total + 1)}
+                            onPress={() => setTotal(total + 1)}
+                            onLongPress={() => setTotal(total + 10)}
                             style={styles.increment_pressable}
                         >
                             <Svg 
@@ -179,7 +182,8 @@ const CounterCard: React.FC = ({ }) => {
 
                         <Pressable
                             testID='minus'
-                            onPressIn={() => setTotal(total - 1)}
+                            onPress={() => setTotal(total - 1)}
+                            onLongPress={() => setTotal(total - 10)}
                             style={styles.increment_pressable}
                         >
                             <Svg viewBox={`${-height/30} 0 420 420`}

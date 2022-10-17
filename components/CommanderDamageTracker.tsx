@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react"
 import { Pressable, StyleSheet, Text, View, LayoutChangeEvent } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
-// import { PlayerContext, PlayerContextProps } from "../PlayerContext";
 import Svg, { Path } from "react-native-svg";
 import { textScaler } from "../functions/textScaler";
 

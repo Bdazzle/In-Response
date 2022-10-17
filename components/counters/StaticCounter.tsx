@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { LayoutChangeEvent, View, StyleSheet, Pressable } from 'react-native';
 import Animated, { Easing, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from '../../GameContext';
-// import { PlayerContext, PlayerContextProps } from '../../PlayerContext';
 import Svg, { Path } from 'react-native-svg'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation';
@@ -23,9 +22,6 @@ const staticCounterList = ['dungeon','blessing', 'initiative', 'monarch']
 
 const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted, playerName, playerID, colorTheme }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    // const {
-    //     playerName,
-    //     playerID, dungeonCompleted } = useContext(PlayerContext) as PlayerContextProps
     const { currentMonarch, setCurrentMonarch, currentInitiative, setCurrentInitiative, globalPlayerData } = useContext(GameContext) as GameContextProps
     const [cityBlessing, setCityBlessing] = useState<boolean>(false)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
@@ -35,7 +31,6 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
         monarch: useSharedValue(.5),
         initiative: useSharedValue(.5)
     }
-
 
     const getImageDimensions = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout
@@ -67,10 +62,8 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
                             duration: 30,
                             easing: Easing.bezier(0.25, 0.1, 0.25, 1)
                         }),
-
                 }
             ],
-
         }
     })
 
@@ -95,11 +88,11 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
     }
 
     const activeInitiative = () => {
-        setCurrentInitiative(playerName)
+        currentInitiative !== playerName ? setCurrentInitiative(playerName) : setCurrentInitiative('')
     }
 
     const activateMonarch = () => {
-        setCurrentMonarch(playerName)
+        currentMonarch !== playerName ? setCurrentMonarch(playerName) : setCurrentMonarch('')
     }
 
     useEffect(() => {

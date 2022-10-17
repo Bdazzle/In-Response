@@ -1,5 +1,5 @@
-import { View, useWindowDimensions, StyleProp, ViewStyle, Animated, PanResponder, Dimensions, Pressable, GestureResponderEvent, PanResponderGestureState, Platform } from 'react-native';
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, GestureResponderEvent } from 'react-native';
+import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 // import { PlayerProvider } from '../PlayerContext';
 import { GameContext, GameContextProps } from '../GameContext';
@@ -7,7 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AllScreenNavProps } from '..';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
-import { debounce } from '../hooks/useDebounce';
 
 
 /*
@@ -58,6 +57,20 @@ export const Game = () => {
     //         }
     //     },
     // })).current
+
+    interface Debounce<T> {
+        (func: T, delay: number): (...args: any) => void
+    }
+
+    const debounce: Debounce<any> = (func: any, delay: number) => {
+        let timeOutId: number;
+        return (...args: any) => {
+            if (timeOutId) clearTimeout(timeOutId)
+            timeOutId = setTimeout(() => {
+                func(...args)
+            }, delay)
+        }
+    }
 
     const debounceSwipe = debounce(setSwipeStart, 100)
 

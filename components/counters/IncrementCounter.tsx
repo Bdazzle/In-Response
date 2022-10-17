@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
-// import { PlayerContext, PlayerContextProps } from "../../PlayerContext"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { ColorTheme, CounterCardProps } from "../.."
@@ -9,17 +8,18 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
 import { textScaler } from "../../functions/textScaler"
+import { counters } from "../../constants/CounterTypes"
 
 interface IncrementCounterProps {
     counterType: string
     colorTheme: ColorTheme
     playerID: number,
-    parentDimensions :{
+    parentDimensions: {
         height: number,
         width: number
     }
 }
-const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions, playerID, colorTheme, counterType }) => {
+const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions, playerID, colorTheme, counterType }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
         {
@@ -28,7 +28,6 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions,
             SvgPaths: undefined,
             SvgViewbox: undefined
         })
-    // const { dimensions } = useContext(PlayerContext) as PlayerContextProps
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const [total, setTotal] = useState<number>()
 
@@ -57,7 +56,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions,
                     {
                         resources.SvgPaths &&
                         <View style={styles.counter_icon_container}
-                        testID="counter_icon_container"
+                            testID="counter_icon_container"
                         >
                             <Svg viewBox={resources.SvgViewbox} style={{ height: '100%', width: '100%' }}>
                                 {
@@ -76,8 +75,11 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({parentDimensions,
                     }
                     <View testID="counter_total_container"
                     style={styles.counter_total_container}>
-                            <Text style={[styles.total_text, {
-                                fontSize:textScaler(38, parentDimensions.height),
+                            <Text 
+                            adjustsFontSizeToFit={true}
+                            numberOfLines={1}
+                            style={[styles.total_text, {
+                                fontSize:textScaler(37, parentDimensions.height),
                                 color: colorTheme.secondary,
                             }]}>
                                 {total}
@@ -96,25 +98,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        width: '100%',
-        height: '20%'
+        height: `${80 / Object.keys(counters).length}%`
     },
     touchable_wrapper: {
         height: '80%',
-        width: '60%',
-        flexDirection: 'row'
+        width: '100%',
+        flexDirection: 'row',
     },
     counter_icon_container: {
         height: '100%',
-        width: '70%'
+        width: '50%'
     },
-    counter_total_container:{
-        width: '100%',
+    counter_total_container: {
+        width: '50%',
     },
-    total_text:{
+    total_text: {
         width: '100%',
-        height:'100%',
+        height: '100%',
         fontFamily: 'Beleren',
+        textAlign:'center',
     }
 })
 

@@ -3,4 +3,5 @@ export const counters ={
     'energy' :0,
     'experience' :0,
     'poison' :0,
+    'tickets':0
 }

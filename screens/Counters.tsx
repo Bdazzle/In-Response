@@ -35,7 +35,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                 playerID: route.params.playerID,
                 field: 'remove counter',
                 subField: counterType,
-                value:0
+                value: 0
             })
             setDisplayTotal(0)
         } else {
@@ -82,20 +82,22 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
 
             {/*Type - Name/Symbol/Total */}
             <View testID='type_container' style={styles.type_container} >
-                <Text 
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                style={[styles.type_text,
-                {
-                    height:'30%',
-                    fontSize: counterType === "experience" ? textScaler(21) : textScaler(28),
-                }]}>{counterType.charAt(0).toLocaleUpperCase() + counterType.slice(1)}</Text>
+                <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    style={[styles.type_text,
+                    {
+                        height: '30%',
+                        fontSize: counterType === "experience" ? textScaler(21) : textScaler(28),
+                    }]}>
+                    {counterType.charAt(0).toLocaleUpperCase() + counterType.slice(1)}
+                </Text>
                 <Svg viewBox={resources.SvgViewbox}
                     style={{
-                        height: '40%', width: '100%' 
+                        height: '40%', width: '100%'
                     }}
                 >
-                    { resources.SvgPaths &&
+                    {resources.SvgPaths &&
                         resources.SvgPaths.map((path: ShapeData<boolean>, i: number) => {
                             return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
                                 fill={path.fill === true ? "white" : "black"} />
@@ -107,8 +109,8 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                         })
                     }
                 </Svg>
-                <Text style={[styles.total_text,{
-                    height:'30%'
+                <Text style={[styles.total_text, {
+                    height: '30%'
                 }]}>{displayTotal}</Text>
             </View>
 
@@ -162,12 +164,12 @@ const Counters: React.FC = ({ }) => {
                     style={styles.storm_container}
                     onPressIn={() => toStorm()}
                 >
-                    <Text style={[styles.type_text,{
-                        fontSize:textScaler(28)
+                    <Text style={[styles.type_text, {
+                        fontSize: textScaler(28)
                     }]} >Storm</Text>
                     <Svg viewBox='-20 0 600 600' style={{
-                        height:'80%',
-                        width:'100%'
+                        height: '80%',
+                        width: '100%'
                     }}>
                         <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />
                         <Polygon fill={"white"} points="289.232,280.023 203.678,371.373 279.623,371.373 239.523,443.699 327.887,347.631 251.941,347.631 " />
@@ -217,12 +219,12 @@ const styles = StyleSheet.create({
     },
     type_text: {
         color: 'white',
-        fontFamily:'Beleren'
+        fontFamily: 'Beleren'
     },
-    total_text:{
+    total_text: {
         color: 'white',
-        fontFamily:'Beleren',
-        fontSize:textScaler(28)
+        fontFamily: 'Beleren',
+        fontSize: textScaler(28)
     },
     close_icon: {
         position: "absolute",

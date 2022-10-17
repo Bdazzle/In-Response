@@ -1,9 +1,7 @@
 import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import React, { useContext, useState } from 'react';
 import Svg, { Path} from 'react-native-svg'
-// import { PlayerContext, PlayerContextProps } from '../PlayerContext'
 import { GameContext, GameContextProps } from '../GameContext'
-// import { TextActionParams, textSizeReducer, TextSizes } from '../reducers/textStyles';
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
 import { ColorTheme, CountersProps, DungeonData } from '..';
@@ -25,44 +23,9 @@ everything not in GameContext gets reset when navigating.
 */
 export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    // const { dimensions, setDimensions, setPlayerName, setDungeonData,
-    //     setDungeonComplete, setColorTheme, setPlayerID } = useContext(PlayerContext) as PlayerContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
     const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
-    // const [dungeonData, setDungeonData] = useState<DungeonData | undefined>()
-    // const [dungeonCompleted, setDungeonComplete] = useState<boolean>(true)
     const [dimensions, setDimensions] = useState<{ width: number, height: number }>({ width: 0, height: 0 })
-
-    // useEffect(() => {
-    //     setPlayerID(playerID)
-    // }, [playerID])
-
-    // useEffect(() => {
-    //     setPlayerName(playerName)
-    // }, [playerName])
-
-    // useEffect(() => {
-    //     setColorTheme(theme)
-    // }, [theme])
-
-    // useEffect(() => {
-    //     setDungeonData(globalPlayerData[playerID].dungeonData as DungeonData)
-    // }, [globalPlayerData[playerID].dungeonData])
-
-    // useEffect(() => {
-    //     setDungeonComplete(globalPlayerData[playerID].dungeonCompleted as boolean)
-    // }, [globalPlayerData[playerID].dungeonCompleted])
-
-    // useLayoutEffect(() => {
-    //     if (dimensions.height > 0) {
-    //         dispatchTextSize({
-    //             playerNumber: totalPlayers,
-    //             parentWidth: dimensions.width,
-    //             parentHeight: dimensions.height,
-    //             decimalPlaces: `${globalPlayerData[playerID].lifeTotal}`.length
-    //         })
-    //     }
-    // }, [dimensions.height])
 
     const handleLifeChange = (val: number): void => {
         dispatchGlobalPlayerData({
@@ -316,7 +279,6 @@ const styles = StyleSheet.create({
     increment_counters_container: {
         position: 'absolute',
         right: 0,
-        justifyContent: 'space-between',
         height: '90%',
         width: '20%',
         marginTop: '2%'
