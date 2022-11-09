@@ -4,7 +4,7 @@ import Svg, { Path} from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
-import { ColorTheme, CountersProps, DungeonData } from '..';
+import { ColorTheme, CountersProps } from '..';
 import CommanderDamage from "./CommanderDamageTracker"
 import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
@@ -187,7 +187,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             color: theme.secondary,
                             fontSize: textScaler(14, dimensions.width),
                             fontFamily: 'Beleren',
-                            textAlign: 'center'
+                            textAlign: 'center',
                         }}>Counters</Text>
                 </Pressable>
                 {

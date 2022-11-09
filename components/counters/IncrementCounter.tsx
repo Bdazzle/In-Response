@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
-import Svg, { Path, Polygon } from "react-native-svg"
+import Svg, { Circle, Path, Polygon } from "react-native-svg"
 import { ColorTheme, CounterCardProps } from "../.."
 import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
@@ -60,30 +60,47 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                         >
                             <Svg viewBox={resources.SvgViewbox} style={{ height: '100%', width: '100%' }}>
                                 {
-                                    resources.SvgPaths.map((path: ShapeData<boolean>, i: number) => {
+                                    resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
                                         return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
-                                            fill={path.fill === true ? colorTheme.secondary : colorTheme.primary} />
+                                            fill={
+                                                typeof path.fill === "string" ? path.fill :
+                                                    path.fill === true ? colorTheme.secondary :
+                                                        colorTheme.primary
+                                                // path.fill === true ? colorTheme.secondary : colorTheme.primary
+                                            } />
                                             : path.polygonPoints ? <Polygon key={`${counterType} polygon ${i}`}
                                                 points={path.polygonPoints}
-                                                fill={path.fill === true ? colorTheme.secondary : colorTheme.primary}
+                                                fill={
+                                                    typeof path.fill === "string" ? path.fill :
+                                                        path.fill === true ? colorTheme.secondary :
+                                                            colorTheme.primary
+                                                    // path.fill === true ? colorTheme.secondary : colorTheme.primary
+                                                }
                                             />
-                                                : undefined
+                                                : path.circle ? <Circle key={`${counterType} circle ${i}`}
+                                                 cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r}
+                                                    fill={
+                                                        typeof path.fill === "string" ? path.fill :
+                                                            path.fill === true ? colorTheme.secondary :
+                                                                colorTheme.primary
+                                                    } />
+                                                    : undefined
                                     })
                                 }
                             </Svg>
                         </View>
                     }
                     <View testID="counter_total_container"
-                    style={styles.counter_total_container}>
-                            <Text 
+                        style={styles.counter_total_container}>
+                        <Text
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.total_text, {
-                                fontSize:textScaler(37, parentDimensions.height),
+                                fontSize: textScaler(37, parentDimensions.height),
                                 color: colorTheme.secondary,
                             }]}>
-                                {total}
-                            </Text>
+                            {total}
+                        </Text>
                     </View>
 
                 </Pressable>
@@ -116,7 +133,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         fontFamily: 'Beleren',
-        textAlign:'center',
+        textAlign: 'center',
     }
 })
 

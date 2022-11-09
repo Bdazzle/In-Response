@@ -13,7 +13,7 @@ export const OptionsContext = createContext({} as OptionsContextProps)
 
 export const OptionsProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const [gameType, setGameType] = useState<string>('normal')
-    const [totalPlayers, setTotalPlayers] = useState<number>(2)
+    const [totalPlayers, setTotalPlayers] = useState<number>(1)
     const [startingLife, setStartingLife] = useState<number>(20)
 
     return <OptionsContext.Provider value={{

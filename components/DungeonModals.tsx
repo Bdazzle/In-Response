@@ -78,13 +78,6 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 5,
     },
-    cancel_modal_button: {
-        borderRadius: 5,
-        backgroundColor:'#001622',
-        width: '40%',
-        justifyContent:'center',
-        alignContent:'center'
-    },
     button_text:{
         color: 'white',
         textAlign:'center',

@@ -48,7 +48,7 @@ export interface PlayerData {
     lifeTotal: number,
     commander_damage:{
         [key: number] : number
-    } | undefined
+    }
 }
 
 export type CounterCardProps = {

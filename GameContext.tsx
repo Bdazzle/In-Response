@@ -4,6 +4,7 @@ import { startingColors } from "./constants/Colors";
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
+import newGameData from "./functions/newGame";
 
 export interface GameContextProps {
   currentMonarch: string | undefined;
@@ -25,6 +26,8 @@ TO DO
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
+3) reset button doesn't reset City's Blessing
+4) 2 people can't touch screen at the same time (swipe function bug), fix that.
 */
 
 /*
@@ -41,28 +44,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   set initial player states for dungeon tracking (to pass to Dungeon screen)
   */
   useEffect(() => {
-    const playersArr = [...Array(totalPlayers).keys()].map(x => x + 1)
-
-    const playersObj = playersArr.reduce((acc, curr: number | string, i: number) => {
-      /*
-      cdamage creates an object out of an array of totalPlayers/all playerIDs, 
-      filters out the current player, and makes a [playerID] : {} out of the remaining players.
-      */
-      const cdamage = playersArr.filter((n) => n !== curr).reduce((o, key) => ({ ...o, [key]: 0 }), {})
-      return {
-        ...acc, [curr]: {
-          colors: startingColors[i],
-          screenName: `Player ${i + 1}`,
-          counterData: {},
-          lifeTotal: startingLife,
-          commander_damage: cdamage
-        }
-      }
-    }, {} as GlobalPlayerData)
 
     dispatchGlobalPlayerData({
       field: 'init',
-      value: playersObj as GlobalPlayerData,
+      value : newGameData({totalPlayers, startingLife}),
       playerID: 0
     })
 
@@ -79,7 +64,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   put this in StartingLife.tsx?
   */
   useEffect(() => {
-    if(Object.keys(globalPlayerData).length){
+    if (Object.keys(globalPlayerData).length) {
       let playersObj = globalPlayerData
       for (let playerID in playersObj) {
         playersObj[playerID].lifeTotal = startingLife
@@ -92,7 +77,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [startingLife])
 
-  
+
 
   return <GameContext.Provider value={{
     currentMonarch: currentMonarch,

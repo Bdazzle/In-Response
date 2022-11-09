@@ -1,31 +1,31 @@
 
-type PlayerTranslates = {
-    translateY: number,
-    translateX: number
-}
+// type PlayerTranslates = {
+//     translateY: number,
+//     translateX: number
+// }
 
-export type TranslateReducerState = {
-   [key: string] : PlayerTranslates
-}
+// export type TranslateReducerState = {
+//    [key: string] : PlayerTranslates
+// }
 
-export type TranslateActionParams = {
-    totalPlayers: number,
-    width: number,
-    height?: number 
-    screenSize: string
-}
+// export type TranslateActionParams = {
+//     totalPlayers: number,
+//     width: number,
+//     height?: number 
+//     screenSize: string
+// }
 
-const translateReducer = (state : TranslateReducerState, action : TranslateActionParams) =>{
-    switch(action.screenSize) {
-        case ('xsm') : {
-            if(action.totalPlayers === 3) {
+// const translateReducer = (state : TranslateReducerState, action : TranslateActionParams) =>{
+//     switch(action.screenSize) {
+//         case ('xsm') : {
+//             if(action.totalPlayers === 3) {
 
-            }
-        };
+//             }
+//         };
 
-    }
+//     }
         
-}
+// }
 
 // const screenKeys = (width: number) =>{
 //     if(width <= )

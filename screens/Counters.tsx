@@ -2,7 +2,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView } from 'react-native';
-import Svg, { Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Path, Polygon } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
 import { imageReducer, ImageReducerState, ShapeData } from '../reducers/imageResources';
@@ -98,14 +98,20 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                     }}
                 >
                     {resources.SvgPaths &&
-                        resources.SvgPaths.map((path: ShapeData<boolean>, i: number) => {
+                        resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
                             return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
-                                fill={path.fill === true ? "white" : "black"} />
-                                :
+                                fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"} 
+                                />
+                                : path.polygonPoints ?
                                 <Polygon key={`${counterType} polygon ${i}`}
                                     points={path.polygonPoints}
-                                    fill={path.fill === true ? "white" : "black"}
+                                    fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
                                 />
+                                : path.circle ?
+                                <Circle key={`${counterType} circle ${i}`}
+                                cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r} 
+                                fill={ typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black" } />
+                                : undefined
                         })
                     }
                 </Svg>
