@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AllScreenNavProps } from '..';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import Svg, { Path } from 'react-native-svg';
-import { iconData } from '../reducers/imageResources';
+// import { iconData } from '../reducers/imageResources';
 import DayNight from '../components/counters/DayNight';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ResetModal from '../components/ResetModal';

@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
 import { GlobalPlayerData, PlanarData } from "."
-import { startingColors } from "./constants/Colors";
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
 import newGameData from "./functions/newGame";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types";
 
 export interface GameContextProps {
   currentMonarch: string | undefined;
@@ -26,8 +27,9 @@ TO DO
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
-3) reset button doesn't reset City's Blessing
-4) 2 people can't touch screen at the same time (swipe function bug), fix that.
+1) reset button doesn't reset City's Blessing
+2) 2 people can't touch screen at the same time (swipe function bug), fix that.
+3) async storage to save names
 */
 
 /*
@@ -39,7 +41,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentInitiative, setCurrentInitiative] = useState<string>()
   const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
   const [planarData, setPlanarData] = useState<PlanarData>({ currentPlane: '', deck: [], discard: [] })
-
+  const [names, setNames] = useState<readonly KeyValuePair[]>()
   /*
   set initial player states for dungeon tracking (to pass to Dungeon screen)
   */
@@ -47,7 +49,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     dispatchGlobalPlayerData({
       field: 'init',
-      value : newGameData({totalPlayers, startingLife}),
+      value: newGameData({ totalPlayers, startingLife }),
       playerID: 0
     })
 
@@ -77,6 +79,64 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [startingLife])
 
+
+  const getPlayerNames = async () => {
+    try {
+      const savedNames = await AsyncStorage.multiGet(Object.keys(globalPlayerData))
+      if (savedNames !== null && savedNames.length > 0) {
+        setNames(savedNames)
+        // console.log('saved names', savedNames)
+        // return savedNames
+      }
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
+
+  
+  // useEffect(() => {
+    // const getstorage = async () =>{
+    //   const savedNames = await AsyncStorage.multiGet(Object.keys(globalPlayerData))
+    //   if (savedNames !== null && savedNames.length > 0) {
+    //     setNames(savedNames)
+    //     console.log('saved names', savedNames)
+    //   }
+    // }
+    // getstorage()
+
+    // getPlayerNames()
+  // })
+
+  useEffect(() => {
+    // const getstorage = async () => {
+    //   const savedNames = await AsyncStorage.multiGet(Object.keys(globalPlayerData))
+    //   if (savedNames !== null && savedNames.length > 0) {
+    //     console.log('saved names', savedNames)
+    //     setNames(savedNames)
+    //   }
+    // }
+    // getstorage()
+
+    getPlayerNames()
+  }, [])
+
+  useEffect(() => {
+    if (names) {
+      names.forEach((arr: KeyValuePair) => {
+        const id = arr[0]
+        if (globalPlayerData[id]) {
+          globalPlayerData[id].screenName = arr[1]
+        }
+      })
+    }
+
+  }, [names])
+
+  // console.log('player names',names)
+  // console.log('gamecontext',  playerName())
+
+  // console.log(globalPlayerData)
 
 
   return <GameContext.Provider value={{

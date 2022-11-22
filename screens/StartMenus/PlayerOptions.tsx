@@ -5,6 +5,7 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import { StartMenuStackNavProps } from "../.."
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ColorSquareParams {
     primary: string,
@@ -47,8 +48,19 @@ interface PlayerRowParams {
 const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
 
+    const storeName = async (val: string) =>{
+        try {
+            await AsyncStorage.setItem(String(playerID), val)
+            // console.log(`new player screenName: ${val}`)
+        }
+        catch (e) {
+            console.info(`error storing player ${playerID} screen name -> ${e}`)
+        }
+    }
+
     const handleNameChange = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
         e.preventDefault()
+        storeName(e.nativeEvent.text)
         dispatchGlobalPlayerData({
             playerID: playerID,
             field: 'screenName',
