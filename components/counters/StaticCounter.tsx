@@ -22,8 +22,7 @@ const staticCounterList = ['dungeon','blessing', 'initiative', 'monarch']
 
 const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted, playerName, playerID, colorTheme }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const { currentMonarch, setCurrentMonarch, currentInitiative, setCurrentInitiative, globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [cityBlessing, setCityBlessing] = useState<boolean>(false)
+    const { currentMonarch, setCurrentMonarch, currentInitiative, setCurrentInitiative, globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
 
     const scales: { [key: string]: SharedValue<number> } = {
@@ -83,9 +82,18 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
     })
 
     const activateCitysBlessing = () => {
-        setCityBlessing(!cityBlessing)
-        scales.blessing.value = scales.blessing.value === .5 ? 1 : .5
+        dispatchGlobalPlayerData({
+            playerID: playerID,
+            field: `city's blessing`,
+            value: !globalPlayerData[playerID].citysBlessing
+        })
     }
+    /*
+    scale change has to be taken out of onPress function so that it triggers when reset button is pressed
+    */
+    useEffect(() =>{
+        globalPlayerData[playerID].citysBlessing === true ? scales.blessing.value = 1 : scales.blessing.value = .5
+    },[globalPlayerData[playerID].citysBlessing])
 
     const activeInitiative = () => {
         currentInitiative !== playerName ? setCurrentInitiative(playerName) : setCurrentInitiative('')
@@ -119,6 +127,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
         } as CounterCardProps)
     }
 
+    
     return (
         <View testID='static_counter_container' style={styles.static_counter_container}>
 
@@ -154,7 +163,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
             <Animated.View testID={"blessing"}
                 style={styles.card_container}>
                 <Pressable
-                    style={cityBlessing === true ? styles.active_card_overlay : [styles.card_overlay, {
+                    style={globalPlayerData[playerID].citysBlessing === true ? styles.active_card_overlay : [styles.card_overlay, {
                         width: imageDimensions && imageDimensions.height * .75,
                         transform: [
                             { scale: scales.blessing.value }
@@ -167,7 +176,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
                 <Animated.Image source={require('../../assets/cards/citys-blessing.png')}
 
                     style={[styles.counter_card,
-                    cityBlessing && blessingScaleStyle,
+                    globalPlayerData[playerID].citysBlessing && blessingScaleStyle,
                     imageDimensions && {
                         width: imageDimensions.height * .75,
                         transform: [

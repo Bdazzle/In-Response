@@ -168,8 +168,11 @@ export const Game = () => {
             if (newPlayerData[playerID].dungeonData) {
                 delete newPlayerData[playerID].dungeonData
             }
+            if(newPlayerData[playerID].citysBlessing) {
+                delete newPlayerData[playerID].citysBlessing
+            }
         }
-
+        
         setCurrentMonarch(undefined)
         setCurrentInitiative(undefined)
 

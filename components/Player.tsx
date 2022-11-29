@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import React, { useContext, useState } from 'react';
-import Svg, { Path} from 'react-native-svg'
+import Svg, { Path } from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
@@ -177,14 +177,17 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             <View style={styles.increment_counters_container}>
                 <Pressable
                     testID='counter_pressable'
-                    style={styles.counter_pressable}
+                    style={({ pressed }) => [
+                        styles.counter_pressable,
+                        { backgroundColor: pressed ? 'grey' : theme.secondary }
+                    ]}
                     onPressIn={() => toCounters()}
                 >
                     <Text
                         numberOfLines={1}
                         adjustsFontSizeToFit={true}
                         style={{
-                            color: theme.secondary,
+                            color: theme.primary,
                             fontSize: textScaler(14, dimensions.width),
                             fontFamily: 'Beleren',
                             textAlign: 'center',
@@ -284,9 +287,15 @@ const styles = StyleSheet.create({
         marginTop: '2%'
     },
     counter_pressable: {
+        marginTop: 5,
         width: '100%',
-        height: '20%',
-        justifyContent: 'center'
+        height: '15%',
+        justifyContent: 'center',
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOpacity: 1,
+        shadowRadius: 5,
+        elevation: 10,
     },
     commander_damage_tracker: {
         position: 'absolute',

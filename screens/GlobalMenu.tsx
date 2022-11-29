@@ -90,7 +90,7 @@ const GlobalMenu: React.FC = ({ }) => {
                         </View>
                     )
                 })}
-                <Text style={styles.button_text} >Swipe in game to access this menu</Text>
+                <Text style={styles.button_text} >Swipe to access this menu. Press/hold icons to interact</Text>
             </View>
 
         </View >

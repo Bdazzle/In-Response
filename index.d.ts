@@ -45,6 +45,7 @@ export interface PlayerData {
     dungeonData?: Partial<DungeonData>,
     dungeonCompleted?: boolean,
     counterData?: CounterData,
+    citysBlessing?: boolean,
     lifeTotal: number,
     commander_damage:{
         [key: number] : number

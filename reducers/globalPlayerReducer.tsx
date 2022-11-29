@@ -104,6 +104,15 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
                 }
             }
         };
+        case "city's blessing" : {
+            return {
+                ...state,
+                [action.playerID] : {
+                    ...state[action.playerID],
+                    citysBlessing: action.value
+                }
+            }
+        }
         case 'init': {
             return {
                 ...action.value as GlobalPlayerData

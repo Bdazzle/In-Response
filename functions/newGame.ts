@@ -5,7 +5,6 @@ interface GameData {
   totalPlayers: number,
   startingLife: number,
   savedScreenNames?: [string, string | null]
-  // existingPlayers?: GlobalPlayerData
 }
 
 const newGameData = ({ totalPlayers, startingLife, savedScreenNames }: GameData): GlobalPlayerData => {
@@ -17,23 +16,6 @@ const newGameData = ({ totalPlayers, startingLife, savedScreenNames }: GameData)
     filters out the current player, and makes a [playerID] : {} out of the remaining players.
     */
     const cdamage = playersArr.filter((n) => n !== curr).reduce((o, key) => ({ ...o, [key]: 0 }), {})
-
-    // let test = ''
-    // const playerName = async () => {
-    //   try {
-    //     return await AsyncStorage.getItem('1')
-    //     // console.log('curr',curr)
-    //     // const savedName = await AsyncStorage.getItem('1')
-    //     // console.log(`saved name ${curr}`, savedName)
-    //     // console.log(savedName)
-    //     // // test = savedName as string
-    //     // return savedName
-    //   }
-    //   catch (e) {
-    //     console.log(`error loading player name`, e)
-    //   }
-    // }
-    // let test = playerName()
 
     return {
       ...acc, [curr]: {
