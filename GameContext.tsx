@@ -38,7 +38,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentInitiative, setCurrentInitiative] = useState<string>()
   const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
   const [planarData, setPlanarData] = useState<PlanarData>({ currentPlane: '', deck: [], discard: [] })
-  // const [names, setNames] = useState<readonly KeyValuePair[]>()
+
   /*
   set initial player states for dungeon tracking (to pass to Dungeon screen)
   */

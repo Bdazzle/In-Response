@@ -26,6 +26,7 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const names = await AsyncStorage.multiGet(playersArr)
             if (savedNames !== null && names.length > 0) {
                 setSavedNames(names)
+                console.log('saved names', names)
             }
         }
         catch (e) {
@@ -34,6 +35,7 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     useEffect(() => {
+        // AsyncStorage.clear()
         getPlayerNames()
     }, [])
 
