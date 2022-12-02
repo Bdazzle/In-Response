@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
-import { GlobalPlayerData, PlanarData } from "."
+import { GlobalPlayerData, PlanarData, StoredNames } from "."
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
 import newGameData from "./functions/newGame";
-import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types";
 
 export interface GameContextProps {
   currentMonarch: string | undefined;
@@ -26,7 +25,8 @@ TO DO
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
-2) 2 people can't touch screen at the same time (swipe function bug), fix that.
+1) 2 people can't touch screen at the same time (swipe function bug), fix that.
+2) Save color schemes?
 */
 
 /*
@@ -46,7 +46,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     dispatchGlobalPlayerData({
       field: 'init',
-      value: newGameData({ totalPlayers, startingLife }),
+      value: newGameData( totalPlayers, startingLife, savedNames ),
       playerID: 0
     })
 
@@ -80,7 +80,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedNames) {
       let newPlayerData = globalPlayerData;
 
-      savedNames.forEach((arr: KeyValuePair) => {
+      savedNames.forEach((arr: StoredNames) => {
         const id = arr[0]
         if (newPlayerData[id] && arr[1] !== null) {
           newPlayerData[id].screenName = arr[1]

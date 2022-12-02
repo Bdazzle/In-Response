@@ -6,6 +6,7 @@ import { StartMenuStackNavProps } from "../.."
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 interface ColorSquareParams {
     primary: string,
