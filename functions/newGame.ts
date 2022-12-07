@@ -1,14 +1,19 @@
-import { GlobalPlayerData, StoredNames } from "../index"
+import { GlobalPlayerData, StoredData } from "../index"
 import { startingColors } from "../constants/Colors"
 
 interface GameData {
   totalPlayers: number,
   startingLife: number,
-  savedScreenNames: StoredNames
+  savedScreenNames: StoredData
 }
 
-const newGameData = ( totalPlayers : number, startingLife : number, savedScreenNames : StoredNames ): GlobalPlayerData => {
+const newGameData = (totalPlayers: number, startingLife: number, savedData: StoredData): GlobalPlayerData => {
   const playersArr = [...Array(totalPlayers).keys()].map(x => x + 1)
+  /* 
+  load saved data when user creates a new game
+  */
+  const savedScreenNames = savedData.filter(i => i[0].includes('screenName'))
+  const savedColors = savedData.filter(i => i[0].includes('colors'))
 
   const playersObj = playersArr.reduce((acc, curr: number | string, i: number) => {
     /*
@@ -19,8 +24,8 @@ const newGameData = ( totalPlayers : number, startingLife : number, savedScreenN
     
     return {
       ...acc, [curr]: {
-        colors: startingColors[i],
-        screenName: savedScreenNames[i] && savedScreenNames[i][1] !== null ? savedScreenNames[i][1] : `Player ${i + 1}`,
+        colors: savedColors[i] && savedColors[i][0] === `${i + 1} colors` && savedColors[i][1] !== null ? JSON.parse(savedColors[i][1]) : startingColors[i],
+        screenName: savedScreenNames[i] && savedScreenNames[i][0] === `${i + 1} screenName` && savedScreenNames[i][1] !== null ? savedScreenNames[i][1] : `Player ${i + 1}`,
         counterData: {},
         lifeTotal: startingLife,
         commander_damage: cdamage
@@ -28,7 +33,7 @@ const newGameData = ( totalPlayers : number, startingLife : number, savedScreenN
     }
   }, {} as GlobalPlayerData)
 
-  
+
   return playersObj
 }
 

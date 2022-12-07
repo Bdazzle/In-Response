@@ -21,12 +21,7 @@ export type PlanarData = {
     discard: string[]
 }
 
-export type StoredNames =  [string, string | null] | readonly KeyValuePair[]
-
-// export type SavedPlayerData = {
-//     screenName: string
-//     colors : ColorTheme
-// }
+export type StoredData =  [string, string | null][] | readonly KeyValuePair[]
 
 export type DungeonData = {
     playerID: number

@@ -15,6 +15,7 @@ import GlobalMenu from '../screens/GlobalMenu';
 import CoinFlipper from '../screens/MainMenu/CoinFlipper';
 import DiceRoller from '../screens/MainMenu/DiceRoller';
 import Planechase from '../screens/MainMenu/Planechase';
+import Instructions from '../screens/MainMenu/Instructions';
 import Counters from '../screens/Counters';
 
 export default function Navigation() {
@@ -75,7 +76,8 @@ export type GlobalMenuParamsList = {
   MainMenu: undefined,
   CoinFlipper: undefined,
   DiceRoller : undefined,
-  Planechase: undefined
+  Planechase: undefined,
+  Instructions: undefined
 }
 
 const GlobalMenuStack = createNativeStackNavigator<GlobalMenuParamsList>()
@@ -89,6 +91,7 @@ function GlobalMenuNavigator() {
       <GlobalMenuStack.Screen name="CoinFlipper" component={CoinFlipper} />
       <GlobalMenuStack.Screen name="DiceRoller" component={DiceRoller} />
       <GlobalMenuStack.Screen name="Planechase" component={Planechase} />
+      <GlobalMenuStack.Screen name="Instructions" component={Instructions} />
     </GlobalMenuStack.Navigator>
   )
 }

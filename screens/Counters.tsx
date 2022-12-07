@@ -210,7 +210,10 @@ const styles = StyleSheet.create({
         width: '100%',
         height: `${80 / Object.keys(counters).length}%`,
         flexDirection: 'row',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-evenly',
+        borderBottomColor:'#6e6e6e',
+        borderBottomWidth:1,
+        marginTop:5
     },
     storm_container: {
         width: '100%',

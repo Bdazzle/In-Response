@@ -5,6 +5,7 @@ import { AllScreenNavProps } from "../..";
 import { ColorLibrary } from "../../constants/Colors";
 import { GameContext, GameContextProps } from "../../GameContext";
 import { StartMenuStackParamList } from "../../navigation";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface ColorSelectorProps {
     playerID: number;
@@ -25,6 +26,16 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
     const rows = chunkedColors.length
     const squareWidth = 100 / chunk
 
+    const saveColors = async (val: string) =>{
+        try {
+            await AsyncStorage.setItem(`${String(route.params.playerID)} colors`, JSON.stringify({...globalPlayerData[route.params.playerID].colors, [route.params.colorPosition] : val}))
+            console.log('new saved colors', JSON.stringify({...globalPlayerData[route.params.playerID].colors, [route.params.colorPosition] : val}))
+        } 
+        catch(e) {
+            console.log(`error saving colors`, e)
+        }
+    }
+
     /*
     will set primary color if colorPosition is primary color, same for secondary (route.params.colorPosition)
     navigation will navigate back with oposite colorPosition from spread context state
@@ -37,6 +48,8 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
             value: color,
             playerID: route.params.playerID
         })
+
+        saveColors(color)
 
         navigation.navigate('ColorMenu', {
             playerID: route.params.playerID,

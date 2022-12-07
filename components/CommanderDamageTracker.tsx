@@ -45,7 +45,6 @@ scale and translateY need to change depending on number of players and opponentI
 */
 const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, opponentName, textColor }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
-    // const { playerID } = useContext(PlayerContext) as PlayerContextProps
     const [isPressed, setIsPressed] = useState<boolean>(false)
     const [componentDimensions, setComponentDimensions] = useState<{ width: number, height: number }>()
     const scaleVal = useSharedValue(0)

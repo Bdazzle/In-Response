@@ -9,7 +9,7 @@ import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
 import { textScaler } from "../functions/textScaler"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 
-const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase"]
+const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions"]
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
@@ -40,6 +40,10 @@ const GlobalMenu: React.FC = ({ }) => {
         navigation.navigate("Planechase")
     }
 
+    const toInstructions = () => {
+        navigation.navigate("Instructions")
+    }
+
     return (
         <View style={styles.menu_container}>
             {/* Close Button */}
@@ -67,7 +71,8 @@ const GlobalMenu: React.FC = ({ }) => {
                                             option === 'Coin Flip' ? toCoin() :
                                                 option === 'Dice' ? toDice() :
                                                     option === "Planechase" ? toPlane() :
-                                                        ''
+                                                        option === "Instructions" ? toInstructions() :
+                                                            ''
                                 }
                             >
                                 {
@@ -78,8 +83,8 @@ const GlobalMenu: React.FC = ({ }) => {
                                         >
                                             {iconData[option].pathData.map((p, i) => {
                                                 return (
-                                                    <Path key={`${option} path ${i}`} d={p.path} 
-                                                    fill={p.fill} 
+                                                    <Path key={`${option} path ${i}`} d={p.path}
+                                                        fill={p.fill}
                                                     />
                                                 )
                                             })}

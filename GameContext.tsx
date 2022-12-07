@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
-import { GlobalPlayerData, PlanarData, StoredNames } from "."
+import { GlobalPlayerData, PlanarData, StoredData } from "."
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
 import newGameData from "./functions/newGame";
+import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types";
 
 export interface GameContextProps {
   currentMonarch: string | undefined;
@@ -26,14 +27,15 @@ TO DO
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
 1) 2 people can't touch screen at the same time (swipe function bug), fix that.
-2) Save color schemes?
+2) instructions screen?
+3) reverse p1 and p2 when 2 players
 */
 
 /*
 Dungeon data tracked in globalPlayerData to pass to Dungeon Screen, since only 1 screen
 */
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { totalPlayers, startingLife, savedNames } = useContext(OptionsContext) as OptionsContextProps
+  const { totalPlayers, startingLife, savedData } = useContext(OptionsContext) as OptionsContextProps
   const [currentMonarch, setCurrentMonarch] = useState<string>()
   const [currentInitiative, setCurrentInitiative] = useState<string>()
   const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
@@ -46,7 +48,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     dispatchGlobalPlayerData({
       field: 'init',
-      value: newGameData( totalPlayers, startingLife, savedNames ),
+      value: newGameData( totalPlayers, startingLife, savedData ),
       playerID: 0
     })
 
@@ -76,26 +78,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [startingLife])
 
+  /*
+  parse saved data : names, colors.
+  sets as default options through rest of app
+  */
   useEffect(() => {
-    if (savedNames) {
+    if (savedData && Object.keys(globalPlayerData).length > 0) {
       let newPlayerData = globalPlayerData;
-
-      savedNames.forEach((arr: StoredNames) => {
-        const id = arr[0]
-        if (newPlayerData[id] && arr[1] !== null) {
-          newPlayerData[id].screenName = arr[1]
-        }
-      })
-
-      dispatchGlobalPlayerData({
-        field: 'init',
-        value: newPlayerData as GlobalPlayerData,
-        playerID: 0
-      })
+        savedData.forEach((arr: KeyValuePair) => {
+          if(arr[0].includes('screenName')){
+            newPlayerData[arr[0].charAt(0)].screenName = arr[1]
+          }
+          if(arr[0].includes('colors')){
+            newPlayerData[arr[0].charAt(0)].colors = JSON.parse(arr[1] as string)
+          }
+        })   
     }
-
-  }, [savedNames])
-
+  }, [savedData])
 
   return <GameContext.Provider value={{
     currentMonarch: currentMonarch,

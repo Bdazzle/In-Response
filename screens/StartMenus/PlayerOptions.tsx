@@ -6,7 +6,6 @@ import { StartMenuStackNavProps } from "../.."
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 interface ColorSquareParams {
     primary: string,
@@ -51,8 +50,8 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
 
     const storeName = async (val: string) =>{
         try {
-            await AsyncStorage.setItem(String(playerID), val)
-            // console.log(`new player screenName: ${val}`)
+            await AsyncStorage.setItem(`${String(playerID)} screenName`, val)
+            console.log(`${String(playerID)} screenName: ${val}`)
         }
         catch (e) {
             console.info(`error storing player ${playerID} screen name -> ${e}`)

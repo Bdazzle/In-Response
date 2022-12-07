@@ -1,5 +1,5 @@
 import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, GestureResponderEvent, Pressable, StyleSheet, LayoutChangeEvent } from 'react-native';
-import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 // import { PlayerProvider } from '../PlayerContext';
 import { GameContext, GameContextProps } from '../GameContext';
@@ -29,6 +29,7 @@ export const Game = () => {
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative } = useContext(GameContext) as GameContextProps
     const [swipeStart, setSwipeStart] = useState<number>()
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
+    const [activeCycle, setActiveCycle] = useState<string>("neutral")
     const randomPlayerScaleVal = useSharedValue(0)
     const randomPlayerZVal = useSharedValue(0)
     const resetModalScaleVal = useSharedValue(0)
@@ -168,13 +169,14 @@ export const Game = () => {
             if (newPlayerData[playerID].dungeonData) {
                 delete newPlayerData[playerID].dungeonData
             }
-            if(newPlayerData[playerID].citysBlessing) {
+            if (newPlayerData[playerID].citysBlessing) {
                 delete newPlayerData[playerID].citysBlessing
             }
         }
-        
+
         setCurrentMonarch(undefined)
         setCurrentInitiative(undefined)
+        setActiveCycle('neutral')
 
         dispatchGlobalPlayerData({
             field: 'init',
@@ -245,7 +247,7 @@ export const Game = () => {
                 <View testID='cycle_icon_container'
                     style={styles.icon_button}
                 >
-                    <DayNight />
+                    <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
                 </View>
 
                 {/* Random Player button */}
@@ -288,7 +290,10 @@ export const Game = () => {
                             height: '50%'
                         }}
                         p2style={{ height: '50%' }}
-                        containerStyle={{ height: '100%' }} />
+                        containerStyle={{
+                            height: '100%',
+                            transform: [{ rotate: "180deg" }],
+                        }} />
                         :
                         totalPlayers === 3 ? <Threeplayer playerIDs={designationMap} />
                             :
@@ -622,11 +627,11 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: 'white'
     },
-    icon_button:{
+    icon_button: {
         height: 38,
         width: 38,
     },
-    button_background:{
+    button_background: {
         backgroundColor: 'white',
         borderRadius: 50
     },

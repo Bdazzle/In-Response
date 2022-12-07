@@ -3,6 +3,11 @@ import { StyleSheet, Pressable, View } from "react-native"
 import Svg, { Circle, Path, Polygon } from "react-native-svg"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
 
+interface DayNightProps {
+    activeCycle: string,
+    setActiveCycle : React.Dispatch<React.SetStateAction<string>>
+}
+
 const CombinedSvg: React.FC = () => {
     return (
         <View style={styles.combined_container}>
@@ -34,8 +39,10 @@ const CombinedSvg: React.FC = () => {
     )
 }
 
-const DayNight: React.FC = () => {
-    const [activeCycle, setActiveCycle] = useState<string>("neutral")
+/*
+changing cycle has to be done in Game.tsx so it can be changed when reset button is pressed.
+*/
+const DayNight: React.FC<DayNightProps> = ({activeCycle, setActiveCycle}) => {
     const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
         {
             SvgPaths: [
