@@ -15,6 +15,8 @@ export interface GameContextProps {
   dispatchGlobalPlayerData: React.Dispatch<GlobalPlayerAction>
   planarData: PlanarData,
   setPlanarData: React.Dispatch<React.SetStateAction<PlanarData>>,
+  reset: boolean,
+  setReset : React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const GameContext = createContext({} as GameContextProps)
@@ -26,9 +28,8 @@ TO DO
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   This may be fixable in the future when I know more about Animated api events.
+*) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
 1) 2 people can't touch screen at the same time (swipe function bug), fix that.
-2) instructions screen?
-3) reverse p1 and p2 when 2 players
 */
 
 /*
@@ -40,7 +41,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentInitiative, setCurrentInitiative] = useState<string>()
   const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
   const [planarData, setPlanarData] = useState<PlanarData>({ currentPlane: '', deck: [], discard: [] })
-
+  const [reset, setReset] = useState<boolean>(false)
   /*
   set initial player states for dungeon tracking (to pass to Dungeon screen)
   */
@@ -104,6 +105,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     globalPlayerData: globalPlayerData as GlobalPlayerData,
     dispatchGlobalPlayerData: dispatchGlobalPlayerData,
     planarData: planarData,
-    setPlanarData: setPlanarData
+    setPlanarData: setPlanarData,
+    reset: reset,
+    setReset: setReset
   }}>{children}</GameContext.Provider>
 }

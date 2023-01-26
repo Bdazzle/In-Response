@@ -49,6 +49,7 @@ export interface PlayerData {
     counterData?: CounterData,
     citysBlessing?: boolean,
     lifeTotal: number,
+    commander_tax: number,
     commander_damage:{
         [key: number] : number
     }

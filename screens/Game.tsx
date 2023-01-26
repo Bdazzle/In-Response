@@ -26,7 +26,7 @@ Fixable?
 export const Game = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { totalPlayers, startingLife } = useContext(OptionsContext) as OptionsContextProps
-    const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative } = useContext(GameContext) as GameContextProps
+    const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
     const [swipeStart, setSwipeStart] = useState<number>()
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
@@ -155,11 +155,12 @@ export const Game = () => {
     set dungeons and static/incrementing counters to 0,
     hide reset confirmation modal
     */
-    const handleReset = () => {
+    const handleReset = async () => {
         let newPlayerData = globalPlayerData
         for (let playerID in newPlayerData) {
             newPlayerData[playerID].lifeTotal = startingLife;
             newPlayerData[playerID].counterData = {}
+            newPlayerData[playerID].commander_tax = 0
             for (let otherPlayer in newPlayerData[playerID].commander_damage) {
                 newPlayerData[playerID].commander_damage[otherPlayer] = 0
             }
@@ -178,11 +179,27 @@ export const Game = () => {
         setCurrentInitiative(undefined)
         setActiveCycle('neutral')
 
-        dispatchGlobalPlayerData({
-            field: 'init',
-            value: newPlayerData,
-            playerID: 0
-        })
+        /* 
+        Implementing a reset boolean variable to each component (like for commander tax tracker)
+        may cut down on updating cost during a game session because 
+        each component could keep track of it's own data, instead of updating GameContext objects
+        */
+        async function resetData(){
+            setReset(true)
+            const testPromise = new Promise<void>((resolve, reject) => {
+                setTimeout(() => {
+                    dispatchGlobalPlayerData({
+                        field: 'init',
+                        value: newPlayerData,
+                        playerID: 0
+                    })
+                    resolve()
+                }, 100)
+            })
+            await testPromise
+            setReset(false)
+        }
+        resetData()
 
         hideResetModal()
     }

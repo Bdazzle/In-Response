@@ -26,6 +26,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
     const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
     const [dimensions, setDimensions] = useState<{ width: number, height: number }>({ width: 0, height: 0 })
+    const [scaleTracker, setScaleTracker] = useState<boolean>(false)
 
     const handleLifeChange = (val: number): void => {
         dispatchGlobalPlayerData({
@@ -52,30 +53,50 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
         } as CountersProps)
     }
 
-    return (
+    const handleCDamageModal = () => {
+        if (scaleTracker === true) {
+            setScaleTracker(false)
+        }
+    }
 
-        <View testID='player_container'
+    return (
+        <Pressable testID='player_container'
             style={[styles.player_container, {
                 backgroundColor: theme.primary,
                 borderRadius: 15,
             }]}
-            onLayout={(e) => getDimensions(e)}>
+            onLayout={(e) => getDimensions(e)}
+            onPressIn={() => handleCDamageModal()}
+        >
             {/* Commander Damage tracker */}
             {gameType === 'commander' &&
                 <View testID='commander_damage_tracker'
                     style={styles.commander_damage_tracker} >
-                    <CommanderDamage playerID={playerID} />
+                    <CommanderDamage playerID={playerID}
+                        scaleTracker={setScaleTracker}
+                        showScale={scaleTracker} />
                 </View>
             }
 
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
-                <StaticCounterContainer
-                    playerID={playerID}
-                    playerName={playerName}
-                    colorTheme={theme}
-                    dungeonCompleted={globalPlayerData[playerID].dungeonCompleted as boolean}
-                />
+                <View testID="static_counter_wrapper"
+                style={{
+                    width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : '55%',
+                    height:'25%',
+                    position: 'absolute',
+                    marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : '20%',
+                    zIndex: 50,
+                }}
+                >
+                    <StaticCounterContainer
+                        playerID={playerID}
+                        playerName={playerName}
+                        colorTheme={theme}
+                        dungeonCompleted={globalPlayerData[playerID].dungeonCompleted as boolean}
+                    />
+                </View>
+
 
                 {/* 
                 Life Total container
@@ -205,7 +226,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     })
                 }
             </View>
-        </View>
+        </Pressable>
     )
 }
 
@@ -218,14 +239,15 @@ const styles = StyleSheet.create({
     life_and_static_container: {
         flexDirection: 'column',
         width: '100%',
-        height: '100%'
+        height: '100%',
+        // alignItems: 'center',
     },
     life_total_container: {
         flexDirection: 'row',
-        height: '100%',
         justifyContent: 'center',
         alignItems: 'flex-end',
-        width: '100%'
+        height: '100%',
+        width: '100%',
     },
     life_total_text_container: {
         width: '60%',
@@ -265,9 +287,9 @@ const styles = StyleSheet.create({
     background_increment_wrapper: {
         height: '75%',
         position: 'absolute',
-        width: '100%',
+        width: '60%',
         zIndex: 10,
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
     },
     background_plus: {
         height: '50%',
@@ -301,7 +323,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         bottom: 0,
-        height: '70%',
+        height: '90%',
         zIndex: 10,
         width: '20%'
     }
