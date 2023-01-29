@@ -305,6 +305,7 @@ export const manaSymbols: any[] = [
     require('../assets/icons/mana/blue.png'),
     require('../assets/icons/mana/white.png'),
     require('../assets/icons/mana/green.png'),
-    require('../assets/icons/mana/red.png')
+    require('../assets/icons/mana/red.png'),
+    require('../assets/icons/mana/colorless.png')
 ]
 
