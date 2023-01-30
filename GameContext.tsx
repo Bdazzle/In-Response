@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
-import { GlobalPlayerData, PlanarData, StoredData } from "."
+import { GlobalPlayerData, PlanarData } from "."
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
@@ -27,9 +27,8 @@ TO DO
   -eas build uses .gitignore to access files, so change access to assets files after build so it's not uploaded to github
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
-  This may be fixable in the future when I know more about Animated api events.
+  Swipeable components from React Native Gesture Handler used instead.
 *) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
-1) 2 people can't touch screen at the same time (swipe function bug), fix that.
 */
 
 /*

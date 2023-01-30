@@ -1,8 +1,8 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, View, Pressable, TextInputSubmitEditingEventData } from "react-native"
 import MenuNavButtons from "../../components/MenuNavButtons"
 import { GameContext, GameContextProps } from "../../GameContext"
-import { StartMenuStackNavProps } from "../.."
+import { ColorTheme, StartMenuStackNavProps } from "../.."
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,7 +28,7 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
         <Pressable style={styles.color_touch}
             onPressIn={() => showColorMenu()}
         >
-            <View style={[styles.color_square_outter,{
+            <View style={[styles.color_square_outter, {
                 backgroundColor: secondary
             }]}>
                 <View style={[styles.color_square_inner, {
@@ -36,7 +36,6 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
                 }]}>
                 </View>
             </View>
-
         </Pressable>
     )
 }
@@ -48,7 +47,7 @@ interface PlayerRowParams {
 const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
 
-    const storeName = async (val: string) =>{
+    const storeName = async (val: string) => {
         try {
             await AsyncStorage.setItem(`${String(playerID)} screenName`, val)
             console.log(`${String(playerID)} screenName: ${val}`)
@@ -67,6 +66,35 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
             value: e.nativeEvent.text
         })
     }
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const savedColors = await AsyncStorage.getItem(`${String(playerID)} colors`)
+                if (savedColors) {
+                    const parsedColors = JSON.parse(savedColors as string)
+                    dispatchGlobalPlayerData({
+                        field: 'colors',
+                        value: parsedColors as ColorTheme,
+                        playerID: playerID
+                    })
+                }
+                
+                const sn = await AsyncStorage.getItem(`${String(playerID)} screenName`)
+                if (sn) {
+                    dispatchGlobalPlayerData({
+                        playerID: playerID,
+                        field: 'screenName',
+                        value: sn
+                    })
+                }
+
+            }
+            catch (e) {
+                console.log(`error getting saved player names`, e)
+            }
+        })()
+    }, [])
 
     return (
         <KeyboardAvoidingView style={styles.row_wrapper} >
@@ -93,7 +121,7 @@ const PlayerOptions = ({ }) => {
 
     return (
         <View style={styles.container}
-        testID="player_name"
+            testID="player_name"
         >
             <Text style={styles.title_text} >Player Names</Text>
             {Object.keys(globalPlayerData).map((p: string) => {
@@ -143,15 +171,15 @@ const styles = StyleSheet.create({
     },
     color_touch: {
         height: '100%',
-        width:'25%',
+        width: '25%',
     },
-    color_square_outter :{
+    color_square_outter: {
         borderColor: 'white',
         borderWidth: .5,
         borderRadius: 5,
         height: '100%',
-        justifyContent:'center',
-        alignItems:'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     color_square_inner: {
         borderRadius: 5,

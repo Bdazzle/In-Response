@@ -5,7 +5,6 @@ import { Image, Text, StyleSheet, View, Pressable, FlatList, ImageSourcePropType
 import Svg, { Path, Polygon } from "react-native-svg"
 import { AllScreenNavProps } from "../.."
 import { textScaler } from "../../functions/textScaler"
-// import GestureHandler, { GestureHandlerRootView, PinchGestureHandler } from "react-native-gesture-handler"
 import ReactNativeZoomableView from '@openspacelabs/react-native-zoomable-view/src/ReactNativeZoomableView';
 
 type InstructionItem = {
@@ -54,8 +53,6 @@ const Instructions: React.FC = ({ }) => {
                     width: width,
                     height: height * .5,
                     resizeMode: 'contain',
-                    // borderColor: 'white',
-                    // borderWidth: 1
                 }}></Image>
             </ReactNativeZoomableView>
         </View>

@@ -1,5 +1,5 @@
 
-import { NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { Game } from '../screens/Game';
@@ -21,11 +21,11 @@ import Counters from '../screens/Counters';
 export default function Navigation() {
   return (
     <NavigationContainer
-      // linking={LinkingConfiguration}
-      // theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-      >
+    // linking={LinkingConfiguration}
+    // theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+    >
       <RootNavigator />
-      
+
     </NavigationContainer>
   );
 }
@@ -41,14 +41,14 @@ for each screen
 export type RootStackParamList = {
   StartMenu: undefined;
   GlobalMenu: undefined;
-  Game: undefined;
+  Game: { menu : boolean };
   Dungeon: DungeonData;
   Card: CounterCardProps;
   Counters: CountersProps
 }
 
 export type StartMenuStackParamList = {
-  Life : undefined;
+  Life: undefined;
   TotalPlayers: undefined;
   PlayerOptions: undefined;
   ColorMenu: ColorMenuProps;
@@ -62,12 +62,12 @@ function StartMenuNavigator() {
     <StartMenuStack.Navigator screenOptions={{
       headerShown: false
     }}>
-      <StartMenuStack.Screen name="Life" component={LifeMenu}  />
+      <StartMenuStack.Screen name="Life" component={LifeMenu} />
       <StartMenuStack.Screen name="TotalPlayers" component={TotalPlayers} />
       <StartMenuStack.Screen name='PlayerOptions' component={PlayerOptions} />
       <StartMenuStack.Screen name='ColorMenu' component={ColorMenu} />
       <StartMenuStack.Screen name="ColorSelector" component={ColorSelector} />
-      
+
     </StartMenuStack.Navigator>
   )
 }
@@ -75,7 +75,7 @@ function StartMenuNavigator() {
 export type GlobalMenuParamsList = {
   MainMenu: undefined,
   CoinFlipper: undefined,
-  DiceRoller : undefined,
+  DiceRoller: undefined,
   Planechase: undefined,
   Instructions: undefined
 }
@@ -100,16 +100,16 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
-      <Stack.Navigator screenOptions={{
-        headerShown: false
-      }}>
-        <Stack.Screen name="GlobalMenu" component={GlobalMenuNavigator} />
-        <Stack.Screen name="StartMenu" component={StartMenuNavigator} />
-        <Stack.Screen name="Game" component={Game} />
-        <Stack.Screen name="Dungeon" component={Dungeon} initialParams={{}} />
-        <Stack.Screen name="Card" component={CounterCard} initialParams={{}}/>
-        <Stack.Screen name="Counters" component={Counters} />
-      </Stack.Navigator>
+    <Stack.Navigator screenOptions={{
+      headerShown: false
+    }}>
+      <Stack.Screen name="GlobalMenu" component={GlobalMenuNavigator} />
+      <Stack.Screen name="Game" component={Game} initialParams={{}} />
+      <Stack.Screen name="StartMenu" component={StartMenuNavigator} />
+      <Stack.Screen name="Dungeon" component={Dungeon} initialParams={{}} />
+      <Stack.Screen name="Card" component={CounterCard} initialParams={{}} />
+      <Stack.Screen name="Counters" component={Counters} />
+    </Stack.Navigator>
   );
 }
 

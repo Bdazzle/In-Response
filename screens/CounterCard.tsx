@@ -94,7 +94,7 @@ const CounterCard: React.FC = ({ }) => {
                 })
             }
         }
-        navigation.navigate('Game')
+        navigation.navigate('Game', { menu : false })
     }
 
     return (

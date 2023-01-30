@@ -1,12 +1,6 @@
 import { GlobalPlayerData, StoredData } from "../index"
 import { startingColors } from "../constants/Colors"
 
-// interface GameData {
-//   totalPlayers: number,
-//   startingLife: number,
-//   savedScreenNames: StoredData
-// }
-
 const newGameData = (totalPlayers: number, startingLife: number, savedData: StoredData): GlobalPlayerData => {
   const playersArr = [...Array(totalPlayers).keys()].map(x => x + 1)
   /* 

@@ -61,7 +61,7 @@ const CoinFlipper = () => {
     })
 
     const handleBack = () => {
-        navigation.navigate('MainMenu')
+        navigation.navigate('Game')
     }
 
     const changeQuantity = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {

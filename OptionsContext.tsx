@@ -33,15 +33,14 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     useEffect(() => {
-        // const clearStorage = async () =>{
+        // (async () =>{
         //     try {
         //         await AsyncStorage.clear()
         //     }
         //     catch(e){
         //         console.log('error clearing storage', e)
         //     }
-        // }
-        // clearStorage()
+        // })()
         getSavedData()
     },[])
 

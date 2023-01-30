@@ -19,6 +19,7 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
     } = useContext(GameContext) as GameContextProps
     const navigation = useNavigation<AllScreenNavProps>()
     const route = useRoute<RouteProp<StartMenuStackParamList, 'ColorSelector'>>()
+
     const filteredColors = Object.entries(ColorLibrary).filter(([key, value]) => value !== route.params.currentColor)
     const chunk = 4
     const totalChunks = Math.ceil(filteredColors.length / chunk)

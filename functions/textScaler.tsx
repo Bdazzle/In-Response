@@ -27,7 +27,7 @@ export function lifeTotalScaler(totalPlayers: number, lifeTotal: number): number
   if (totalPlayers === 1) {
     return String(lifeTotal).length < 3 ? textScaler(235) : textScaler(171)
   } else if (totalPlayers === 2) {
-    return String(lifeTotal).length < 3 ? textScaler(170) : textScaler(118)
+    return String(lifeTotal).length < 3 ? textScaler(180) : textScaler(120)
   } else if (totalPlayers === 3) {
     return String(lifeTotal).length < 3 ? textScaler(140) : textScaler(120)
   } else {

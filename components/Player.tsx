@@ -190,8 +190,6 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         }]} >{playerName}
                         </Text>
                     </View>
-
-
                 </View>
             </View>
 
@@ -240,7 +238,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         width: '100%',
         height: '100%',
-        // alignItems: 'center',
     },
     life_total_container: {
         flexDirection: 'row',

@@ -1,33 +1,35 @@
-import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, GestureResponderEvent, Pressable, StyleSheet, LayoutChangeEvent } from 'react-native';
-import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions,  Pressable, StyleSheet } from 'react-native';
+import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 // import { PlayerProvider } from '../PlayerContext';
 import { GameContext, GameContextProps } from '../GameContext';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AllScreenNavProps } from '..';
+// import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// import { AllScreenNavProps } from '..';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import Svg, { Path } from 'react-native-svg';
-// import { iconData } from '../reducers/imageResources';
 import DayNight from '../components/counters/DayNight';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ResetModal from '../components/ResetModal';
+import GlobalMenu from './GlobalMenu'
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+// import { RootStackParamList } from '../navigation';
 
 interface Debounce<T> {
     (func: T, delay: number): (...args: any) => void
 }
 
-const screen = Dimensions.get("screen");
 const window = Dimensions.get("window")
 /*
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 Fixable?
 */
 export const Game = () => {
-    const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
+    // const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
+    // const route = useRoute<RouteProp<RootStackParamList, 'Game'>>()
     const { totalPlayers, startingLife } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
-    const [swipeStart, setSwipeStart] = useState<number>()
+    // const [swipeStart, setSwipeStart] = useState<number>()
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
     const randomPlayerScaleVal = useSharedValue(0)
@@ -35,77 +37,44 @@ export const Game = () => {
     const resetModalScaleVal = useSharedValue(0)
     const resetModalZVal = useSharedValue(0)
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
-    const panActivationWidth = useRef(Math.round(Dimensions.get('window').width / 3))
-    // const pan = useRef(new Animated.ValueXY()).current
+    const swipeRef = useRef<Swipeable>(null)
 
-    // const panResponder = useRef(PanResponder.create({
-    //     // onMoveShouldSetPanResponder: () => true,
-    //     onMoveShouldSetPanResponder: Platform.select({
-    //         default: () => true,
-    //         android: (e: GestureResponderEvent, state: PanResponderGestureState) => {
-    //             console.log(state)
-    //             return Math.abs(state.dx) > panActivationWidth.current || Math.abs(state.dy) > panActivationWidth.current
-    //             // state.vx > 0
+    /* Old swipe code 
 
-    //         }
-    //     }),
-    //     onPanResponderGrant: () => {
-    //         pan.setOffset({
-    //             x: (pan.x as any)._value,
-    //             y: 0
-    //         });
-    //     },
-    //     onPanResponderMove: Animated.event(
-    //         [
-    //             null,
-    //             {
-    //                 dx: pan.x,
-    //                 dy: pan.y
-    //             },
-    //         ],
-    //         { useNativeDriver: true }
-    //     ),
-    //     onPanResponderRelease: () => {
-    //         if ((pan.x as any)._value > panActivationWidth.current || (pan.x as any)._value < -panActivationWidth.current) {
+    // const debounce: Debounce<any> = (func: any, delay: number) => {
+    //     let timeOutId: number;
+    //     return (...args: any) => {
+    //         if (timeOutId) clearTimeout(timeOutId)
+    //         timeOutId = setTimeout(() => {
+    //             func(...args)
+    //         }, delay)
+    //     }
+    // }
+
+    // const debounceSwipe = debounce(setSwipeStart, 100)
+
+    // const handleSwipe = (event: GestureResponderEvent) => {
+    //     debounceSwipe(event.nativeEvent.pageX)
+    // }
+
+    // const swipeEnd = (input: number) => {
+    //     if (swipeStart) {
+    //         if (input - swipeStart > panActivationWidth.current || swipeStart - input > panActivationWidth.current) {
     //             navigation.navigate('GlobalMenu', {
     //                 screen: "MainMenu"
     //             })
     //         }
-    //     },
-    // })).current
+    //     }
+    //     setSwipeStart(undefined)
+    // }
 
-    const debounce: Debounce<any> = (func: any, delay: number) => {
-        let timeOutId: number;
-        return (...args: any) => {
-            if (timeOutId) clearTimeout(timeOutId)
-            timeOutId = setTimeout(() => {
-                func(...args)
-            }, delay)
-        }
-    }
+    // const debounceSwipeEnd = debounce(swipeEnd, 100)
 
-    const debounceSwipe = debounce(setSwipeStart, 100)
+    // const handleSwipeEnd = (event: GestureResponderEvent) => {
+    //     debounceSwipeEnd(event.nativeEvent.pageX)
+    // }
 
-    const handleSwipe = (event: GestureResponderEvent) => {
-        debounceSwipe(event.nativeEvent.pageX)
-    }
-
-    const swipeEnd = (input: number) => {
-        if (swipeStart) {
-            if (input - swipeStart > panActivationWidth.current || swipeStart - input > panActivationWidth.current) {
-                navigation.navigate('GlobalMenu', {
-                    screen: "MainMenu"
-                })
-            }
-        }
-        setSwipeStart(undefined)
-    }
-
-    const debounceSwipeEnd = debounce(swipeEnd, 100)
-
-    const handleSwipeEnd = (event: GestureResponderEvent) => {
-        debounceSwipeEnd(event.nativeEvent.pageX)
-    }
+*/
 
     /* Random Player Functions */
     const getRandomPlayer = () => {
@@ -184,7 +153,7 @@ export const Game = () => {
         may cut down on updating cost during a game session because 
         each component could keep track of it's own data, instead of updating GameContext objects
         */
-        async function resetData(){
+        async function resetData() {
             setReset(true)
             const testPromise = new Promise<void>((resolve, reject) => {
                 setTimeout(() => {
@@ -199,8 +168,8 @@ export const Game = () => {
             await testPromise
             setReset(false)
         }
-        resetData()
 
+        resetData()
         hideResetModal()
     }
 
@@ -221,104 +190,121 @@ export const Game = () => {
         }
     })
 
+
+    const renderLeftActions = () => {
+        return (
+            <GlobalMenu />
+        );
+    };
+
     return (
-        <View
-            onTouchStart={(e) => handleSwipe(e)}
-            onTouchEnd={(e) => handleSwipeEnd(e)}
-            testID='game_container' style={styles.game_container}>
-
-            <View testID='middle_buttons'
-                style={{
-                    zIndex: 10,
-                    position: 'absolute',
-                    height: '5%',
-                    width: totalPlayers === 1 ? window.width / 2 : window.width,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    top: totalPlayers === 1 ? 0 : totalPlayers === 3 ? (window.height - 38) * .65 : (window.height - 38) / 2,
-                    transform: totalPlayers === 1 ? [
-                        { rotate: '90deg' },
-                        { translateX: window.width / 4 },
-                        { translateY: window.width / 5 }
-                    ]
-                        : [],
-                }}
+        <GestureHandlerRootView>
+            <Swipeable
+                ref={swipeRef}
+                leftThreshold={80}
+                renderLeftActions={renderLeftActions}
             >
-                {/* Reset button */}
-                <View testID='reset_button'
-                    style={[styles.icon_button, styles.button_background]}
-                >
-                    <Pressable
-                        onPress={() => showResetModal()}
-                    >
-                        <Svg viewBox='0 0 25 25'>
-                            <Path d="M20,8 C18.5974037,5.04031171 15.536972,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 L12,21 C16.9705627,21 21,16.9705627 21,12 M21,3 L21,9 L15,9"
-                                stroke={"#000"}
-                            ></Path>
-                        </Svg>
-                    </Pressable>
-                </View>
+                <View
+                    // onTouchStart={(e) => handleSwipe(e)}
+                    // onTouchEnd={(e) => handleSwipeEnd(e)}
+                    testID='game_container'
+                    style={styles.game_container}>
 
-
-                {/* Day/night Cycle button */}
-                <View testID='cycle_icon_container'
-                    style={styles.icon_button}
-                >
-                    <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
-                </View>
-
-                {/* Random Player button */}
-                <View testID='random_button'
-                    style={[styles.icon_button, styles.button_background]}
-                >
-                    <Pressable onPress={() => getRandomPlayer()}>
-                        <Svg viewBox='0 0 358 358' >
-                            <Path d="M179.006,0C80.141,0,0,80.141,0,179.006s80.141,179.006,179.006,179.006   s179.006-80.141,179.006-179.006S277.871,0,179.006,0z M277.668,281.04l-8.437-8.437l33.587-33.588l-79.091-0.376v-0.018   c-1.545,0-3.031-0.603-4.141-1.671l-51.411-49.65l-51.405,49.65c-1.116,1.074-2.602,1.671-4.147,1.671H41.022v-11.934h69.192   L159.59,179l-49.376-47.687H41.022v-11.934h71.602c1.545,0,3.031,0.603,4.147,1.677l51.405,49.65l51.411-49.65   c1.116-1.074,2.602-1.677,4.141-1.677h25.389v0.137l53.642,0.257l-34.363-34.369l8.437-8.437l48.797,48.797l-47.962,47.962   l-8.437-8.437l33.588-33.588l-76.704-0.364L176.768,179l49.376,47.687h22.972v0.137l53.642,0.257l-34.363-34.369l8.437-8.437   l48.797,48.797L277.668,281.04z"
-                                fill={"#010002"}
-                            ></Path>
-                        </Svg>
-                    </Pressable>
-                </View>
-            </View>
-
-            {/* Random Player Modal */}
-            <Animated.View testID='random_player_modal'
-                style={[styles.modal, scaleStyle]}
-            >
-                <Pressable style={[styles.random_modal_pressable]}
-                    onPress={() => hideRandomPlayer()}>
-                    <Text style={[styles.modal_text]}>{randomPlayer} Selected</Text>
-                </Pressable>
-            </Animated.View>
-
-            {/* Reset Modal */}
-            <Animated.View testID='confirm_reset'
-                style={[styles.reset_modal, resetModalStyle]}
-            >
-                <ResetModal accept={() => handleReset()} decline={() => hideResetModal()} />
-            </Animated.View>
-
-            {
-                totalPlayers === 1 ? <Oneplayer playerIDs={designationMap} />
-                    :
-                    totalPlayers === 2 ? <TwoPlayerScreen playerIDs={designationMap}
-                        p1style={{
-                            transform: [{ rotate: "180deg" }],
-                            height: '50%'
+                    <View testID='middle_buttons'
+                        style={{
+                            zIndex: 10,
+                            position: 'absolute',
+                            height: '5%',
+                            width: totalPlayers === 1 ? window.width / 2 : window.width,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            top: totalPlayers === 1 ? 0 : totalPlayers === 3 ? (window.height - 38) * .65 : (window.height - 38) / 2,
+                            transform: totalPlayers === 1 ? [
+                                { rotate: '90deg' },
+                                { translateX: window.width / 4 },
+                                { translateY: window.width / 5 }
+                            ]
+                                : [],
                         }}
-                        p2style={{ height: '50%' }}
-                        containerStyle={{
-                            height: '100%',
-                            transform: [{ rotate: "180deg" }],
-                        }} />
-                        :
-                        totalPlayers === 3 ? <Threeplayer playerIDs={designationMap} />
+                    >
+                        {/* Reset button */}
+                        <View testID='reset_button'
+                            style={[styles.icon_button, styles.button_background]}
+                        >
+                            <Pressable
+                                onPress={() => showResetModal()}
+                            >
+                                <Svg viewBox='0 0 25 25'>
+                                    <Path d="M20,8 C18.5974037,5.04031171 15.536972,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 L12,21 C16.9705627,21 21,16.9705627 21,12 M21,3 L21,9 L15,9"
+                                        stroke={"#000"}
+                                    ></Path>
+                                </Svg>
+                            </Pressable>
+                        </View>
+
+
+                        {/* Day/night Cycle button */}
+                        <View testID='cycle_icon_container'
+                            style={styles.icon_button}
+                        >
+                            <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
+                        </View>
+
+                        {/* Random Player button */}
+                        <View testID='random_button'
+                            style={[styles.icon_button, styles.button_background]}
+                        >
+                            <Pressable onPress={() => getRandomPlayer()}>
+                                <Svg viewBox='0 0 358 358' >
+                                    <Path d="M179.006,0C80.141,0,0,80.141,0,179.006s80.141,179.006,179.006,179.006   s179.006-80.141,179.006-179.006S277.871,0,179.006,0z M277.668,281.04l-8.437-8.437l33.587-33.588l-79.091-0.376v-0.018   c-1.545,0-3.031-0.603-4.141-1.671l-51.411-49.65l-51.405,49.65c-1.116,1.074-2.602,1.671-4.147,1.671H41.022v-11.934h69.192   L159.59,179l-49.376-47.687H41.022v-11.934h71.602c1.545,0,3.031,0.603,4.147,1.677l51.405,49.65l51.411-49.65   c1.116-1.074,2.602-1.677,4.141-1.677h25.389v0.137l53.642,0.257l-34.363-34.369l8.437-8.437l48.797,48.797l-47.962,47.962   l-8.437-8.437l33.588-33.588l-76.704-0.364L176.768,179l49.376,47.687h22.972v0.137l53.642,0.257l-34.363-34.369l8.437-8.437   l48.797,48.797L277.668,281.04z"
+                                        fill={"#010002"}
+                                    ></Path>
+                                </Svg>
+                            </Pressable>
+                        </View>
+                    </View>
+
+                    {/* Random Player Modal */}
+                    <Animated.View testID='random_player_modal'
+                        style={[styles.modal, scaleStyle]}
+                    >
+                        <Pressable style={[styles.random_modal_pressable]}
+                            onPress={() => hideRandomPlayer()}>
+                            <Text style={[styles.modal_text]}>{randomPlayer} Selected</Text>
+                        </Pressable>
+                    </Animated.View>
+
+                    {/* Reset Modal */}
+                    <Animated.View testID='confirm_reset'
+                        style={[styles.reset_modal, resetModalStyle]}
+                    >
+                        <ResetModal accept={() => handleReset()} decline={() => hideResetModal()} />
+                    </Animated.View>
+
+                    {
+                        totalPlayers === 1 ? <Oneplayer playerIDs={designationMap} />
                             :
-                            totalPlayers === 4 ? <Fourplayer playerIDs={designationMap} />
+                            totalPlayers === 2 ? <TwoPlayerScreen playerIDs={designationMap}
+                                p1style={{
+                                    transform: [{ rotate: "180deg" }],
+                                    height: '50%'
+                                }}
+                                p2style={{ height: '50%' }}
+                                containerStyle={{
+                                    height: '100%',
+                                    transform: [{ rotate: "180deg" }],
+                                }} />
                                 :
-                                undefined
-            }
-        </View>
+                                totalPlayers === 3 ? <Threeplayer playerIDs={designationMap} />
+                                    :
+                                    totalPlayers === 4 ? <Fourplayer playerIDs={designationMap} />
+                                        :
+                                        undefined
+                    }
+                </View>
+
+             </Swipeable>
+         </GestureHandlerRootView>
     )
 }
 
@@ -334,7 +320,7 @@ const Oneplayer: React.FC<GameParams> = ({ playerIDs }) => {
         <View testID='player_provider_wrapper'
             style={styles.player_provider_wrapper}>
             {Object.keys(globalPlayerData).length > 0 ?
-                // <PlayerProvider >
+                
                 <View testID='player_wrapper'
                     style={[styles.player_wrapper, {
                         height: width,
@@ -347,7 +333,7 @@ const Oneplayer: React.FC<GameParams> = ({ playerIDs }) => {
                         playerID={playerIDs[0]}
                     />
                 </View>
-                // </PlayerProvider>
+                
 
                 : <></>
             }
@@ -368,7 +354,7 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        {/* <PlayerProvider> */}
+                        
                         <View testID='player_wrapper' style={[p1style, styles.player_wrapper_2p]}>
 
                             <Player
@@ -377,13 +363,13 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                                 playerID={playerIDs[0]}
                             />
                         </View>
-                        {/* </PlayerProvider> */}
+                        
                     </View>
 
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        {/* <PlayerProvider> */}
+                        
                         <View testID='player_wrapper'
                             style={[p2style, styles.player_wrapper_2p]}>
 
@@ -393,7 +379,7 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                                 playerID={playerIDs[1]}
                             />
                         </View>
-                        {/* </PlayerProvider> */}
+                        
                     </View>
                 </View>
             }
@@ -419,7 +405,7 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        {/* <PlayerProvider> */}
+                        
                         <View testID='p_wrapper_2p_screen'
                             style={[p1style, styles.p_wrapper_2p_screen]}>
                             <Player
@@ -428,13 +414,13 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
                                 playerID={playerIDs[0]}
                             />
                         </View>
-                        {/* </PlayerProvider> */}
+                        
                     </View>
 
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        {/* <PlayerProvider> */}
+
                         <View testID='p_wrapper_2p_screen'
                             style={[p2style, styles.p_wrapper_2p_screen]}>
                             <Player
@@ -443,7 +429,7 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
                                 playerID={playerIDs[1]}
                             />
                         </View>
-                        {/* </PlayerProvider> */}
+
                     </View>
                 </View>
                 : <></>
@@ -489,7 +475,6 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
                             height: height * .65,
                         }} />
 
-                    {/* <PlayerProvider> */}
                     <View key="player_3" style={[styles.player_3, {
                         height: height / 3
                     }]}>
@@ -499,7 +484,7 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
                             playerID={playerIDs[2]}
                         />
                     </View>
-                    {/* </PlayerProvider> */}
+
                 </View>
                 : <></>
             }

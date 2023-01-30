@@ -4,6 +4,7 @@ import { GameProvider } from './GameContext';
 import { OptionsProvider } from './OptionsContext';
 import { useFonts } from "expo-font";
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 export default function App() {

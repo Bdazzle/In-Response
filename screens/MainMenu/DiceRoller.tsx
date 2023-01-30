@@ -92,7 +92,7 @@ const DiceRoller = () => {
     }
 
     const handleBack = () => {
-        navigation.navigate('MainMenu')
+        navigation.navigate('Game')
     }
 
     const changeAmount = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
