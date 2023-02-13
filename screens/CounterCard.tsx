@@ -8,6 +8,7 @@ import { RootStackParamList } from '../navigation';
 import { imageReducer, ImageReducerState, manaSymbols } from '../reducers/imageResources';
 import { counters } from '../constants/CounterTypes'
 import { textScaler } from '../functions/textScaler';
+import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 
 interface ManaCounterProps {
     source: ImageSourcePropType
@@ -55,6 +56,7 @@ in which case, when closed, should save the total to globalPlayerData -> playerI
 which should update corresponding Player component
 */
 const CounterCard: React.FC = ({ }) => {
+    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Card'>>()
     const { dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
@@ -102,6 +104,13 @@ const CounterCard: React.FC = ({ }) => {
             style={[styles.container, {
                 width: width,
                 height: height,
+                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID % 2 !== 0) ?
+                    [{
+                        rotate: '180deg',
+                    },{
+                        translateY: 70
+                    }
+                ] : []
             }]}>
             <KeyboardAvoidingView testID='card_wrapper'
                 behavior={Platform.OS === "ios" ? "padding" : "height"}

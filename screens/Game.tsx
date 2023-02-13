@@ -1,11 +1,7 @@
 import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions,  Pressable, StyleSheet } from 'react-native';
 import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
-// import { PlayerProvider } from '../PlayerContext';
 import { GameContext, GameContextProps } from '../GameContext';
-// import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-// import { AllScreenNavProps } from '..';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import Svg, { Path } from 'react-native-svg';
 import DayNight from '../components/counters/DayNight';
@@ -13,23 +9,14 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from '
 import ResetModal from '../components/ResetModal';
 import GlobalMenu from './GlobalMenu'
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
-// import { RootStackParamList } from '../navigation';
-
-interface Debounce<T> {
-    (func: T, delay: number): (...args: any) => void
-}
 
 const window = Dimensions.get("window")
 /*
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
-Fixable?
 */
 export const Game = () => {
-    // const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    // const route = useRoute<RouteProp<RootStackParamList, 'Game'>>()
     const { totalPlayers, startingLife } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
-    // const [swipeStart, setSwipeStart] = useState<number>()
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
     const randomPlayerScaleVal = useSharedValue(0)
@@ -38,43 +25,6 @@ export const Game = () => {
     const resetModalZVal = useSharedValue(0)
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
     const swipeRef = useRef<Swipeable>(null)
-
-    /* Old swipe code 
-
-    // const debounce: Debounce<any> = (func: any, delay: number) => {
-    //     let timeOutId: number;
-    //     return (...args: any) => {
-    //         if (timeOutId) clearTimeout(timeOutId)
-    //         timeOutId = setTimeout(() => {
-    //             func(...args)
-    //         }, delay)
-    //     }
-    // }
-
-    // const debounceSwipe = debounce(setSwipeStart, 100)
-
-    // const handleSwipe = (event: GestureResponderEvent) => {
-    //     debounceSwipe(event.nativeEvent.pageX)
-    // }
-
-    // const swipeEnd = (input: number) => {
-    //     if (swipeStart) {
-    //         if (input - swipeStart > panActivationWidth.current || swipeStart - input > panActivationWidth.current) {
-    //             navigation.navigate('GlobalMenu', {
-    //                 screen: "MainMenu"
-    //             })
-    //         }
-    //     }
-    //     setSwipeStart(undefined)
-    // }
-
-    // const debounceSwipeEnd = debounce(swipeEnd, 100)
-
-    // const handleSwipeEnd = (event: GestureResponderEvent) => {
-    //     debounceSwipeEnd(event.nativeEvent.pageX)
-    // }
-
-*/
 
     /* Random Player Functions */
     const getRandomPlayer = () => {
@@ -205,8 +155,6 @@ export const Game = () => {
                 renderLeftActions={renderLeftActions}
             >
                 <View
-                    // onTouchStart={(e) => handleSwipe(e)}
-                    // onTouchEnd={(e) => handleSwipeEnd(e)}
                     testID='game_container'
                     style={styles.game_container}>
 

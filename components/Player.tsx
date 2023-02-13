@@ -81,13 +81,13 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
                 <View testID="static_counter_wrapper"
-                style={{
-                    width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : '55%',
-                    height:'25%',
-                    position: 'absolute',
-                    marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : '20%',
-                    zIndex: 50,
-                }}
+                    style={{
+                        width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : '55%',
+                        height: '25%',
+                        position: 'absolute',
+                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : '20%',
+                        zIndex: 50,
+                    }}
                 >
                     <StaticCounterContainer
                         playerID={playerID}
@@ -212,17 +212,24 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             textAlign: 'center',
                         }}>Counters</Text>
                 </Pressable>
-                {
-                    Object.keys(globalPlayerData[playerID].counterData!).sort().map(c => {
-                        return <IncrementingCounter
-                            key={c}
-                            counterType={c}
-                            colorTheme={theme}
-                            playerID={playerID}
-                            parentDimensions={dimensions}
-                        />
-                    })
-                }
+                <View testID='counter_icons_container'
+                style={{
+                    height:'100%',
+                    width:'100%'
+                }}
+                >
+                    {
+                        Object.keys(globalPlayerData[playerID].counterData!).sort().map(c => {
+                            return <IncrementingCounter
+                                key={c}
+                                counterType={c}
+                                colorTheme={theme}
+                                playerID={playerID}
+                                parentDimensions={dimensions}
+                            />
+                        })
+                    }
+                </View>
             </View>
         </Pressable>
     )
@@ -301,9 +308,9 @@ const styles = StyleSheet.create({
     increment_counters_container: {
         position: 'absolute',
         right: 0,
-        height: '90%',
+        height: '100%',
         width: '20%',
-        marginTop: '2%'
+        // marginTop: '2%'
     },
     counter_pressable: {
         marginTop: 5,

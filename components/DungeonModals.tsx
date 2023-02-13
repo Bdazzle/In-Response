@@ -22,9 +22,7 @@ export const CompleteDungeonModal: React.FC<ModalProps> = ({ OnAccept, OnCancel 
     }
 
     return (
-        <View style={[styles.modal_container, {
-            height: "20%"
-        }]}>
+        <View style={styles.modal_container}>
             <Text style={styles.modal_text}>Complete Dungeon?</Text>
             <View style={styles.button_container}>
                 <Pressable style={styles.complete_modal_buttons} onPressIn={(e) => handleComplete(e)}>
@@ -46,6 +44,7 @@ export const CompleteDungeonModal: React.FC<ModalProps> = ({ OnAccept, OnCancel 
 
 const styles = StyleSheet.create({
     modal_container: {
+        height: "20%",
         position: 'absolute',
         backgroundColor: "white",
         borderRadius: 5,

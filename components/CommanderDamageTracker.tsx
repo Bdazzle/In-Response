@@ -106,7 +106,6 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
         }
     })
 
-    // console.log(playerID, opponentName, componentDimensions, totalPlayers)
     return (
         <Animated.View testID={`${opponentName}_damage_container`}
             style={[scaleStyles,
@@ -157,8 +156,8 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                             {
                                 globalPlayerData[playerID!] && <Text style={[styles.all_text, {
                                     color: globalPlayerData[oppponentID].colors.secondary,
-                                    fontSize: componentDimensions && ( totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height  : componentDimensions.height * .7),
-                                    lineHeight: componentDimensions && ( totalPlayers === 4 ? componentDimensions.height * .8  : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                    fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                    lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
                                     width: isPressed ? '60%' : 'auto',
                                 }]}
                                     adjustsFontSizeToFit={true}
@@ -205,10 +204,10 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>()
 
     useEffect(() => {
-        if(reset === true){
+        if (reset === true) {
             setTax(0)
         }
-    },[reset])
+    }, [reset])
 
     const getDimensions = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout
@@ -217,24 +216,21 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
         }
     }
 
-    
+
     return (
         <View style={styles.cdamage_container}
         >
             <Pressable style={styles.tax}
-            onPress={() => setTax(tax + 1)}
-            onLongPress={() => setTax(tax - 1)}
-            onLayout={(e) => getDimensions(e)}
+                onPress={() => setTax(tax + 1)}
+                onLongPress={() => setTax(tax - 1)}
+                onLayout={(e) => getDimensions(e)}
             >
-                <View style={{
-                    width:'12%',
-                    justifyContent:'center',
-                }}>
-                <Text style={{
-                    color: globalPlayerData[playerID].colors.secondary,
-                    fontFamily: 'Beleren',
-                    fontSize: textScaler(12),
-                }}>Tax</Text>
+                <View style={styles.tax_text_wrapper}>
+                    <Text style={{
+                        color: globalPlayerData[playerID].colors.secondary,
+                        fontFamily: 'Beleren',
+                        fontSize: textScaler(12),
+                    }}>Tax</Text>
                 </View>
                 <Text style={{
                     color: globalPlayerData[playerID].colors.secondary,
@@ -268,18 +264,22 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         paddingBottom: 5
     },
-    tax:{
-        paddingLeft:'8%',
-        height:'25%',
-        width:'100%',
-        flexDirection:'row',
+    tax: {
+        paddingLeft: '8%',
+        height: '25%',
+        width: '100%',
+        flexDirection: 'row',
+    },
+    tax_text_wrapper:{
+        width: '12%',
+        justifyContent: 'center',
     },
     damage_row: {
         flexDirection: 'row',
         justifyContent: 'center',
     },
-    damage_pressable :{
-        justifyContent:'center',
+    damage_pressable: {
+        justifyContent: 'center',
     },
     player_pressable: {
         height: '100%'

@@ -88,11 +88,12 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
             value: !globalPlayerData[playerID].citysBlessing
         })
     }
+
     /*
     scale change has to be taken out of onPress function so that it triggers when reset button is pressed
     */
     useEffect(() =>{
-        globalPlayerData[playerID].citysBlessing === true ? scales.blessing.value = 1 : scales.blessing.value = .5
+        scales.blessing.value = globalPlayerData[playerID].citysBlessing === true ? 1 : .5
     },[globalPlayerData[playerID].citysBlessing])
 
     const activeInitiative = () => {
@@ -126,7 +127,6 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
             counterType: counterType
         } as CounterCardProps)
     }
-
     
     return (
         <View testID='static_counter_container' style={styles.static_counter_container}>
@@ -165,7 +165,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
                     style={globalPlayerData[playerID].citysBlessing === true ? styles.active_card_overlay : [styles.card_overlay, {
                         width: imageDimensions && imageDimensions.height * .75,
                         transform: [
-                            { scale: scales.blessing.value }
+                            { scale: globalPlayerData[playerID].citysBlessing === true ? 1 : .5 }
                         ]
                     }]}
                     onPress={() => activateCitysBlessing()}
@@ -173,14 +173,12 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
                     testID={"blessing_pressable"}
                 />
                 <Animated.Image source={require('../../assets/cards/citys-blessing.png')}
-
-                    style={[styles.counter_card,
-                    globalPlayerData[playerID].citysBlessing && blessingScaleStyle,
+                    style={[
+                        styles.counter_card,
+                    // globalPlayerData[playerID].citysBlessing && blessingScaleStyle,
+                    blessingScaleStyle,
                     imageDimensions && {
                         width: imageDimensions.height * .75,
-                        transform: [
-                            { scale: scales.blessing.value }
-                        ]
                     }
                     ]}
                     onLayout={(e) => getImageDimensions(e)}

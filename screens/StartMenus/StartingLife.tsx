@@ -32,24 +32,10 @@ const LifeMenu = () => {
     return (
         <View style={styles.container}>
             <View testID="gametype_container" 
-            style={{
-                width:'100%',
-                height:'30%',
-                justifyContent: 'space-evenly'
-            }}
+            style={styles.gametype_container}
             >
-                <Text style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontSize: 40,
-                    fontFamily:'Beleren'
-                }}>Game Type</Text>
-                <View style={{
-                    width:'100%',
-                    height:'80%',
-                    justifyContent: 'space-evenly',
-                    alignItems:'center'
-                }}>
+                <Text style={styles.title_text}>Game Type</Text>
+                <View style={styles.game_options_wrapper}>
                     <Pressable 
                     onPressIn={() => handleOptionDefault('commander')}
                         style={styles.game_option}
@@ -121,11 +107,22 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         alignItems: 'center',
     },
+    gametype_container:{
+        width:'100%',
+        height:'30%',
+        justifyContent: 'space-evenly'
+    },
     title_text: {
         color: 'white',
         textAlign: 'center',
         fontSize: 40,
         fontFamily:'Beleren'
+    },
+    game_options_wrapper:{
+        width:'100%',
+        height:'80%',
+        justifyContent: 'space-evenly',
+        alignItems:'center'
     },
     game_option:{
         borderColor: 'white',

@@ -9,6 +9,7 @@ import { imageReducer, ImageReducerState, ShapeData } from '../reducers/imageRes
 import { counters } from '../constants/CounterTypes';
 import { CounterCardProps } from '..';
 import { textScaler } from '../functions/textScaler';
+import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 
 interface CounterRowProps {
     counterType: string
@@ -100,18 +101,18 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                     {resources.SvgPaths &&
                         resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
                             return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
-                                fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"} 
-                                />
+                                fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
+                            />
                                 : path.polygonPoints ?
-                                <Polygon key={`${counterType} polygon ${i}`}
-                                    points={path.polygonPoints}
-                                    fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
-                                />
-                                : path.circle ?
-                                <Circle key={`${counterType} circle ${i}`}
-                                cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r} 
-                                fill={ typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black" } />
-                                : undefined
+                                    <Polygon key={`${counterType} polygon ${i}`}
+                                        points={path.polygonPoints}
+                                        fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
+                                    />
+                                    : path.circle ?
+                                        <Circle key={`${counterType} circle ${i}`}
+                                            cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r}
+                                            fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"} />
+                                        : undefined
                         })
                     }
                 </Svg>
@@ -147,7 +148,9 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
 }
 
 const Counters: React.FC = ({ }) => {
+    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
 
     const closeCounters = () => {
         navigation.navigate("Game")
@@ -156,13 +159,21 @@ const Counters: React.FC = ({ }) => {
     const toStorm = () => {
         navigation.navigate("Card", {
             counterType: "storm",
-            currentCounters: 0
+            currentCounters: 0,
+            playerID: route.params.playerID
         } as CounterCardProps)
     }
 
     return (
         <>
-            <KeyboardAvoidingView style={styles.counter_rows_container}>
+            <KeyboardAvoidingView style={[styles.counter_rows_container,
+            {
+                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID % 2 !== 0) ?
+                    [{
+                        rotate: '180deg'
+                    }] : []
+            }
+            ]}>
                 {Object.keys(counters).map((counterType: string) => {
                     return <CounterRow key={counterType} counterType={counterType} />
                 })}
@@ -173,18 +184,23 @@ const Counters: React.FC = ({ }) => {
                     <Text style={[styles.type_text, {
                         fontSize: textScaler(28)
                     }]} >Storm</Text>
-                    <Svg viewBox='-20 0 600 600' style={{
-                        height: '80%',
-                        width: '100%'
-                    }}>
+                    <Svg viewBox='-25 0 600 600' style={styles.storm_icon}>
                         <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />
                         <Polygon fill={"white"} points="289.232,280.023 203.678,371.373 279.623,371.373 239.523,443.699 327.887,347.631 251.941,347.631 " />
                         <Polygon fill={"white"} points="168.739,294.847 116.246,350.895 162.842,350.895 138.239,395.271 192.454,336.326 145.858,336.326   " />
                     </Svg>
                 </Pressable>
-
             </KeyboardAvoidingView>
-            <Pressable style={styles.close_icon}
+            <Pressable style={[styles.close_icon,
+            (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 3)) ?
+                {
+                    top: 0,
+                    left: 0
+                } : {
+                    bottom: 60,
+                    right: 60
+                }
+            ]}
                 onPressIn={() => closeCounters()}
             >
                 <Svg height="60" width="60" viewBox='0 0 512 512'
@@ -211,15 +227,19 @@ const styles = StyleSheet.create({
         height: `${80 / Object.keys(counters).length}%`,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        borderBottomColor:'#6e6e6e',
-        borderBottomWidth:1,
-        marginTop:5
+        borderBottomColor: '#6e6e6e',
+        borderBottomWidth: 1,
+        marginTop: 5
     },
     storm_container: {
-        width: '100%',
+        width: '50%',
         height: `${80 / Object.keys(counters).length}%`,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+    },
+    storm_icon: {
+        height: '80%',
+        width: '100%',
     },
     type_container: {
         width: '33%',
@@ -237,9 +257,7 @@ const styles = StyleSheet.create({
     },
     close_icon: {
         position: "absolute",
-        right: 0,
-        bottom: 10,
-        zIndex: 1
+        zIndex: 1,
     },
 })
 

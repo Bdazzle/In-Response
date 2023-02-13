@@ -29,11 +29,10 @@ TO DO
   Because the touch event is intercepted by the Animated API. 
   Swipeable components from React Native Gesture Handler used instead.
 *) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
+*) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related? really need to test on a tablet
+*) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
 */
 
-/*
-Dungeon data tracked in globalPlayerData to pass to Dungeon Screen, since only 1 screen
-*/
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { totalPlayers, startingLife, savedData } = useContext(OptionsContext) as OptionsContextProps
   const [currentMonarch, setCurrentMonarch] = useState<string>()
@@ -61,20 +60,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   }, [totalPlayers])
 
-  /*
-  put this in StartingLife.tsx?
-  */
+  /* reset game when starting life total options change */
   useEffect(() => {
     if (Object.keys(globalPlayerData).length) {
       let playersObj = globalPlayerData
       for (let playerID in playersObj) {
         playersObj[playerID].lifeTotal = startingLife
       }
+
       dispatchGlobalPlayerData({
         field: 'init',
         value: playersObj as GlobalPlayerData,
         playerID: 0
       })
+
     }
   }, [startingLife])
 
