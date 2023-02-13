@@ -1,6 +1,6 @@
 {
   "name": "mtg_counter",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
