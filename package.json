@@ -21,6 +21,7 @@
     "@react-navigation/core": "^6.2.1",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
+    "@sentry/react-native": "^4.15.0",
     "expo": "^46.0.0",
     "expo-asset": "~8.6.3",
     "expo-constants": "~13.2.4",

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useReducer, useState } from "react"
-import { View, StyleSheet, Text, Pressable } from "react-native"
+import React, { useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react"
+import { View, StyleSheet, Text, Pressable, LayoutChangeEvent, Dimensions } from "react-native"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
 import Svg, { Circle, Path, Polygon } from "react-native-svg"
 import { ColorTheme, CounterCardProps, CounterData } from "../.."
@@ -7,8 +7,7 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
-import { textScaler } from "../../functions/textScaler"
-import { counters } from "../../constants/CounterTypes"
+import { counterScaler, textScaler } from "../../functions/textScaler"
 
 interface IncrementCounterProps {
     counterType: string
@@ -30,6 +29,9 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
         })
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const [total, setTotal] = useState<number>()
+    // const [counterDimensions, setCounterDimensions] = useState<{height: number, width: number}>()
+    const counterDimensions = useRef<{height: number, width: number}>()
+    // const totalRef = useRef<View>(null)
 
     useEffect(() => {
         dispatchResources(counterType)
@@ -91,13 +93,15 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                         </View>
                     }
                     <View testID="counter_total_container"
-                        style={styles.counter_total_container}>
+                        style={styles.counter_total_container}
+                        >
                         <Text
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
+                            allowFontScaling={true}
+                            maxFontSizeMultiplier={1}
                             style={[styles.total_text, {
-                                fontSize: textScaler(parentDimensions.height/Object.keys(globalPlayerData[playerID].counterData as CounterData).length),
-                                // fontSize: textScaler(26), //this setting works best at max(5) counter types displayed
+                                fontSize: counterScaler(Object.keys(globalPlayerData[playerID].counterData as CounterData).length),
                                 color: colorTheme.secondary,
                             }]}>
                             {total}

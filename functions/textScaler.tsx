@@ -34,3 +34,17 @@ export function lifeTotalScaler(totalPlayers: number, lifeTotal: number): number
     return String(lifeTotal).length < 3 ? textScaler(140) : textScaler(120)
   }
 }
+
+export function counterScaler(totalCounters: number, dimensions?: {height: number, width: number}){
+  if(totalCounters === 1){
+    return textScaler(80)
+  } else if(totalCounters === 2) {
+    return textScaler(52)
+  } else if(totalCounters === 3){
+    return textScaler(36)
+  } else if(totalCounters === 4){
+    return textScaler(32)
+  } else {
+    return textScaler(26)
+  }
+}
