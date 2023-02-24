@@ -18,9 +18,9 @@ interface StaticCounterProps {
     dungeonCompleted: boolean,
 }
 
-const staticCounterList = ['dungeon','blessing', 'initiative', 'monarch']
+const staticCounterList = ['dungeon', 'blessing', 'initiative', 'monarch']
 
-const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted, playerName, playerID, colorTheme }) => {
+const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted, playerName, playerID, colorTheme }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { currentMonarch, setCurrentMonarch, currentInitiative, setCurrentInitiative, globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
@@ -92,9 +92,9 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
     /*
     scale change has to be taken out of onPress function so that it triggers when reset button is pressed
     */
-    useEffect(() =>{
+    useEffect(() => {
         scales.blessing.value = globalPlayerData[playerID].citysBlessing === true ? 1 : .5
-    },[globalPlayerData[playerID].citysBlessing])
+    }, [globalPlayerData[playerID].citysBlessing])
 
     const activeInitiative = () => {
         currentInitiative !== playerName ? setCurrentInitiative(playerName) : setCurrentInitiative('')
@@ -127,7 +127,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
             counterType: counterType
         } as CounterCardProps)
     }
-    
+
     return (
         <View testID='static_counter_container' style={styles.static_counter_container}>
 
@@ -175,11 +175,10 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({dungeonCompleted,
                 <Animated.Image source={require('../../assets/cards/citys-blessing.png')}
                     style={[
                         styles.counter_card,
-                    // globalPlayerData[playerID].citysBlessing && blessingScaleStyle,
-                    blessingScaleStyle,
-                    imageDimensions && {
-                        width: imageDimensions.height * .75,
-                    }
+                        blessingScaleStyle,
+                        imageDimensions && {
+                            width: imageDimensions.height * .75,
+                        }
                     ]}
                     onLayout={(e) => getImageDimensions(e)}
                 />
@@ -247,8 +246,8 @@ const styles = StyleSheet.create({
     scaled up = 1.5. original height = 20% = 30% total height
     */
     static_counter_container: {
-        height:'100%',
-        width:'100%',
+        height: '100%',
+        width: '100%',
         flexDirection: 'row',
         paddingTop: '1%',
         zIndex: 50,
@@ -256,21 +255,21 @@ const styles = StyleSheet.create({
     dungeon_complete_touch: {
         flexDirection: 'row',
         height: '100%',
-        width: `${100/staticCounterList.length}%`,
+        width: `${100 / staticCounterList.length}%`,
         justifyContent: 'center',
-        alignItems:'center',
+        alignItems: 'center',
     },
     dungeon_icon_touch: {
         flexDirection: 'row',
         height: '100%',
         width: '15%',
         justifyContent: 'center',
-        alignItems:'center',
+        alignItems: 'center',
     },
     card_container: {
         height: '100%',
-        width: `${100/staticCounterList.length}%`,
-        alignItems:'center',
+        width: `${100 / staticCounterList.length}%`,
+        alignItems: 'center',
     },
     active_card_overlay: {
         backgroundColor: 'rgba(200, 200, 200, 0)',

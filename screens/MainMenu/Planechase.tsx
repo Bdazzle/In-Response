@@ -2,7 +2,7 @@ import { Text, Image, View, useWindowDimensions, StyleSheet, Pressable, LayoutCh
 import React, { useContext, useEffect, useState } from 'react';
 import planechaseImages, { PlaneswalkerSvg } from '../../constants/PlanechaseImages';
 import { GameContext, GameContextProps } from '../../GameContext';
-import Svg, { G, Path } from 'react-native-svg';
+import Svg, { G, Path, Rect } from 'react-native-svg';
 import shuffle from '../../functions/shuffler';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -65,7 +65,7 @@ const Planechase = ({ }) => {
             discard: discard
         })
     }
-    
+
     const getDimensions = (event: LayoutChangeEvent) => {
         const { width } = event.nativeEvent.layout
         if (width !== 0) {
@@ -88,13 +88,13 @@ const Planechase = ({ }) => {
                     onPressIn={() => handleNav()}
                     style={[styles.image_container, {
                         height: width,
-                        width: height * .8,
+                        width: height * .8, //works for phone
                     }]}
                 >
                     <Image source={planechaseImages.phenomenon[currentPlane] ? planechaseImages.phenomenon[currentPlane] : planechaseImages.planes[currentPlane]}
                         style={{
                             height: height * .8,
-                            width: width,
+                            width: width < 900 ? width : '70%',
                             resizeMode: 'cover',
                             transform: [
                                 { rotate: '90deg' },
@@ -104,22 +104,21 @@ const Planechase = ({ }) => {
                 </Pressable>
 
                 {/* Die Container */}
-                <View 
-                onLayout={(e) => getDimensions(e)}
-                style={[styles.diecontainer, {
-                    height: width,
-                    width: height * .2,
-                }]}>
+                <View testID='diecontainer'
+                    onLayout={(e) => getDimensions(e)}
+                    style={[styles.diecontainer, {
+                        height: width,
+                        width: height * .2,
+                    }]}>
                     <View
                         testID='die_text_container'
-                        style={{
-                            alignItems: 'center',
-                        }}>
-                        <Text style={styles.die_text}>Roll them planar bones!</Text>
+                        style={styles.die_text_container}>
+                        <Text style={styles.die_text}
+                        >Roll them planar bones!</Text>
                         <Pressable style={[styles.die,
                         {
-                            width:dieContainerWidth && dieContainerWidth as number * .7,
-                            height:dieContainerWidth && dieContainerWidth as number * .7,
+                            width: dieContainerWidth && dieContainerWidth as number * .7,
+                            height: dieContainerWidth && dieContainerWidth as number * .7,
                         }]}
                             testID="die"
                             onPressIn={() => rollDie()}
@@ -135,19 +134,38 @@ const Planechase = ({ }) => {
                                                 />
                                             </G>
                                         </Svg>
-                                        : undefined
+                                        : 
+                                        <Svg viewBox='0 0 24 24'>
+                                            <Rect x={4} y={4} width={16} height={16} rx={2} stroke={'white'} strokeWidth={1} strokeLinecap={'round'} ></Rect>
+                                        </Svg>
                             }
                         </Pressable>
                     </View>
                     <View testID='mana_cost_container'
-                        style={[styles.mana_cost_container,{
-                            width: dieContainerWidth && dieContainerWidth as number/2,
-                            height: dieContainerWidth && dieContainerWidth as number/2,
+                        style={[styles.mana_cost_container, {
+                            width: dieContainerWidth && dieContainerWidth as number / 2,
+                            height: dieContainerWidth && dieContainerWidth as number / 2,
                         }]}
                     >
-                        <Text style={styles.text_style}>{rollCost}</Text>
+                        <Text style={[styles.text_style, {
+                            fontSize: width < 900 ? textScaler(42) : textScaler(34),//works for tablet
+                        }]}>{rollCost}</Text>
                     </View>
-                </View>
+
+                    {/* Reset button */}
+                            <Pressable
+                            style={[styles.reset_button ,{
+                                height: width < 900 ? 30 : 50
+                            }]}
+                                onPress={() => setRollCost(0)}
+                            >
+                                <Svg viewBox='0 0 25 25'>
+                                    <Path d="M20,8 C18.5974037,5.04031171 15.536972,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 L12,21 C16.9705627,21 21,16.9705627 21,12 M21,3 L21,9 L15,9"
+                                        stroke={"white"}
+                                    ></Path>
+                                </Svg>
+                            </Pressable>
+                        </View>
 
             </View>
         </View>
@@ -187,10 +205,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    die_text_container: {
+        alignItems: 'center',
+        width: '100%',
+    },
     die_text: {
         fontFamily: "Beleren",
         color: 'white',
-        width: '90%',
+        width: '100%',
         textAlign: 'center',
         fontSize: textScaler(12)
     },
@@ -198,14 +220,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#CAC5C0',
-        borderRadius: 50,
+        borderRadius: 60,
     },
     text_style: {
         textAlign: 'center',
         color: 'black',
-        fontSize: textScaler(42),
         fontFamily: 'Beleren',
-        paddingTop: 5
+    },
+    reset_button:{
+        position:'absolute',
+        bottom:0,
+        right:10,
+        width:'20%',
     }
 })
 

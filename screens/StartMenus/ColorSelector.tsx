@@ -20,7 +20,7 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
     const navigation = useNavigation<AllScreenNavProps>()
     const route = useRoute<RouteProp<StartMenuStackParamList, 'ColorSelector'>>()
 
-    const filteredColors = Object.entries(ColorLibrary).filter(([key, value]) => value !== route.params.currentColor)
+    const filteredColors = Object.entries(ColorLibrary).filter(([_, value]) => value !== route.params.currentColor)
     const chunk = 4
     const totalChunks = Math.ceil(filteredColors.length / chunk)
     const chunkedColors = [...Array(totalChunks)].map((_) => filteredColors.splice(0, chunk))
@@ -30,7 +30,7 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ }) => {
     const saveColors = async (val: string) =>{
         try {
             await AsyncStorage.setItem(`${String(route.params.playerID)} colors`, JSON.stringify({...globalPlayerData[route.params.playerID].colors, [route.params.colorPosition] : val}))
-            console.log('new saved colors', JSON.stringify({...globalPlayerData[route.params.playerID].colors, [route.params.colorPosition] : val}))
+            // console.log('new saved colors', JSON.stringify({...globalPlayerData[route.params.playerID].colors, [route.params.colorPosition] : val}))
         } 
         catch(e) {
             console.log(`error saving colors`, e)

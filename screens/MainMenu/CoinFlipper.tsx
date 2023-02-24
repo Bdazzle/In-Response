@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React, { useEffect, useState } from "react"
 import { Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
-import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withRepeat, withTiming } from "react-native-reanimated"
+import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
 import { AllScreenNavProps } from "../.."
 import { textScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
@@ -86,6 +86,7 @@ const CoinFlipper = () => {
         setTimeout(() => resultSpin.value = 0, 1200)
     }, [results])
 
+
     return (
         <View style={styles.flipper_container}>
             {/* Back Button */}
@@ -135,10 +136,7 @@ const CoinFlipper = () => {
                 <Pressable style={styles.coin_button}
                     onPressIn={() => handleFlip()}
                 >
-                    <View style={{
-                        height: '100%'
-                    }}>
-
+                    <View style={styles.face_wrapper}>
                         <Animated.View
                             style={[styles.tails_wrapper, rotateStyle, zStyle]}
                         >
@@ -151,10 +149,7 @@ const CoinFlipper = () => {
                 </Pressable>
             </Animated.View>
 
-            <Text style={[styles.all_text, {
-                paddingTop: '15%',
-            }]}>{results.join(', ')}</Text>
-
+            <Text style={styles.all_text}>{results.join(', ')}</Text>
         </View>
     )
 }
@@ -196,7 +191,7 @@ const styles = StyleSheet.create({
         fontFamily: "Beleren"
     },
     coins_container: {
-        height: '50%',
+        height: '40%',
         width: '90%',
         marginLeft: '5%',
         top: '5%',
@@ -204,10 +199,13 @@ const styles = StyleSheet.create({
     coin_button: {
         height: '10%',
     },
+    face_wrapper:{
+        height: '100%',
+    },
     coin:{
         resizeMode: 'contain',
         width: '100%',
-        height: '100%'
+        height: '100%',
     },
     heads_wrapper: {
         position: 'absolute',

@@ -8,8 +8,7 @@ import { AllScreenNavProps } from "../..";
 import { ColorLibrary } from "../../constants/Colors";
 import { textScaler } from "../../functions/textScaler";
 
-// const traingleFaceHeight = 30
-
+/* Die rolling animations in future? */
 const D20 = () => {
     // const [front, setFront] = useState<string | number>()
     // const numbers = [...Array(20)].map((_, i) => i + 1)

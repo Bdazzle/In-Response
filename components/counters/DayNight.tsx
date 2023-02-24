@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react"
+import React, { useEffect, useReducer } from "react"
 import { StyleSheet, Pressable, View } from "react-native"
 import Svg, { Circle, Path, Polygon } from "react-native-svg"
 import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"

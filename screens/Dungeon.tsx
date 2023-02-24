@@ -12,7 +12,7 @@ import { textScaler } from '../functions/textScaler';
 type dungeonInfo = {
     name: string | undefined,
     uri: ImageSourcePropType | undefined,
-    lastroom_height?: string
+    lastroom_height?: number
 }
 
 interface MarkerProps {
@@ -20,9 +20,10 @@ interface MarkerProps {
     y: number,
     radius: number,
     moveDelay: number,
+    touchResponse: (event: GestureResponderEvent) => void
 }
 
-const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay }) => {
+const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay, touchResponse }) => {
     const translateX = useDerivedValue<number>(() => { return x })
     const translateY = useDerivedValue<number>(() => { return y })
     const endScale = useSharedValue(0)
@@ -66,7 +67,7 @@ const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay }) => {
     })
 
     return (
-        <Animated.View key="pulse_container" style={[styles.pulse_container, containerMoveStyle,
+        <Animated.View key="pulse_container" onTouchEnd={(e) => touchResponse(e)} style={[styles.pulse_container, containerMoveStyle,
         {
             height: radius * 2,
             width: radius * 2,
@@ -79,32 +80,36 @@ const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay }) => {
     )
 }
 
-
-const dungeonReducer = (state: dungeonInfo, action: string) => {
-    switch (action) {
+type DungeonAction = {
+    dungeon: string,
+    imageHeight: number
+}
+//action.imageHeight might need to change to aspect ratio (ratio < 1.5 for phone)
+const dungeonReducer = (state: dungeonInfo, action: DungeonAction) => {
+    switch (action.dungeon) {
         case "Undercity":
             return {
                 name: "Undercity",
                 uri: require("../assets/dungeons/Undercity.jpg"),
-                lastroom_height: '33%'
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .30 : action.imageHeight * .25
             };
         case "Dungeon of the Mad Mage":
             return {
                 name: "Dungeon of the Mad Mage",
                 uri: require("../assets/dungeons/Dungeon-of-the-Mad-Mage.jpg"),
-                lastroom_height: '32%'
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .29 : action.imageHeight * .25
             };
         case "Tomb of Annihilation":
             return {
                 name: "Tomb of Annihilation",
                 uri: require("../assets/dungeons/Tomb-of-Annihilation.jpg"),
-                lastroom_height: '37%'
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .35 : action.imageHeight * .3
             };
         case "Lost Mines of Phandelver":
             return {
                 name: "Lost Mines of Phandelver",
                 uri: require("../assets/dungeons/Lost-Mine-of-Phandelver.jpg"),
-                lastroom_height: '35%'
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .32 : action.imageHeight * .26
             };
         case "Completed":
             return {
@@ -126,7 +131,7 @@ const Dungeon: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Dungeon'>>()
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [currentDungeon, dispatchDungeon] = useReducer<(state: dungeonInfo, action: string) => dungeonInfo>(dungeonReducer,
+    const [currentDungeon, dispatchDungeon] = useReducer<(state: dungeonInfo, action: DungeonAction) => dungeonInfo>(dungeonReducer,
         {
             name: undefined,
             uri: undefined,
@@ -146,7 +151,7 @@ const Dungeon: React.FC = ({ }) => {
                 x: route.params.dungeonCoords!.x,
                 y: route.params.dungeonCoords!.y,
             })
-            dispatchDungeon(route.params.currentDungeon)
+            dispatchDungeon({dungeon: route.params.currentDungeon, imageHeight: height})
         }
         else {
             setMarker_coords({
@@ -157,12 +162,12 @@ const Dungeon: React.FC = ({ }) => {
     }, [])
 
     const markerDrag = (event: GestureResponderEvent) => {
-        if(flipped) {
+        if (flipped) {
             setMarker_coords({
                 x: width - event.nativeEvent.pageX,
                 y: height - event.nativeEvent.pageY - 70,
             })
-        } 
+        }
         else {
             setMarker_coords({
                 x: event.nativeEvent.pageX,
@@ -171,13 +176,20 @@ const Dungeon: React.FC = ({ }) => {
         }
     }
 
+
+    const markerRelease = (event: GestureResponderEvent) =>{
+        const Ythreshold = height - (currentDungeon.lastroom_height as number)
+        if(event.nativeEvent.pageY >= Ythreshold){
+            setPromptComplete(true)
+        }
+    }
     /*
     on dungeon complete, have to reset dungeon data, and set dungeonComplete to true  
     in globalPlayerData for active player.
     reset marker coords to x = width/2, y = top of page (0) + marker radius
     */
     const completeDungeon = () => {
-        dispatchDungeon("Completed")
+        dispatchDungeon({dungeon: "Completed", imageHeight:0})
         dispatchGlobalPlayerData({
             field: 'complete dungeon',
             playerID: route.params.playerID,
@@ -213,7 +225,8 @@ const Dungeon: React.FC = ({ }) => {
     }
 
     const cancelDungeon = () => {
-        dispatchDungeon("Completed")
+        dispatchDungeon({dungeon: "Completed", imageHeight:0})
+        setPromptComplete(false)
     }
 
     useLayoutEffect(() => {
@@ -221,14 +234,14 @@ const Dungeon: React.FC = ({ }) => {
             setFlipped(true)
         }
     }, [route.params.playerID])
-
+    
     return (
         <View style={[styles.dungeon_container,
-            flipped && {
-                transform: [{
-                    rotate: '180deg',
-                }]
-            }
+        flipped && {
+            transform: [{
+                rotate: '180deg',
+            }]
+        }
         ]}>
             {
                 currentDungeon.name === undefined ?
@@ -251,7 +264,7 @@ const Dungeon: React.FC = ({ }) => {
                             {dungeonList.map((d: string) => {
                                 return (
                                     <Pressable key={d} style={styles.dungeon_button}
-                                        onPressIn={() => dispatchDungeon(d)}>
+                                        onPressIn={() => dispatchDungeon({ dungeon : d, imageHeight : height })}>
                                         <Text style={styles.dungeon_name_text}>
                                             {d}
                                         </Text>
@@ -263,7 +276,7 @@ const Dungeon: React.FC = ({ }) => {
                     </>
                     :
                     <>
-                        {/*Back to game */}
+                        {/*Back to game/Close*/}
                         <Pressable style={styles.close_icon}
                             onPressIn={() => closeDungeon()}>
                             <Svg height="60" width="60" viewBox='0 0 512 512'
@@ -292,24 +305,25 @@ const Dungeon: React.FC = ({ }) => {
                         <View style={styles.dungeon_wrapper}
                             onTouchMove={(e) => markerDrag(e)}
                         >
-                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius} moveDelay={200} />
-                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={350} />
-                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={500} />
+                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius} moveDelay={200} />
+                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={350} />
+                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={500} />
                             <View style={styles.image_container}>
-                                <ImageBackground
-                                    testID='dungeon_image'
-                                    source={currentDungeon.uri as ImageSourcePropType}
-                                    resizeMode="contain"
-                                    resizeMethod='scale'
-                                    style={styles.dungeon_image}
-                                >
-                                    <Pressable key="lastroom"
-                                        onPressIn={() => setPromptComplete(true)}
-                                        style={[styles.lastroom, {
-                                            height: currentDungeon.lastroom_height
-                                        }]}>
-                                    </Pressable>
-                                </ImageBackground>
+                                    <ImageBackground
+                                        testID='dungeon_image'
+                                        source={currentDungeon.uri as ImageSourcePropType}
+                                        resizeMode="contain"
+                                        resizeMethod='scale'
+                                        style={styles.dungeon_image}
+                                    >
+                                        <Pressable key="lastroom"
+                                            onPressOut={() => setPromptComplete(true)}
+                                            style={[styles.lastroom, {
+                                                //height needs to change depending on aspect ratio for phone() vs tablet
+                                                height: currentDungeon.lastroom_height as number
+                                            }]}>
+                                        </Pressable>
+                                    </ImageBackground>
                             </View>
                         </View>
                     </>
@@ -357,8 +371,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     dungeon_image: {
-        height: '100%',
-        width: '100%',
+        width:'100%',
         flex: 1,
         justifyContent: "flex-end",
     },

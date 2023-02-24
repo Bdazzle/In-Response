@@ -31,6 +31,11 @@ TO DO
 *) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
 *) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related? really need to test on a tablet
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
+*) move player translates to a reducer (multiplayerTranslates.tsx)?
+*) change +/- life total buttons to be off center so they can be seen if single digit/3 digit
+  - life buttons contrast
+
+1) TABLET TO DO:
 */
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

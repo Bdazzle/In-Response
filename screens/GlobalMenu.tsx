@@ -59,10 +59,9 @@ const GlobalMenu: React.FC = ({ }) => {
                                     >
                                         {
                                             option === "Planechase" ?
-                                                <PlaneswalkerSvg viewBox="-100 0 1300 1300" fillColor="white" />
+                                                <PlaneswalkerSvg viewBox="-50 0 1300 1300" fillColor="white" />
                                                 :
-                                                <Svg viewBox={iconData[option].viewBox}
-                                                >
+                                                <Svg viewBox={iconData[option].viewBox}>
                                                     {iconData[option].pathData.map((p, i) => {
                                                         return (
                                                             <Path key={`${option} path ${i}`} d={p.path}
@@ -100,18 +99,15 @@ const styles = StyleSheet.create({
     },
     button_wrapper: {
         height: `${(100 / options.length) - 5}%`,
-        width: '100%',
         borderRadius: 50,
         borderColor: 'white',
         borderWidth: 1,
         border: '2px solid white',
     },
     button_touch: {
-        height: '100%',
-        width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        flexShrink: 1
+        flexShrink: 1,
     },
     button_text: {
         color: 'white',

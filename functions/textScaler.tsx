@@ -1,9 +1,6 @@
 import { Dimensions, PixelRatio, Platform } from 'react-native';
 
-const {
-  width,
-  height,
-} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 //320 is from iphone 5 scale, smallest phone baseline. idk how this number is calculated
 // const scale = width / 320;
@@ -37,7 +34,8 @@ export function lifeTotalScaler(totalPlayers: number, lifeTotal: number): number
 
 export function counterScaler(totalCounters: number, dimensions?: {height: number, width: number}){
   if(totalCounters === 1){
-    return textScaler(80)
+    //900 = test tablet width
+    return width >= 900 ? textScaler(55) : textScaler(80)
   } else if(totalCounters === 2) {
     return textScaler(52)
   } else if(totalCounters === 3){

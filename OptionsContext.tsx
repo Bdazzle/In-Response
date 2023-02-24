@@ -26,6 +26,7 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const allKeys = await AsyncStorage.getAllKeys()
             const allSaved = await AsyncStorage.multiGet(allKeys)
             setSavedData(allSaved)
+            // console.log(allSaved)
         }
         catch (e) {
             console.log(`error getting saved player names`, e)

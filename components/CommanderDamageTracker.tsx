@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Pressable, StyleSheet, Text, View, LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
@@ -46,6 +46,7 @@ function scaleY(totalPlayers: number, position: number, componentHeight: number)
 
 /*
 scale and translateY need to change depending on number of players and opponentID
+Commander damage number display only works if opponent name is 1 line
 */
 const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, opponentName, scaleTracker, showScale, componentDimensions }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
@@ -118,17 +119,22 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                     borderRadius: 5,
                 }
             ]}>
-            <Pressable testID={`${opponentName}_pressable`} style={styles.player_pressable}
+            <Pressable testID={`${opponentName}_pressable`}
+                style={styles().player_pressable}
                 onPress={() => handlePress()}
             >
                 {({ pressed }) => (
                     <>
-                        <Text style={[styles.all_text, {
-                            color: globalPlayerData[oppponentID].colors.secondary,
-                        }]}>
+                        <Text
+                            adjustsFontSizeToFit={true}
+                            numberOfLines={1}
+                            style={styles(globalPlayerData[oppponentID].colors.secondary).all_text}
+                        >
                             {opponentName}
                         </Text>
-                        <View style={styles.damage_row}>
+                        <View
+                            style={styles().damage_row}
+                        >
                             {
                                 isPressed &&
                                 <Pressable
@@ -136,7 +142,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                     onPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] + 1)}
                                     onLongPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] + 10)}
                                     delayLongPress={300}
-                                    style={styles.damage_pressable}
+                                    style={styles().damage_pressable}
                                 >
                                     <Svg viewBox='-50 0 600 600'
                                         style={{
@@ -154,12 +160,13 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 </Pressable>
                             }
                             {
-                                globalPlayerData[playerID!] && <Text style={[styles.all_text, {
-                                    color: globalPlayerData[oppponentID].colors.secondary,
-                                    fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
-                                    lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
-                                    width: isPressed ? '60%' : 'auto',
-                                }]}
+                                globalPlayerData[playerID!] && <Text
+                                    style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
+                                    {
+                                        fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7), //works on phone
+                                        lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                        width: isPressed ? '60%' : 'auto',
+                                    }]}
                                     adjustsFontSizeToFit={true}
                                     numberOfLines={1}
                                 >
@@ -173,7 +180,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                     onPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] - 1)}
                                     onLongPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] - 10)}
                                     delayLongPress={300}
-                                    style={styles.damage_pressable}
+                                    style={styles().damage_pressable}
                                 >
                                     <Svg viewBox='0 0 360 360'
                                         style={{
@@ -216,28 +223,28 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
         }
     }
 
-
     return (
-        <View style={styles.cdamage_container}
+        <View style={styles().cdamage_container}
         >
-            <Pressable style={styles.tax}
+            <Pressable style={styles().tax}
                 onPress={() => setTax(tax + 1)}
                 onLongPress={() => setTax(tax - 1)}
                 onLayout={(e) => getDimensions(e)}
             >
-                <View style={styles.tax_text_wrapper}>
-                    <Text style={{
-                        color: globalPlayerData[playerID].colors.secondary,
-                        fontFamily: 'Beleren',
-                        fontSize: textScaler(12),
-                    }}>Tax</Text>
+                <View style={styles().tax_text_wrapper}>
+                    <Text style={styles(globalPlayerData[playerID].colors.secondary).tax_text}
+                    >T</Text>
+                    <Text style={styles(globalPlayerData[playerID].colors.secondary).tax_text}
+                    >a</Text>
+                    <Text style={[styles(globalPlayerData[playerID].colors.secondary).tax_text, {
+                        paddingBottom:5
+                    }]}
+                    >x</Text>
                 </View>
-                <Text style={{
-                    color: globalPlayerData[playerID].colors.secondary,
-                    fontFamily: 'Beleren',
+                <Text style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
+                {
                     fontSize: pressDimensions?.height,
-                    letterSpacing: -2,
-                }}>{tax}</Text>
+                }]}>{tax}</Text>
             </Pressable>
             {Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
                 .map((id, index) => {
@@ -255,7 +262,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     )
 }
 
-const styles = StyleSheet.create({
+const styles = (textColor?: ColorValue | undefined) => StyleSheet.create({
     cdamage_container: {
         height: '100%',
         width: '100%',
@@ -270,9 +277,20 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
     },
-    tax_text_wrapper:{
-        width: '12%',
+    tax_text_wrapper: {
+        width: '15%',
         justifyContent: 'center',
+        height: '100%'
+    },
+    tax_text: {
+        fontFamily: 'Beleren',
+        fontSize: textScaler(12),//works for phone
+        color: textColor,
+    },
+    tax_total: {
+        color: textColor,
+        fontFamily: 'Beleren',
+        letterSpacing: -2,
     },
     damage_row: {
         flexDirection: 'row',
@@ -288,6 +306,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'Beleren',
         fontSize: textScaler(12),
+        color: textColor
     }
 })
 

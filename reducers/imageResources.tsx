@@ -22,7 +22,8 @@ export interface ImageReducerState {
 }
 
 /*
-fill boolean refers to theme reducer choices in App
+fill boolean refers to theme reducer choices in App.
+get device dimensions and change viewboxes depending on device width? (phone v. tablet)?
 */
 export const imageReducer = (state: ImageReducerState, action: string) => {
     switch (action) {
@@ -119,7 +120,7 @@ export const imageReducer = (state: ImageReducerState, action: string) => {
                         fill: true,
                     }
                 ],
-                SvgViewbox: '-100 0 1050 1050'
+                SvgViewbox: '-50 0 1050 1050' //tablet, width 900
             };
         case "neutral":
             return {

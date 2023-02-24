@@ -95,7 +95,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                 </Text>
                 <Svg viewBox={resources.SvgViewbox}
                     style={{
-                        height: '40%', width: '100%'
+                        height: '30%', width: '100%'
                     }}
                 >
                     {resources.SvgPaths &&
@@ -117,7 +117,8 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                     }
                 </Svg>
                 <Text style={[styles.total_text, {
-                    height: '30%'
+                    fontSize: textScaler(24),
+                    height: '35%'
                 }]}>{displayTotal}</Text>
             </View>
 
@@ -182,7 +183,7 @@ const Counters: React.FC = ({ }) => {
                     onPressIn={() => toStorm()}
                 >
                     <Text style={[styles.type_text, {
-                        fontSize: textScaler(28)
+                        fontSize: textScaler(24),
                     }]} >Storm</Text>
                     <Svg viewBox='-25 0 600 600' style={styles.storm_icon}>
                         <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />
@@ -234,7 +235,6 @@ const styles = StyleSheet.create({
     storm_container: {
         width: '50%',
         height: `${80 / Object.keys(counters).length}%`,
-        justifyContent: 'center',
         alignItems: 'center',
     },
     storm_icon: {
@@ -253,7 +253,6 @@ const styles = StyleSheet.create({
     total_text: {
         color: 'white',
         fontFamily: 'Beleren',
-        fontSize: textScaler(28)
     },
     close_icon: {
         position: "absolute",

@@ -9,8 +9,10 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from '
 import ResetModal from '../components/ResetModal';
 import GlobalMenu from './GlobalMenu'
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import shuffle from '../functions/shuffler';
 
 const window = Dimensions.get("window")
+console.log(window.width, window.height)
 /*
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 */
@@ -27,9 +29,18 @@ export const Game = () => {
     const swipeRef = useRef<Swipeable>(null)
 
     /* Random Player Functions */
+    //see if ppl notice difference between shuffler and Math random players
     const getRandomPlayer = () => {
-        const random = Math.ceil(Math.random() * totalPlayers)
-        setRandomPlayer(globalPlayerData[random].screenName)
+        /*shuffled players */
+        const playerNames = Object.keys(globalPlayerData).map((player) => {
+            return globalPlayerData[Number(player)].screenName
+        })
+        const shuffledPlayers = shuffle(playerNames)
+        setRandomPlayer(shuffledPlayers[0])
+
+        /* standard randomized players */
+        // const random = Math.ceil(Math.random() * totalPlayers)
+        // setRandomPlayer(globalPlayerData[random].screenName)
         randomPlayerScaleVal.value = 5
         randomPlayerZVal.value = 10
     }
@@ -164,13 +175,14 @@ export const Game = () => {
                             position: 'absolute',
                             height: '5%',
                             width: totalPlayers === 1 ? window.width / 2 : window.width,
+                            maxWidth: totalPlayers === 1 ? 350 : '100%',
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             top: totalPlayers === 1 ? 0 : totalPlayers === 3 ? (window.height - 38) * .65 : (window.height - 38) / 2,
                             transform: totalPlayers === 1 ? [
                                 { rotate: '90deg' },
-                                { translateX: window.width / 4 },
-                                { translateY: window.width / 5 }
+                                { translateX: window.width / 5 },
+                                { translateY: window.width / 6 }
                             ]
                                 : [],
                         }}
