@@ -12,7 +12,7 @@ import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler'
 import shuffle from '../functions/shuffler';
 
 const window = Dimensions.get("window")
-console.log(window.width, window.height)
+
 /*
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 */
