@@ -1,23 +1,24 @@
-import React, { createContext, useState } from "react"
-import { ColorTheme, DungeonData } from "."
+// import React, { createContext, useState } from "react"
+// import { ColorTheme, DungeonData } from "."
 
 
-export interface PlayerContextProps {
-    dungeonCompleted: boolean,
-    setDungeonComplete: React.Dispatch<React.SetStateAction<boolean>>,
-    dimensions: { width: number, height: number },
-    setDimensions: React.Dispatch<React.SetStateAction<{ width: number, height: number }>>,
-    playerName: string,
-    setPlayerName: React.Dispatch<React.SetStateAction<string>>,
-    dungeonData: DungeonData | undefined,
-    setDungeonData: React.Dispatch<React.SetStateAction<DungeonData | undefined>>,
-    colorTheme: ColorTheme,
-    setColorTheme : React.Dispatch<React.SetStateAction<ColorTheme>>,
-    playerID: number | undefined,
-    setPlayerID: React.Dispatch<React.SetStateAction<number | undefined>>,
-}
+// export interface PlayerContextProps {
+//     dungeonCompleted: boolean,
+//     setDungeonComplete: React.Dispatch<React.SetStateAction<boolean>>,
+//     dimensions: { width: number, height: number },
+//     setDimensions: React.Dispatch<React.SetStateAction<{ width: number, height: number }>>,
+//     playerName: string,
+//     setPlayerName: React.Dispatch<React.SetStateAction<string>>,
+//     dungeonData: DungeonData | undefined,
+//     setDungeonData: React.Dispatch<React.SetStateAction<DungeonData | undefined>>,
+//     colorTheme: ColorTheme,
+//     setColorTheme : React.Dispatch<React.SetStateAction<ColorTheme>>,
+//     playerID: number | undefined,
+//     setPlayerID: React.Dispatch<React.SetStateAction<number | undefined>>,
+// }
 
-export const PlayerContext = createContext({} as PlayerContextProps)
+// export const PlayerContext = createContext({} as PlayerContextProps)
+
 // export const PlayerContext = React.createContext<PlayerContextProps | null>(null)
 
 // export const PlayerProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {

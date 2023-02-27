@@ -41,6 +41,7 @@ export const Game = () => {
         /* standard randomized players */
         // const random = Math.ceil(Math.random() * totalPlayers)
         // setRandomPlayer(globalPlayerData[random].screenName)
+        
         randomPlayerScaleVal.value = 5
         randomPlayerZVal.value = 10
     }
