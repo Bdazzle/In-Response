@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     modal_container: {
         height: "20%",
         position: 'absolute',
-        backgroundColor: "white",
-        borderRadius: 5,
+        backgroundColor:'black',
+        borderRadius:10,
         width: '80%',
         marginLeft: '10%',
         marginTop: '50%',
@@ -55,13 +55,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: "space-evenly",
         zIndex: 1,
-        borderColor:'#001622',
-        borderWidth:.5
+        borderColor:'white',
+        borderWidth:3,
     },
     modal_text:{
         fontSize: textScaler(20),
         textAlign: 'center',
-        fontFamily:'Beleren'
+        fontFamily:'Beleren',
+        color:'white'
     },
     button_container:{
         flexDirection: 'row',

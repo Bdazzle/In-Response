@@ -88,9 +88,21 @@ const CounterCard: React.FC = ({ }) => {
                     value: total as number
                 })
             } else {
+                /*
+                sets counters to 0, but still keeps display
+                */
+                // dispatchGlobalPlayerData({
+                //     playerID: route.params.playerID,
+                //     field: 'counters',
+                //     subField: route.params.counterType,
+                //     value: 0
+                // })
+                /* 
+                remove counters
+                */
                 dispatchGlobalPlayerData({
                     playerID: route.params.playerID,
-                    field: 'counters',
+                    field: 'remove counter',
                     subField: route.params.counterType,
                     value: 0
                 })

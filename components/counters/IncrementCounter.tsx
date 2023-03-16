@@ -104,7 +104,6 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                             {total}
                         </Text>
                     </View>
-
                 </Pressable>
             </View>
     )

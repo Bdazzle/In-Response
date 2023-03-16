@@ -28,12 +28,14 @@ TO DO
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
   Swipeable components from React Native Gesture Handler used instead.
+*) example of passing variables to StyleSheet as function: CommanderDamageTracker
 *) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
-*) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related? really need to test on a tablet
+*) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
 *) move player translates to a reducer (multiplayerTranslates.tsx)?
-*) change +/- life total buttons to be off center so they can be seen if single digit/3 digit
-  - life buttons contrast
+
+FEATURES TO ADD:
+*) Round Timer
 
 1) TABLET TO DO:
 */

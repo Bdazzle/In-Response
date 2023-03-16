@@ -32,17 +32,22 @@ export function lifeTotalScaler(totalPlayers: number, lifeTotal: number): number
   }
 }
 
-export function counterScaler(totalCounters: number, dimensions?: {height: number, width: number}){
-  if(totalCounters === 1){
+export function counterScaler(totalCountersTypes: number, dimensions?: {height: number, width: number}){
+  if(totalCountersTypes === 1){
     //900 = test tablet width
-    return width >= 900 ? textScaler(55) : textScaler(80)
-  } else if(totalCounters === 2) {
-    return textScaler(52)
-  } else if(totalCounters === 3){
-    return textScaler(36)
-  } else if(totalCounters === 4){
-    return textScaler(32)
+    return width >= 900 ? textScaler(40) : textScaler(60)
+  } else if(totalCountersTypes === 2) {
+    // return textScaler(52)
+    // return textScaler(35)
+    return width >= 900 ? textScaler(35) : textScaler(60)
+  } else if(totalCountersTypes === 3){
+    // return textScaler(36)
+    return width >= 900 ? textScaler(35) : textScaler(60)
+  } else if(totalCountersTypes === 4){
+    // return textScaler(32)
+    return width >= 900 ? textScaler(32) : textScaler(60)
   } else {
-    return textScaler(26)
+    // return textScaler(26)
+    return width >= 900 ? textScaler(25) : textScaler(35)
   }
 }

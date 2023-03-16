@@ -306,8 +306,8 @@ const Dungeon: React.FC = ({ }) => {
                             onTouchMove={(e) => markerDrag(e)}
                         >
                             <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius} moveDelay={200} />
-                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={350} />
-                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={500} />
+                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={500} />
+                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={350} />
                             <View style={styles.image_container}>
                                     <ImageBackground
                                         testID='dungeon_image'

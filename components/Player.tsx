@@ -19,6 +19,11 @@ interface PlayerProps {
     playerID: number
 }
 
+type Dimensions = {
+    height: number,
+    width: number
+}
+
 /*
 everything not in GameContext gets reset when navigating.
 */
@@ -26,7 +31,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
     const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
-    const [dimensions, setDimensions] = useState<{ width: number, height: number }>({ width: 0, height: 0 })
+    const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 })
     const [scaleTracker, setScaleTracker] = useState<boolean>(false)
     const luminance = useLuminance(theme.secondary.slice(theme.secondary.indexOf('(') + 1, theme.secondary.lastIndexOf(',')).split(','))
 
@@ -63,9 +68,11 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
 
     return (
         <Pressable testID='player_container'
-            style={[styles.player_container, {
-                backgroundColor: theme.primary,
-            }]}
+            style={[styles.player_container,
+                    {
+                    backgroundColor: theme.primary,
+                }
+            ]}
             onLayout={(e) => getDimensions(e)}
             onPressIn={() => handleCDamageModal()}
         >
@@ -82,13 +89,10 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
                 <View testID="static_counter_wrapper"
-                    style={{
+                    style={[styles.static_counter_wrapper, {
                         width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : '55%',
-                        height: '25%',
-                        position: 'absolute',
                         marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : '20%',
-                        zIndex: 50,
-                    }}
+                    }]}
                 >
                     <StaticCounterContainer
                         playerID={playerID}
@@ -200,15 +204,13 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     ]}
                     onPressIn={() => toCounters()}
                 >
-                    <Text
+                    <Text testID='counter_pressable_text'
                         numberOfLines={1}
                         adjustsFontSizeToFit={true}
-                        style={{
+                        style={[styles.counter_pressable_text, {
                             color: theme.primary,
                             fontSize: textScaler(14, dimensions.width),
-                            fontFamily: 'Beleren',
-                            textAlign: 'center',
-                        }}>Counters</Text>
+                        }]}>Counters</Text>
                 </Pressable>
                 <View testID='counter_icons_container'
                     style={styles.counter_icons_container}
@@ -229,18 +231,41 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
         </Pressable>
     )
 }
-
+/*
+variables to be passed:
+theme :{ primary: String, secondary: String }
+gameType === 'normal' || 'commander'
+totalPlayers
+lifeTotal = globalPlayerData[playerID].lifeTotal
+playerDimensions
+*/
+interface StyleVars {
+    theme?: ColorTheme,
+    gameType?: string,
+    totalPlayers?: number,
+    lifeTotal?: number,
+    dimensions?: Dimensions
+}
+// theme? : ColorTheme, gameType? : string, totalPlayers? : number, lifeTotal?: number, dimensions?: Dimensions
+// {theme, gameType, totalPlayers, lifeTotal, dimensions} : StyleVars
+// const styles = (theme? : ColorTheme, gameType? : string, totalPlayers? : number, lifeTotal?: number, dimensions?: Dimensions) => StyleSheet.create({
 const styles = StyleSheet.create({
     player_container: {
         height: '100%',
         width: '100%',
         flexDirection: 'row',
         borderRadius: 15,
+        // backgroundColor: theme!.primary
     },
     life_and_static_container: {
         flexDirection: 'column',
         width: '100%',
         height: '100%',
+    },
+    static_counter_wrapper: {
+        height: '25%',
+        position: 'absolute',
+        zIndex: 50,
     },
     life_total_container: {
         flexDirection: 'row',
@@ -256,9 +281,11 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     life_total: {
-        color: 'black',
+        // color: 'black',
         textAlign: 'center',
         width: '100%',
+        // fontSize: lifeTotalScaler(totalPlayers!, lifeTotal!),
+        // color: theme!.secondary,
     },
     player_name_container: {
         height: '15%',
@@ -270,6 +297,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Beleren',
         height: '100%',
         textAlign: 'center',
+        // fontSize: dimensions!.height * .13,
+        // color: theme!.secondary,
     },
     life_button_container: {
         height: '70%',
@@ -322,6 +351,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 5,
         elevation: 10,
+    },
+    counter_pressable_text: {
+        fontFamily: 'Beleren',
+        textAlign: 'center',
+        // color: theme!.primary,
+        // fontSize: textScaler(14, dimensions!.width),
     },
     counter_icons_container: {
         height: '100%',
