@@ -72,6 +72,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
             try {
                 const savedColors = await AsyncStorage.getItem(`${String(playerID)} colors`)
                 if (savedColors) {
+                    // console.log(savedColors)
                     const parsedColors = JSON.parse(savedColors as string)
                     dispatchGlobalPlayerData({
                         field: 'colors',
@@ -82,6 +83,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
                 
                 const sn = await AsyncStorage.getItem(`${String(playerID)} screenName`)
                 if (sn) {
+                    // console.log(sn)
                     dispatchGlobalPlayerData({
                         playerID: playerID,
                         field: 'screenName',
