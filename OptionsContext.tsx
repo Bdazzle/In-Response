@@ -25,16 +25,24 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     potentially causing crashes
     */
     // const getSavedData = async () => {
+    //     let allKeys: readonly string[] = [];
+    //     let allSaved: readonly KeyValuePair[] = [];
     //     try {
-    //         const allKeys = await AsyncStorage.getAllKeys()
-    //         const allSaved = await AsyncStorage.multiGet(allKeys)
-    //         if(allSaved.length > 0) {
-    //             setSavedData(allSaved)
-    //         }
-    //         console.log(allKeys)
+    //         // const allKeys = await AsyncStorage.getAllKeys()
+    //         allKeys = await AsyncStorage.getAllKeys()
+    //         allSaved = await AsyncStorage.multiGet(allKeys)
+    //         // const allSaved = await AsyncStorage.multiGet(allKeys)
+    //         // if (allSaved.length > 0) {
+    //         //     setSavedData(allSaved)
+    //         // }
+    //         // console.log(allKeys)
     //     }
     //     catch (e) {
     //         console.log(`error getting saved player names`, e)
+    //     }
+
+    //     if (allSaved.length > 0) {
+    //         setSavedData(allSaved)
     //     }
     // }
 
