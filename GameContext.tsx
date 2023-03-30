@@ -22,7 +22,7 @@ export interface GameContextProps {
 export const GameContext = createContext({} as GameContextProps)
 
 /*
-TO DO
+TO DO/NOTES
 *)build command for apk: eas build -p android --profile preview
   -eas build uses .gitignore to access files, so change access to assets files after build so it's not uploaded to github
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
@@ -33,9 +33,6 @@ TO DO
 *) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
 *) move player translates to a reducer (multiplayerTranslates.tsx)?
-
-FEATURES TO ADD:
-*) Round Timer
 
 1) TABLET TO DO:
 */

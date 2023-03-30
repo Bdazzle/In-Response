@@ -5,7 +5,7 @@ import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
 import { ColorTheme, CountersProps } from '..';
-import CommanderDamage from "./CommanderDamageTracker"
+import CommanderDamage from "./DamageTracker"
 import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -77,21 +77,25 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             onPressIn={() => handleCDamageModal()}
         >
             {/* Commander Damage tracker */}
-            {gameType === 'commander' &&
+            {gameType === 'oathbreaker' || 'commander'  ?
                 <View testID='commander_damage_tracker'
                     style={styles.commander_damage_tracker} >
-                    <CommanderDamage playerID={playerID}
-                        scaleTracker={setScaleTracker}
-                        showScale={scaleTracker} />
-                </View>
+                    <CommanderDamage playerID = {playerID}
+                        scaleTracker = {setScaleTracker}
+                        showScale = {scaleTracker} 
+                        gameType = {gameType}
+                        />
+                </View> 
+                : 
+                <></>
             }
 
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
                 <View testID="static_counter_wrapper"
                     style={[styles.static_counter_wrapper, {
-                        width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : '55%',
-                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : '20%',
+                        width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) || gameType === "oathbreaker" ? '80%' : '55%',
+                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) || gameType === "oathbreaker" ? 0 : '20%',
                     }]}
                 >
                     <StaticCounterContainer

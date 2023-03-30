@@ -171,6 +171,14 @@ export const imageReducer = (state: ImageReducerState, action: string) => {
                     }
                 ],
                 SvgViewbox: "0 0 506 506"
+            };
+        case "dayCard":
+            return {
+                cardImage: require('../assets/cards/day.png')
+            };
+        case "nightCard":
+            return {
+                cardImage: require('../assets/cards/night.png')
             }
         default: return state
     }

@@ -8,7 +8,8 @@ import { textScaler } from "../functions/textScaler";
 interface CommanderDamageProps {
     playerID: number,
     scaleTracker: React.Dispatch<React.SetStateAction<boolean>>,
-    showScale: boolean
+    showScale: boolean,
+    gameType: string
 }
 
 interface TrackerProps {
@@ -205,9 +206,10 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     )
 }
 
-const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracker, showScale }) => {
+const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracker, showScale, gameType }) => {
     const { globalPlayerData, reset } = useContext(GameContext) as GameContextProps
     const [tax, setTax] = useState<number>(0)
+    const [tax2, setTax2] = useState<number>(0)
     const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>()
 
     useEffect(() => {
@@ -226,27 +228,39 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     return (
         <View style={styles().cdamage_container}
         >
-            <Pressable style={styles().tax}
+            <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
                 onPress={() => setTax(tax + 1)}
                 onLongPress={() => setTax(tax - 1)}
                 onLayout={(e) => getDimensions(e)}
             >
-                <View style={styles().tax_text_wrapper}>
-                    <Text style={styles(globalPlayerData[playerID].colors.secondary).tax_text}
-                    >T</Text>
-                    <Text style={styles(globalPlayerData[playerID].colors.secondary).tax_text}
-                    >a</Text>
-                    <Text style={[styles(globalPlayerData[playerID].colors.secondary).tax_text, {
-                        paddingBottom:5
-                    }]}
-                    >x</Text>
-                </View>
-                <Text style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                 {
-                    fontSize: pressDimensions?.height,
-                }]}>{tax}</Text>
+                    gameType === 'oathbreaker' ?
+                        <View style={styles().oath_tax_text_wrapper}>
+                            <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text}>Tax</Text>
+                        </View>
+                        :
+                        <View style={styles().tax_text_wrapper}>
+                            <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text}
+                            >T</Text>
+                            <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text}
+                            >a</Text>
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text, {
+                                paddingBottom: 5
+                            }]}
+                            >x</Text>
+                        </View>
+                }
+
+                <Text
+                    adjustsFontSizeToFit={true}
+                    numberOfLines={1}
+                    style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
+                    {
+                        fontSize: pressDimensions?.height,
+                        lineHeight: pressDimensions?.height
+                    }]}>{tax}</Text>
             </Pressable>
-            {Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
+            {gameType === 'commander' ? Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
                 .map((id, index) => {
                     return <Tracker key={`${globalPlayerData[Number(id)].screenName}_tracker`}
                         playerID={playerID}
@@ -257,40 +271,67 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         showScale={showScale}
                         componentDimensions={pressDimensions}
                     />
-                })}
+                })
+                :
+                <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
+                    onPress={() => setTax2(tax2 + 1)}
+                    onLongPress={() => setTax2(tax2 - 1)}
+                    onLayout={(e) => getDimensions(e)}
+                >
+                    <View style={styles().oath_tax_text_wrapper}>
+                        <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text}>Spell Tax</Text>
+                    </View>
+                        <Text
+                            adjustsFontSizeToFit={true}
+                            numberOfLines={1}
+                            style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
+                            {
+                                fontSize: pressDimensions?.height,
+                                lineHeight: pressDimensions?.height
+                            }]}>{tax2}</Text>
+                </Pressable>
+            }
         </View>
     )
 }
 
-const styles = (textColor?: ColorValue | undefined) => StyleSheet.create({
+const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleSheet.create({
     cdamage_container: {
         height: '100%',
         width: '100%',
         justifyContent: 'center',
         alignContent: 'center',
         marginLeft: 5,
-        paddingBottom: 5
+        paddingBottom: 5,
     },
     tax: {
         paddingLeft: '8%',
-        height: '25%',
+        height: gameType === 'oathbreaker' ? '30%' : '25%',
         width: '100%',
-        flexDirection: 'row',
+        flexDirection: gameType === 'commander' ? 'row' : 'column',
+        marginBottom: gameType === 'oathbreaker' ? 20 : 0,
+        alignItems:'center',
     },
     tax_text_wrapper: {
         width: '15%',
         justifyContent: 'center',
         height: '100%'
     },
+    oath_tax_text_wrapper: {
+        justifyContent: 'center',
+        width: '100%',
+    },
     tax_text: {
         fontFamily: 'Beleren',
-        fontSize: textScaler(12),//works for phone
+        fontSize: gameType === 'commander' ? textScaler(12) : textScaler(12),//works for phone
         color: textColor,
     },
     tax_total: {
         color: textColor,
         fontFamily: 'Beleren',
         letterSpacing: -2,
+        height: '100%',
+        width: '100%',
     },
     damage_row: {
         flexDirection: 'row',

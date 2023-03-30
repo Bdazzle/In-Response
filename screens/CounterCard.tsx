@@ -70,7 +70,7 @@ const CounterCard: React.FC = ({ }) => {
     const width = Dimensions.get('screen').width
 
     useEffect(() => {
-        dispatchCardImageSource(route.params.counterType)
+        dispatchCardImageSource(route.params.card)
         setTotal(route.params.currentCounters)
     }, [])
 
@@ -79,33 +79,35 @@ const CounterCard: React.FC = ({ }) => {
     }
 
     const handleSaveAndClose = () => {
-        if (Object.keys(counters).includes(route.params.counterType)) {
-            if (total as number > 0) {
-                dispatchGlobalPlayerData({
-                    playerID: route.params.playerID,
-                    field: 'counters',
-                    subField: route.params.counterType,
-                    value: total as number
-                })
-            } else {
-                /*
-                sets counters to 0, but still keeps display
-                */
-                // dispatchGlobalPlayerData({
-                //     playerID: route.params.playerID,
-                //     field: 'counters',
-                //     subField: route.params.counterType,
-                //     value: 0
-                // })
-                /* 
-                remove counters
-                */
-                dispatchGlobalPlayerData({
-                    playerID: route.params.playerID,
-                    field: 'remove counter',
-                    subField: route.params.counterType,
-                    value: 0
-                })
+        if (route.params.playerID){
+            if (Object.keys(counters).includes(route.params.card)) {
+                if (total as number > 0) {
+                    dispatchGlobalPlayerData({
+                        playerID: route.params.playerID,
+                        field: 'counters',
+                        subField: route.params.card,
+                        value: total as number
+                    })
+                } else {
+                    /*
+                    sets counters to 0, but still keeps display
+                    */
+                    // dispatchGlobalPlayerData({
+                    //     playerID: route.params.playerID,
+                    //     field: 'counters',
+                    //     subField: route.params.card,
+                    //     value: 0
+                    // })
+                    /* 
+                    remove counters
+                    */
+                    dispatchGlobalPlayerData({
+                        playerID: route.params.playerID,
+                        field: 'remove counter',
+                        subField: route.params.card,
+                        value: 0
+                    })
+                }
             }
         }
         navigation.navigate('Game', { menu: false })
@@ -116,7 +118,7 @@ const CounterCard: React.FC = ({ }) => {
             style={[styles.container, {
                 width: width,
                 height: height,
-                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID % 2 !== 0) ?
+                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID! % 2 !== 0) ?
                     [{
                         rotate: '180deg',
                     }, {
@@ -127,8 +129,8 @@ const CounterCard: React.FC = ({ }) => {
             <KeyboardAvoidingView testID='card_wrapper'
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={[styles.card_wrapper, {
-                    flex: route.params.counterType === 'storm' ? 0 : 1,
-                    height: route.params.counterType === 'storm' ? height * .45 : height,
+                    flex: route.params.card === 'storm' ? 0 : 1,
+                    height: route.params.card === 'storm' ? height * .45 : height,
                     width: width,
                 }]}>
                 {/* Image/Close functions */}
@@ -137,7 +139,7 @@ const CounterCard: React.FC = ({ }) => {
                     style={styles.card_pressable}
                 >
                     <Image
-                        style={Object.keys(counters).includes(route.params.counterType) || route.params.counterType === 'storm'
+                        style={Object.keys(counters).includes(route.params.card) || route.params.card === 'storm'
                             ? styles.counter_card_image : styles.static_card}
                         source={cardImageSource.cardImage!}
                         resizeMethod='scale'
@@ -148,7 +150,7 @@ const CounterCard: React.FC = ({ }) => {
                 {/* Total/Increment Buttons */}
                 {total !== undefined &&
                     <View style={[styles.button_wrapper, {
-                        height: route.params.counterType === 'storm' ? '25%' : '20%'
+                        height: route.params.card === 'storm' ? '25%' : '20%'
                     }]}>
                             <Pressable
                                 testID='plus'
@@ -171,7 +173,7 @@ const CounterCard: React.FC = ({ }) => {
 
                         <Pressable style={styles.total_wrapper}>
                             <TextInput style={[styles.total_text, {
-                                fontSize: route.params.counterType === 'storm' ? textScaler(42) : textScaler(56),
+                                fontSize: route.params.card === 'storm' ? textScaler(42) : textScaler(56),
                             }
                             ]}
                                 value={`${total}`}
@@ -204,7 +206,7 @@ const CounterCard: React.FC = ({ }) => {
                 }
 
             </KeyboardAvoidingView>
-            {route.params.counterType === 'storm' &&
+            {route.params.card === 'storm' &&
                 <View testID='mana_container' style={styles.mana_container}>
                     <View testID='mana_wrapper'
                         style={styles.mana_wrapper}>

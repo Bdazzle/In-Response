@@ -1,4 +1,4 @@
-import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions,  Pressable, StyleSheet } from 'react-native';
+import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet } from 'react-native';
 import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 import { GameContext, GameContextProps } from '../GameContext';
@@ -264,8 +264,8 @@ export const Game = () => {
                     }
                 </View>
 
-             </Swipeable>
-         </GestureHandlerRootView>
+            </Swipeable>
+        </GestureHandlerRootView>
     )
 }
 
@@ -281,7 +281,7 @@ const Oneplayer: React.FC<GameParams> = ({ playerIDs }) => {
         <View testID='player_provider_wrapper'
             style={styles.player_provider_wrapper}>
             {Object.keys(globalPlayerData).length > 0 ?
-                
+
                 <View testID='player_wrapper'
                     style={[styles.player_wrapper, {
                         height: width,
@@ -313,7 +313,7 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        
+
                         <View testID='player_wrapper' style={[p1style, styles.player_wrapper_2p]}>
 
                             <Player
@@ -322,13 +322,13 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                                 playerID={playerIDs[0]}
                             />
                         </View>
-                        
+
                     </View>
 
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        
+
                         <View testID='player_wrapper'
                             style={[p2style, styles.player_wrapper_2p]}>
 
@@ -338,7 +338,7 @@ const Twoplayer: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2style, con
                                 playerID={playerIDs[1]}
                             />
                         </View>
-                        
+
                     </View>
                 </View>
             }
@@ -364,7 +364,7 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
                     <View testID='player_provider_wrapper'
                         style={styles.player_provider_wrapper}
                     >
-                        
+
                         <View testID='p_wrapper_2p_screen'
                             style={[p1style, styles.p_wrapper_2p_screen]}>
                             <Player
@@ -373,7 +373,7 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
                                 playerID={playerIDs[0]}
                             />
                         </View>
-                        
+
                     </View>
 
                     <View testID='player_provider_wrapper'
@@ -461,7 +461,8 @@ const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
                 <View testID='players_container'
                     style={styles.players_container} >
 
-                    <Twoplayer playerIDs={playerIDs.slice(0, 2)}
+                    <Twoplayer
+                        playerIDs={[1, 3]}
                         p1style={{
                             transform: [
                                 { rotate: '90deg' },
@@ -483,7 +484,8 @@ const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
                             alignItems: 'center',
                         }} />
 
-                    <Twoplayer playerIDs={playerIDs.slice(2)}
+                    <Twoplayer
+                        playerIDs={[2, 4]}
                         p1style={{
                             transform: [
                                 { rotate: '270deg' },

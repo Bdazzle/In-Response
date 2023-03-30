@@ -48,6 +48,12 @@ const LifeMenu = () => {
                     >
                         <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
                     </Pressable>
+                    <Pressable 
+                    onPressIn={() => handleOptionDefault('oathbreaker')}
+                        style={styles.game_option}
+                    >
+                        <Text style={ gameType ==='oathbreaker' ? styles.selected_option : styles.option_text}>Oathbreaker</Text>
+                    </Pressable>
                 </View>
             </View>
 

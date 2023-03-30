@@ -56,8 +56,8 @@ export interface PlayerData {
 }
 
 export type CounterCardProps = {
-    counterType: string
-    playerID: number
+    card: string
+    playerID?: number
     currentCounters?: number
 }
 

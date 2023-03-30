@@ -124,7 +124,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
     const cardLongPress = (counterType: string) => {
         navigation.navigate("Card", {
             playerID: playerID as number,
-            counterType: counterType
+            card: counterType
         } as CounterCardProps)
     }
 
