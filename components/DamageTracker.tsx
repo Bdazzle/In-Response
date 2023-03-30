@@ -215,6 +215,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     useEffect(() => {
         if (reset === true) {
             setTax(0)
+            setTax2(0)
         }
     }, [reset])
 
