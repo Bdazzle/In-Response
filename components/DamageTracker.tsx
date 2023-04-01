@@ -321,10 +321,11 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
     oath_tax_text_wrapper: {
         justifyContent: 'center',
         width: '100%',
+        marginTop:'15%'
     },
     tax_text: {
         fontFamily: 'Beleren',
-        fontSize: gameType === 'commander' ? textScaler(12) : textScaler(12),//works for phone
+        fontSize: gameType === 'commander' ? textScaler(12) : textScaler(14),//works for phone
         color: textColor,
     },
     tax_total: {

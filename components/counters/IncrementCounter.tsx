@@ -37,7 +37,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
     const handleCounterPress = (counter: string) => {
         navigation.navigate("Card", {
             playerID: playerID,
-            counterType: counter,
+            card: counter,
             currentCounters: globalPlayerData[playerID].counterData![counterType]
         } as CounterCardProps)
     }

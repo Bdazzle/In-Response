@@ -33,6 +33,7 @@ TO DO/NOTES
 *) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
 *) move player translates to a reducer (multiplayerTranslates.tsx)?
+*)Oathbreaker tax text is too high on 4 players, overlapping w/dungeon icon
 
 1) TABLET TO DO:
 */
