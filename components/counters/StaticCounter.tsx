@@ -250,7 +250,6 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         paddingTop: '1%',
-        zIndex: 50,
     },
     dungeon_complete_touch: {
         flexDirection: 'row',

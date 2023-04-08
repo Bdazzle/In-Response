@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue } from 'react-native';
+import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue, Dimensions, useWindowDimensions } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
@@ -55,6 +55,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     const scaleVal = useSharedValue(0)
     const translateXVal = useSharedValue(0)
     const translateYVal = useSharedValue(0)
+    const {height, width} = useWindowDimensions();
     const totalPlayers = Object.keys(globalPlayerData).length
 
     const handleDamageChange = (val: number) => {
@@ -164,8 +165,11 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 globalPlayerData[playerID!] && <Text
                                     style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
                                     {
-                                        fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7), //works on phone
-                                        lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                        // fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7), //works on phone
+                                        fontSize: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
+                                        // componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                        // lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
+                                        lineHeight: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
                                         width: isPressed ? '60%' : 'auto',
                                     }]}
                                     adjustsFontSizeToFit={true}
@@ -246,7 +250,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text}
                             >a</Text>
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text, {
-                                paddingBottom: 5
+                                paddingBottom: 10
                             }]}
                             >x</Text>
                         </View>
@@ -257,6 +261,8 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     numberOfLines={1}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     {
+                        /* potential responsive text overflow (cutting off) with player 3 in 3 player game? */
+                        // fontSize: playerID === 3 && Object.keys(globalPlayerData).length === 3 ? (tax < 10  ? pressDimensions?.height : textScaler(230, pressDimensions?.width)) : pressDimensions?.height ,
                         fontSize: pressDimensions?.height,
                         lineHeight: pressDimensions?.height
                     }]}>{tax}</Text>
@@ -287,6 +293,8 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             numberOfLines={1}
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             {
+                                /* potential responsive text overflow (cutting off) with player 3 in 3 player game? */
+                                // fontSize: playerID === 3 && Object.keys(globalPlayerData).length === 3 ? (tax < 10  ? pressDimensions?.height : textScaler(230, pressDimensions?.width)) : pressDimensions?.height ,
                                 fontSize: pressDimensions?.height,
                                 lineHeight: pressDimensions?.height
                             }]}>{tax2}</Text>
@@ -331,6 +339,7 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
     tax_total: {
         color: textColor,
         fontFamily: 'Beleren',
+        paddingLeft:4,
         letterSpacing: -2,
         height: '100%',
         width: '100%',

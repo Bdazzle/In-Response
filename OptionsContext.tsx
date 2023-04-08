@@ -10,7 +10,6 @@ export interface OptionsContextProps {
     setGameType: React.Dispatch<React.SetStateAction<string>>,
     totalPlayers: number,
     setTotalPlayers: React.Dispatch<React.SetStateAction<number>>,
-    // savedData : StoredData,
 }
 
 export const OptionsContext = createContext({} as OptionsContextProps)
@@ -65,6 +64,5 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setStartingLife: setStartingLife,
         gameType: gameType,
         setGameType: setGameType,
-        // savedData: savedData,
     }}>{children}</OptionsContext.Provider>
 }

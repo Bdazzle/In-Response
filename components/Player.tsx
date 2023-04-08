@@ -77,7 +77,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             onPressIn={() => handleCDamageModal()}
         >
             {/* Commander Damage tracker */}
-            {gameType === 'oathbreaker' || 'commander'  ?
+            {gameType === 'oathbreaker' || gameType === 'commander'  ?
                 <View testID='commander_damage_tracker'
                     style={styles.commander_damage_tracker} >
                     <CommanderDamage playerID = {playerID}
@@ -285,7 +285,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     life_total: {
-        // color: 'black',
         textAlign: 'center',
         width: '100%',
         // fontSize: lifeTotalScaler(totalPlayers!, lifeTotal!),
@@ -336,8 +335,6 @@ const styles = StyleSheet.create({
     },
     life_icon_wrapper: {
         height: '40%',
-        // width:'25%',
-        // justifyContent:'flex-start',
     },
     increment_counters_container: {
         position: 'absolute',
@@ -359,8 +356,6 @@ const styles = StyleSheet.create({
     counter_pressable_text: {
         fontFamily: 'Beleren',
         textAlign: 'center',
-        // color: theme!.primary,
-        // fontSize: textScaler(14, dimensions!.width),
     },
     counter_icons_container: {
         height: '100%',
@@ -370,7 +365,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         bottom: 0,
-        height: '90%',
+        height:'80%',
         zIndex: 10,
         width: '20%'
     }

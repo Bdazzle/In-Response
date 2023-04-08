@@ -7,7 +7,7 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
-import { counterScaler } from "../../functions/textScaler"
+import { counterScaler, textScaler } from "../../functions/textScaler"
 
 interface IncrementCounterProps {
     counterType: string
@@ -98,7 +98,8 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                             allowFontScaling={true}
                             maxFontSizeMultiplier={1}
                             style={[styles.total_text, {
-                                fontSize: counterScaler(Object.keys(globalPlayerData[playerID].counterData as CounterData).length),
+                                // fontSize: counterScaler(Object.keys(globalPlayerData[playerID].counterData as CounterData).length),
+                                fontSize: total! < 10 ? counterScaler(Object.keys(globalPlayerData[playerID].counterData as CounterData).length) : textScaler(36),
                                 color: colorTheme.secondary,
                             }]}>
                             {total}

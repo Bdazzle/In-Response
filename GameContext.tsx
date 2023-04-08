@@ -23,7 +23,7 @@ export const GameContext = createContext({} as GameContextProps)
 
 /*
 TO DO/NOTES
-*)build command for apk: eas build -p android --profile preview
+*) build command for apk: eas build -p android --profile preview
   -eas build uses .gitignore to access files, so change access to assets files after build so it's not uploaded to github
 *) Animated.View prevents any child components onPress and onLongPress from firing normally,
   Because the touch event is intercepted by the Animated API. 
@@ -33,7 +33,8 @@ TO DO/NOTES
 *) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
 *) move player translates to a reducer (multiplayerTranslates.tsx)?
-*)Oathbreaker tax text is too high on 4 players, overlapping w/dungeon icon
+*) customizeable color inputs?
+*) additional tax for commander if partners/backgrounds?
 
 1) TABLET TO DO:
 */

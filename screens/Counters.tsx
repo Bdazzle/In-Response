@@ -159,7 +159,7 @@ const Counters: React.FC = ({ }) => {
 
     const toStorm = () => {
         navigation.navigate("Card", {
-            counterType: "storm",
+            card: "storm",
             currentCounters: 0,
             playerID: route.params.playerID
         } as CounterCardProps)
