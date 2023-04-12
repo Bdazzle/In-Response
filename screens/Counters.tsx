@@ -10,6 +10,7 @@ import { counters } from '../constants/CounterTypes';
 import { CounterCardProps } from '..';
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
+import useScreenRotation from '../hooks/useScreenRotation';
 
 interface CounterRowProps {
     counterType: string
@@ -152,6 +153,7 @@ const Counters: React.FC = ({ }) => {
     const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
+    const [rotate ] = useScreenRotation(totalPlayers, route.params.playerID)
 
     const closeCounters = () => {
         navigation.navigate("Game")
@@ -168,11 +170,8 @@ const Counters: React.FC = ({ }) => {
     return (
         <>
             <KeyboardAvoidingView style={[styles.counter_rows_container,
-            {
-                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID <= 2) ?
-                    [{
-                        rotate: '180deg'
-                    }] : []
+             rotate && {
+                transform: [rotate]
             }
             ]}>
                 {Object.keys(counters).map((counterType: string) => {

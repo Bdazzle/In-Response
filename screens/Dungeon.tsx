@@ -8,6 +8,7 @@ import { GameContext, GameContextProps } from '../GameContext';
 import { CompleteDungeonModal } from '../components/DungeonModals';
 import { RootStackParamList } from '../navigation';
 import { textScaler } from '../functions/textScaler';
+import useScreenRotation from '../hooks/useScreenRotation';
 
 type dungeonInfo = {
     name: string | undefined,
@@ -141,6 +142,7 @@ const Dungeon: React.FC = ({ }) => {
     const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [promptComplete, setPromptComplete] = useState<boolean>(false)
     const [flipped, setFlipped] = useState<boolean>(false)
+    const [rotate] = useScreenRotation(Object.keys(globalPlayerData).length, route.params.playerID)
     const marker_radius = 75
     const { width, height } = Dimensions.get('screen')
 
@@ -228,19 +230,11 @@ const Dungeon: React.FC = ({ }) => {
         dispatchDungeon({dungeon: "Completed", imageHeight:0})
         setPromptComplete(false)
     }
-
-    useLayoutEffect(() => {
-        if ((Object.keys(globalPlayerData).length === 2 && route.params.playerID === 2) || (Object.keys(globalPlayerData).length === 3 && route.params.playerID !== 3) || (Object.keys(globalPlayerData).length === 4 && route.params.playerID <= 2)) {
-            setFlipped(true)
-        }
-    }, [route.params.playerID])
     
     return (
         <View style={[styles.dungeon_container,
-        flipped && {
-            transform: [{
-                rotate: '180deg',
-            }]
+        rotate && {
+            transform: [rotate]
         }
         ]}>
             {

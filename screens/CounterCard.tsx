@@ -9,6 +9,7 @@ import { imageReducer, ImageReducerState, manaSymbols } from '../reducers/imageR
 import { counters } from '../constants/CounterTypes'
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
+import useScreenRotation from '../hooks/useScreenRotation';
 
 interface ManaCounterProps {
     source: ImageSourcePropType
@@ -65,6 +66,7 @@ const CounterCard: React.FC = ({ }) => {
             cardImage: undefined,
         })
     const [total, setTotal] = useState<number | undefined>()
+    const [rotate] = useScreenRotation(totalPlayers, route.params.playerID!)
 
     const height = Dimensions.get('screen').height
     const width = Dimensions.get('screen').width
@@ -118,13 +120,7 @@ const CounterCard: React.FC = ({ }) => {
             style={[styles.container, {
                 width: width,
                 height: height,
-                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID! <= 2) ?
-                    [{
-                        rotate: '180deg',
-                    }, {
-                        translateY: 70
-                    }
-                    ] : []
+                transform: rotate && [rotate, { translateY : 70 }]
             }]}>
             <KeyboardAvoidingView testID='card_wrapper'
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
