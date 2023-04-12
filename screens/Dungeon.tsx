@@ -230,7 +230,7 @@ const Dungeon: React.FC = ({ }) => {
     }
 
     useLayoutEffect(() => {
-        if ((Object.keys(globalPlayerData).length === 2 && route.params.playerID === 2) || (Object.keys(globalPlayerData).length === 3 && route.params.playerID !== 3) || (Object.keys(globalPlayerData).length === 4 && route.params.playerID % 2 !== 0)) {
+        if ((Object.keys(globalPlayerData).length === 2 && route.params.playerID === 2) || (Object.keys(globalPlayerData).length === 3 && route.params.playerID !== 3) || (Object.keys(globalPlayerData).length === 4 && route.params.playerID <= 2)) {
             setFlipped(true)
         }
     }, [route.params.playerID])

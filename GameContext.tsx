@@ -32,7 +32,7 @@ TO DO/NOTES
 *) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
 *) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
 *) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
-*) move player translates to a reducer (multiplayerTranslates.tsx)?
+*) move player translates to a reducer (multiplayerTranslates.tsx)? also exist for Dungeon, Counters, CounterCard
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
 
