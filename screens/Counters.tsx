@@ -169,7 +169,7 @@ const Counters: React.FC = ({ }) => {
         <>
             <KeyboardAvoidingView style={[styles.counter_rows_container,
             {
-                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID % 2 !== 0) ?
+                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID <= 2) ?
                     [{
                         rotate: '180deg'
                     }] : []
@@ -193,7 +193,7 @@ const Counters: React.FC = ({ }) => {
                 </Pressable>
             </KeyboardAvoidingView>
             <Pressable style={[styles.close_icon,
-            (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 3)) ?
+            (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 2)) ?
                 {
                     top: 0,
                     left: 0

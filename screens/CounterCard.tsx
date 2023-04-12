@@ -118,7 +118,7 @@ const CounterCard: React.FC = ({ }) => {
             style={[styles.container, {
                 width: width,
                 height: height,
-                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID! % 2 !== 0) ?
+                transform: (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && route.params.playerID! <= 2) ?
                     [{
                         rotate: '180deg',
                     }, {
