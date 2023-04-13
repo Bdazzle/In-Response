@@ -55,7 +55,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     const scaleVal = useSharedValue(0)
     const translateXVal = useSharedValue(0)
     const translateYVal = useSharedValue(0)
-    const {height, width} = useWindowDimensions();
+    const { width} = useWindowDimensions();
     const totalPlayers = Object.keys(globalPlayerData).length
 
     const handleDamageChange = (val: number) => {
@@ -165,10 +165,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 globalPlayerData[playerID!] && <Text
                                     style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
                                     {
-                                        // fontSize: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7), //works on phone
                                         fontSize: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
-                                        // componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
-                                        // lineHeight: componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7),
                                         lineHeight: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
                                         width: isPressed ? '60%' : 'auto',
                                     }]}
@@ -255,16 +252,15 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             >x</Text>
                         </View>
                 }
-
+                {/* Commander Tax  */}
                 <Text
                     adjustsFontSizeToFit={true}
                     numberOfLines={1}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     {
-                        /* potential responsive text overflow (cutting off) with player 3 in 3 player game? */
-                        // fontSize: playerID === 3 && Object.keys(globalPlayerData).length === 3 ? (tax < 10  ? pressDimensions?.height : textScaler(230, pressDimensions?.width)) : pressDimensions?.height ,
-                        fontSize: pressDimensions?.height,
-                        lineHeight: pressDimensions?.height
+                        /* text being cut off  for 2 player when double digits*/
+                        fontSize: Object.keys(globalPlayerData).length === 2 && tax >= 10 ? textScaler(53) : pressDimensions?.height,
+                        lineHeight: Object.keys(globalPlayerData).length === 2 && tax >= 10 ? (gameType === 'oathbreaker' ? pressDimensions && pressDimensions.height *.8 : pressDimensions?.height) : pressDimensions?.height
                     }]}>{tax}</Text>
             </Pressable>
             {gameType === 'commander' ? Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
@@ -280,6 +276,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     />
                 })
                 :
+                /* Spell Tax */
                 <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
                     onPress={() => setTax2(tax2 + 1)}
                     onLongPress={() => setTax2(tax2 - 1)}
@@ -293,10 +290,9 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             numberOfLines={1}
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             {
-                                /* potential responsive text overflow (cutting off) with player 3 in 3 player game? */
-                                // fontSize: playerID === 3 && Object.keys(globalPlayerData).length === 3 ? (tax < 10  ? pressDimensions?.height : textScaler(230, pressDimensions?.width)) : pressDimensions?.height ,
-                                fontSize: pressDimensions?.height,
-                                lineHeight: pressDimensions?.height
+                                /* text being cut off  for 2 player when double digits*/
+                                fontSize: Object.keys(globalPlayerData).length === 2 && tax2 >= 10 ? textScaler(53) : pressDimensions?.height,
+                                lineHeight: Object.keys(globalPlayerData).length === 2 && tax2 >= 10 ? pressDimensions && pressDimensions.height *.8 : pressDimensions?.height
                             }]}>{tax2}</Text>
                 </Pressable>
             }
