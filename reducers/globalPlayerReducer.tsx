@@ -5,7 +5,7 @@ needs to  have payload value for counter data, colors, screen name, and dungeon 
 change value to generic?
 */
 export type GlobalPlayerAction = {
-    playerID: number,
+    playerID: string | number,
     field: string,
     subField?: string | number
     value: string | CounterData | ColorTheme | Partial<DungeonData> | GlobalPlayerData | boolean | number

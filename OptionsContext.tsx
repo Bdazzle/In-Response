@@ -1,7 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types"
-import React, { createContext, useEffect, useState } from "react"
-import { StoredData } from "."
+import React, { createContext, useState } from "react"
+
 
 export interface OptionsContextProps {
     startingLife: number,
@@ -21,30 +19,8 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // const [savedData, setSavedData] = useState<readonly KeyValuePair[]>([])
 
     /*
-    potentially causing crashes
+    clear storage
     */
-    // const getSavedData = async () => {
-    //     let allKeys: readonly string[] = [];
-    //     let allSaved: readonly KeyValuePair[] = [];
-    //     try {
-    //         // const allKeys = await AsyncStorage.getAllKeys()
-    //         allKeys = await AsyncStorage.getAllKeys()
-    //         allSaved = await AsyncStorage.multiGet(allKeys)
-    //         // const allSaved = await AsyncStorage.multiGet(allKeys)
-    //         // if (allSaved.length > 0) {
-    //         //     setSavedData(allSaved)
-    //         // }
-    //         // console.log(allKeys)
-    //     }
-    //     catch (e) {
-    //         console.log(`error getting saved player names`, e)
-    //     }
-
-    //     if (allSaved.length > 0) {
-    //         setSavedData(allSaved)
-    //     }
-    // }
-
     // useEffect(() => {
     //     (async () =>{
     //         try {

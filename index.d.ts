@@ -66,7 +66,7 @@ export type CountersProps = {
 }
 
 export type GlobalPlayerData = {
-    [key: number] : PlayerData
+    [key: string | number] : PlayerData
 }
 
 export type AllScreenNavProps = CompositeNavigationProp<

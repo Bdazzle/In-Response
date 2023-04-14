@@ -6,6 +6,7 @@ import { ColorTheme, StartMenuStackNavProps } from "../.."
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 interface ColorSquareParams {
     primary: string,
@@ -50,7 +51,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
     const storeName = async (val: string) => {
         try {
             await AsyncStorage.setItem(`${String(playerID)} screenName`, val)
-            console.log(`${String(playerID)} screenName: ${val}`)
+            console.log(`saved ${val} to playerID ${playerID}`)
         }
         catch (e) {
             console.info(`error storing player ${playerID} screen name -> ${e}`)
@@ -67,6 +68,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
         })
     }
 
+
     useEffect(() => {
         (async () => {
             try {
@@ -80,7 +82,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
                         playerID: playerID
                     })
                 }
-                
+
                 const sn = await AsyncStorage.getItem(`${String(playerID)} screenName`)
                 if (sn) {
                     // console.log(sn)
@@ -119,6 +121,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
 creating global player object is handled in game context as totalPlayers is updated
 */
 const PlayerOptions = ({ }) => {
+    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
 
     return (
@@ -126,8 +129,14 @@ const PlayerOptions = ({ }) => {
             testID="player_name"
         >
             <Text style={styles.title_text} >Player Names</Text>
+            
             {Object.keys(globalPlayerData).map((p: string) => {
-                return <PlayerRow playerID={Number(p)} key={`Player ${p}`} />
+                /*   
+                check to see if playerID <= totalPlayers 
+                so that saved stuff doesn't get set to nonexistent player object.
+                Error caused a player to be created w/only screenName field
+                */
+                return Number(p) <= totalPlayers &&  <PlayerRow playerID={Number(p)} key={`Player ${p}`} />
             })}
             <FadeContainer style={styles.fade_container}>
                 <MenuNavButtons navTo="Game" navBack="TotalPlayers" labelBack="Total Players" labelTo="Start Game" />

@@ -4,7 +4,6 @@ import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayer
 import generatePlanarDeck from "./functions/planarDeck";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
 import newGameData from "./functions/newGame";
-import { KeyValuePair } from "@react-native-async-storage/async-storage/lib/typescript/types";
 
 export interface GameContextProps {
   currentMonarch: string | undefined;
@@ -35,7 +34,7 @@ TO DO/NOTES
 *) move player translates to a reducer or hooks?
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
-*) text scaler functions for DamageTracker?
+*) commander damage tracker removing from life total?
 
 1) TABLET TO DO:
 */
@@ -47,9 +46,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
   const [planarData, setPlanarData] = useState<PlanarData>({ currentPlane: '', deck: [], discard: [] })
   const [reset, setReset] = useState<boolean>(false)
-  /*
-  set initial player states for dungeon tracking (to pass to Dungeon screen)
-  */
+  
   useEffect(() => {
 
     dispatchGlobalPlayerData({
@@ -57,7 +54,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value: newGameData( totalPlayers, startingLife),
       playerID: 0
     })
-
+  
     const newPlanarDeck = generatePlanarDeck(totalPlayers)
     setPlanarData({
       currentPlane: newPlanarDeck[0],
