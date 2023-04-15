@@ -51,3 +51,29 @@ export function counterScaler(totalCountersTypes: number, dimensions?: {height: 
     return width >= 900 ? textScaler(25) : textScaler(35)
   }
 }
+// width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)) 
+export function cdmgLineHeight(componentHeight : number, totalPlayers: number){
+  if( width >= 900) {
+    return totalPlayers === 4 ? componentHeight * .75 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
+  }
+  if (width >= 600 && width < 900 ) {
+    return totalPlayers === 4 ? componentHeight *.7 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .9
+  }
+  if (width < 600) {
+    return totalPlayers === 4 ? componentHeight *.8 : totalPlayers === 3 ? componentHeight : componentHeight * .7
+  }
+}
+
+// width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
+export function cdmgScaler(componentHeight : number, totalPlayers: number){
+  if( width >= 900) {
+    return totalPlayers === 4 ? componentHeight * .8 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
+  }
+  if (width >= 600 && width < 900 ) {
+    // return totalPlayers === 4 ? componentHeight *.7 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .9
+    return totalPlayers === 4 ? componentHeight *.7 : componentHeight * .9
+  }
+  if (width < 600) {
+    return totalPlayers === 4 ? componentHeight *.8 : totalPlayers === 3 ? componentHeight : componentHeight * .7
+  }
+}

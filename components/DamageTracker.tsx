@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue, Dimen
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
-import { textScaler } from "../functions/textScaler";
+import { cdmgLineHeight, cdmgScaler, textScaler } from "../functions/textScaler";
 
 interface CommanderDamageProps {
     playerID: number,
@@ -162,11 +162,14 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 </Pressable>
                             }
                             {
+                                /*Player Damage total*/
                                 globalPlayerData[playerID!] && <Text
                                     style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
                                     {
-                                        fontSize: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
-                                        lineHeight: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
+                                        // fontSize: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
+                                        // lineHeight: width < 900 ? (componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height : componentDimensions.height * .7)) : ( componentDimensions && (totalPlayers === 4 ? componentDimensions.height * .8 : totalPlayers === 3 ? componentDimensions.height *.9 : componentDimensions.height * .7)),
+                                        fontSize: componentDimensions && cdmgScaler(componentDimensions!.height, totalPlayers),
+                                        lineHeight: componentDimensions && cdmgLineHeight(componentDimensions!.height, totalPlayers),
                                         width: isPressed ? '60%' : 'auto',
                                     }]}
                                     adjustsFontSizeToFit={true}
@@ -259,7 +262,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     {
                         /* text being cut off  for 2 player when double digits*/
-                        fontSize: Object.keys(globalPlayerData).length === 2 && tax >= 10 ? textScaler(53) : pressDimensions?.height,
+                        fontSize: Object.keys(globalPlayerData).length === 2 && tax >= 10 ? textScaler(53) : pressDimensions && pressDimensions!.height * .95,
                         lineHeight: Object.keys(globalPlayerData).length === 2 && tax >= 10 ? (gameType === 'oathbreaker' ? pressDimensions && pressDimensions.height *.8 : pressDimensions?.height) : pressDimensions?.height
                     }]}>{tax}</Text>
             </Pressable>
@@ -291,7 +294,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             {
                                 /* text being cut off  for 2 player when double digits*/
-                                fontSize: Object.keys(globalPlayerData).length === 2 && tax2 >= 10 ? textScaler(53) : pressDimensions?.height,
+                                fontSize: Object.keys(globalPlayerData).length === 2 && tax2 >= 10 ? textScaler(53) : pressDimensions && pressDimensions!.height * .95,
                                 lineHeight: Object.keys(globalPlayerData).length === 2 && tax2 >= 10 ? pressDimensions && pressDimensions.height *.8 : pressDimensions?.height
                             }]}>{tax2}</Text>
                 </Pressable>
