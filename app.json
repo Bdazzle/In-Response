@@ -2,12 +2,12 @@
   "expo": {
     "name": "In_Response",
     "slug": "In_Response",
-    "version": "1.0.0",
+    "version": "1.8",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/appIcons/Color_Wheel.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,12 +19,28 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.beedazzle.In_Response"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bf756dd9-c496-4b10-9018-4229073b742a"
+      }
     }
   }
 }
