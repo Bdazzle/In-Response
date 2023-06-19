@@ -10,7 +10,6 @@ import { counters } from '../constants/CounterTypes'
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
-// import Animated, { interpolate, useSharedValue } from 'react-native-reanimated';
 import FlipCard from '../components/counters/Flipcard';
 import TheRing from '../components/overlays/TheRingOverlay';
 
@@ -20,24 +19,25 @@ interface ManaCounterProps {
 }
 
 const ManaCounter: React.FC<ManaCounterProps> = ({ source }) => {
+    const { deviceType } = useContext(OptionsContext)
     const [total, setTotal] = useState<number>(0)
 
     return (
-        <View style={styles.mana_counter} >
+        <View style={styles().mana_counter} >
             {/*Mana Symbol/Plus*/}
             <Pressable onPressIn={() => setTotal(total + 1)}
-                style={styles.mana_pressable}
+                style={styles().mana_pressable}
             >
                 <Image source={source}
                     resizeMode='contain'
-                    style={styles.mana_image}
+                    style={styles().mana_image}
                 />
             </Pressable>
             {/* Total */}
-            <Text testID='mana_total' style={styles.mana_total} >{total}</Text>
+            <Text testID='mana_total' style={styles(undefined, deviceType).mana_total} >{total}</Text>
             {/* Minus */}
             <Pressable onPressIn={() => setTotal(total - 1)}
-                style={styles.mana_minus}
+                style={styles().mana_minus}
             >
                 <Svg viewBox='0 -100 520 520' height={'100%'} width={'50%'}>
                     <Path d="M281.633,48.328C250.469,17.163,209.034,0,164.961,0C120.888,0,79.453,17.163,48.289,48.328   c-64.333,64.334-64.333,169.011,0,233.345C79.453,312.837,120.888,330,164.962,330c44.073,0,85.507-17.163,116.671-48.328   c31.165-31.164,48.328-72.599,48.328-116.672S312.798,79.492,281.633,48.328z M260.42,260.46   C234.922,285.957,201.021,300,164.962,300c-36.06,0-69.961-14.043-95.46-39.54c-52.636-52.637-52.636-138.282,0-190.919   C95,44.042,128.901,30,164.961,30s69.961,14.042,95.459,39.54c25.498,25.499,39.541,59.4,39.541,95.46   S285.918,234.961,260.42,260.46z"
@@ -124,8 +124,9 @@ const CounterCard: React.FC = ({ }) => {
     }
 
     return (
-        <View testID='container'
-            style={[styles.container, {
+        <Pressable testID='container'
+        onPressIn={() => handleSaveAndClose()  }
+            style={[styles().container, {
                 width: width,
                 height: height,
                 transform: rotate && [rotate, { translateY: 70 }],
@@ -140,14 +141,7 @@ const CounterCard: React.FC = ({ }) => {
                     :
                     <KeyboardAvoidingView testID='card_wrapper'
                         behavior={Platform.OS === "ios" ? "padding" : "height"}
-                        style={[styles.card_wrapper,
-                        route.params.card === 'storm' ? {
-                            flex: 0,
-                            height: height * .45
-                        } :
-                            {
-                                justifyContent: 'center',
-                            }]}>
+                        style={styles(route.params.card).card_wrapper}>
                         {/* Image/Close functions */}
                         {
                             (typeof cardImageSource.cardImage === 'object' &&
@@ -158,11 +152,11 @@ const CounterCard: React.FC = ({ }) => {
                                 // Static Card
                                 <Pressable testID='card_pressable'
                                     onPressIn={() => handleSaveAndClose()}
-                                    style={styles.card_pressable}
+                                    style={styles().card_pressable}
                                 >
                                     <Image
                                         style={Object.keys(counters).includes(route.params.card) || route.params.card === 'storm'
-                                            ? styles.counter_card_image : styles.static_card}
+                                            ? styles().counter_card_image : styles().static_card}
                                         source={cardImageSource.cardImage!}
                                         resizeMethod='scale'
                                         resizeMode="contain"
@@ -172,14 +166,12 @@ const CounterCard: React.FC = ({ }) => {
                         
                         {/* Total/Increment Buttons */}
                         {total !== undefined &&
-                            <View style={[styles.button_wrapper, {
-                                height: route.params.card === 'storm' ? '25%' : '20%'
-                            }]}>
+                            <View style={styles().button_wrapper}>
                                 <Pressable
                                     testID='plus'
                                     onPress={() => setTotal(total + 1)}
                                     onLongPress={() => setTotal(total + 10)}
-                                    style={styles.increment_pressable}
+                                    style={styles().increment_pressable}
                                 >
                                     <Svg
                                         viewBox={`${width < 900 ? -width / 10 : 10} 0 650 650`}
@@ -194,11 +186,8 @@ const CounterCard: React.FC = ({ }) => {
                                     </Svg>
                                 </Pressable>
 
-                                <Pressable style={styles.total_wrapper}>
-                                    <TextInput style={[styles.total_text, {
-                                        fontSize: route.params.card === 'storm' ? textScaler(42) : textScaler(56),
-                                    }
-                                    ]}
+                                <Pressable style={styles().total_wrapper}>
+                                    <TextInput style={styles(route.params.card).total_text}
                                         value={`${total}`}
                                         testID="counter_total"
                                         keyboardType='numeric'
@@ -210,7 +199,7 @@ const CounterCard: React.FC = ({ }) => {
                                     testID='minus'
                                     onPress={() => setTotal(total - 1)}
                                     onLongPress={() => setTotal(total - 10)}
-                                    style={styles.increment_pressable}
+                                    style={styles().increment_pressable}
                                 >
                                     <Svg
                                         viewBox={`${width < 900 ? -width / 10 : -width / 90} 0 420 420`}
@@ -232,9 +221,9 @@ const CounterCard: React.FC = ({ }) => {
 
 
             {route.params.card === 'storm' &&
-                <View testID='mana_container' style={styles.mana_container}>
+                <View testID='mana_container' style={styles().mana_container}>
                     <View testID='mana_wrapper'
-                        style={styles.mana_wrapper}>
+                        style={styles().mana_wrapper}>
                         {
                             manaSymbols.map((m, i) => {
                                 return <ManaCounter key={`manasymbol_${i}`} source={m} />
@@ -243,26 +232,32 @@ const CounterCard: React.FC = ({ }) => {
                     </View>
                 </View>
             }
-        </View>
+        </Pressable>
     )
 }
 
-const styles = StyleSheet.create({
+const styles = (cardName? : string, deviceType?: string) => StyleSheet.create({
     container: {
         backgroundColor: 'black',
         justifyContent: 'center',
         alignItems: 'center',
+        flex:1,
     },
     card_wrapper: {
+        flex: cardName === 'storm' ? 0 : 1,
+        height: cardName === 'storm' ? '55%' : '100%',
         width: '100%',
-        zIndex: 20,
-        top: 0,
         backgroundColor: 'black',
     },
     card_pressable: {
+        height:'80%',
         width: '100%',
+        justifyContent: 'center',
         alignItems: 'center',
-        justifyContent: 'center'
+    },
+    counter_card_image: {
+        height: '100%',
+        width: '100%',
     },
     static_card: {
         resizeMode: 'contain',
@@ -274,20 +269,14 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: 'center',
     },
-    counter_card_image: {
-        height: '100%',
-        width: '100%',
-    },
     button_wrapper: {
+        height:'20%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
     },
     total_wrapper: {
-        flex: 1,
         width: '33%',
-        alignContent: 'center',
-        justifyContent: 'center',
     },
     total_text: {
         color: 'white',
@@ -295,21 +284,20 @@ const styles = StyleSheet.create({
         borderBottomColor: 'white',
         borderWidth: 0,
         borderBottomWidth: 2,
-        fontFamily: 'Beleren'
+        fontFamily: 'Beleren',
+        fontSize: cardName === 'storm' ? textScaler(48) : textScaler(56),
     },
     mana_container: {
-        height: '55%',
-        flex: 1,
-        top: 0,
+        height: '45%',
         overflow: 'visible',
     },
     mana_wrapper: {
-        alignContent: 'center',
+        justifyContent:'center',
         flex: 1,
     },
     mana_counter: {
         flexDirection: 'row',
-        height: '14%',
+        height: '16%',
         width: '100%',
         bottom: 0,
         alignItems: 'center',
@@ -318,7 +306,7 @@ const styles = StyleSheet.create({
     mana_total: {
         color: 'white',
         textAlign: 'center',
-        fontSize: textScaler(34),
+        fontSize: deviceType === 'phone' ? textScaler(42) : textScaler(30),
         fontFamily: 'Beleren',
         borderBottomColor: 'white',
         borderWidth: 0,
@@ -341,11 +329,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    flip_button: {
-        borderColor: 'white',
-        borderRadius: 50,
-        borderWidth: 1,
-    }
 })
 
 export default CounterCard

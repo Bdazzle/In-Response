@@ -23,6 +23,7 @@ TO DO/NOTES
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
 *) Add mechanics options screen, to have a less busy UI.
+*)make black background in CounterCard pressable to navigate away from card screen
 
 *) check text scaling functions to see if using component width instead of component height will refactor into clearer code 
 1) TABLET TO DO:

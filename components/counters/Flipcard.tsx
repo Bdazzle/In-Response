@@ -1,18 +1,18 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { StyleSheet, ImageSourcePropType, Pressable, View, Image, useWindowDimensions, LayoutChangeEvent } from "react-native";
+import React, { useRef } from "react";
+import { StyleSheet, ImageSourcePropType, Pressable, View, Image } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
-import { OptionsContext } from "../../OptionsContext";
-import { iconData, ShapeData } from "../../reducers/imageResources";
+import { iconData } from "../../reducers/imageResources";
 
 
 interface FlipCardProps {
     front: ImageSourcePropType,
     back: ImageSourcePropType,
     onLayout?: ({ width, height }: { width: number, height: number }) => void,
+    onFlip?: () => void,
 }
 
-const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout }) => {
+const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip }) => {
     const flipVal = useSharedValue(0)
     const imageRef = useRef<Image>(null)
 
@@ -42,6 +42,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout }) => {
 
     const flipCard = () => {
         flipVal.value = flipVal.value ? 0 : 1
+        onFlip && onFlip()
     }
 
     const handleImageLayout = () => {
@@ -82,7 +83,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout }) => {
             </View>
             <Pressable testID="flip-button"
                 onPress={() => flipCard()}
-                style={ styles.flipButton}
+                style={styles.flipButton}
             >
                 <Svg viewBox={iconData['flip'].viewBox}>
                     {
@@ -132,12 +133,11 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderRadius: 50,
         borderWidth: 1,
-        width: 50,
-        height: 48,
+        width: 80,
+        height: 78,
         zIndex: 50,
         backgroundColor: 'black',
-        position: 'absolute',
-        bottom: 0,
+        bottom: '5%',
     }
 })
 

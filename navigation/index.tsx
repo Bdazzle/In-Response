@@ -109,6 +109,12 @@ function RootNavigator() {
       <Stack.Screen name="Dungeon" component={Dungeon} initialParams={{}} />
       <Stack.Screen name="Card" component={CounterCard} initialParams={{}} />
       <Stack.Screen name="Counters" component={Counters} />
+      {/* <Stack.Screen name="Card" component={CounterCard} initialParams={{ playerID: 1, 
+        // card:'the ring'
+        // card:"monarch"
+        // card:"initiative"
+        card:"storm"
+        }} /> */}
     </Stack.Navigator>
   );
 }
