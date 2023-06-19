@@ -22,9 +22,7 @@ TO DO/NOTES
 *) move player translates to a reducer or hooks?
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
-*) commander damage tracker removing from life total?
 *) Add mechanics options screen, to have a less busy UI.
-*) add The Ring mechanics/cards. add ring to globalplayerdata and Game.tsx reset
 
 *) check text scaling functions to see if using component width instead of component height will refactor into clearer code 
 1) TABLET TO DO:

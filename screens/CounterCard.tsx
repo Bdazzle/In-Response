@@ -5,7 +5,7 @@ import { Text, Image, View, StyleSheet, Dimensions, TextInput, TextInputChangeEv
 import Svg, { Path } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
-import { DualFacedCard, imageReducer, ImageReducerState, manaSymbols } from '../reducers/imageResources';
+import { imageReducer, ImageReducerState, manaSymbols } from '../reducers/imageResources';
 import { counters } from '../constants/CounterTypes'
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';

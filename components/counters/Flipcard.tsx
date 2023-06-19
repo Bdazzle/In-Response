@@ -1,6 +1,5 @@
-import { stringifyQuery } from "next/dist/server/server-route-utils";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ImageSourcePropType, Pressable, View, Image, useWindowDimensions, LayoutChangeEvent } from "react-native";
+import { StyleSheet, ImageSourcePropType, Pressable, View, Image, useWindowDimensions, LayoutChangeEvent } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 import { OptionsContext } from "../../OptionsContext";
@@ -47,102 +46,43 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout }) => {
 
     const handleImageLayout = () => {
         if (imageRef.current) {
-          imageRef.current.measure((x, y, width, height, pageX, pageY) => {
-            onLayout && onLayout({ width, height });
-          });
+            imageRef.current.measure((x, y, width, height, pageX, pageY) => {
+                onLayout && onLayout({ width, height });
+            });
         }
-      };
+    };
 
     return (
-        <View style={{
-            width: '100%',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <View testID='flip-card-container'
-                style={{
-                    width: '100%',
-                    // width:imageDimensions!.width,
-                    height: '100%',
-                    alignItems: 'center',
-
-                    // borderColor: 'white',
-                    // borderWidth: 1,
-                }}>
+        <View testID="flip-card-container"
+            style={styles.flipcardContainer}>
+            <View testID='flip-card-wrapper'
+                style={styles.flipcardWrapper}>
                 {/* Front */}
-                <Animated.View testID='flip-wrapper'
-                    style={[frontAnimatedStyle, {
-                        width: '100%',
-                        height: '100%',
-                        justifyContent: 'center',
-                        backfaceVisibility: 'hidden',
-
-                    //    width: width > imageDimensions!.width ? imageDimensions?.width : '100%',
-                        // width: imageDimensions?.width,
-                        // flex:1,
-                        // alignItems:'center',
-                        // justifyContent:'center',
-                        // borderColor: 'white',
-                        // borderWidth: 1,
-                    }]}
+                <Animated.View testID='front-wrapper'
+                    style={[frontAnimatedStyle, styles.frontWrapper]}
                 >
-                    <Image source={front}
-                    ref={imageRef}
-                        // onLayout={(e) => getImageSize(e)}
+                    <Image testID="front-image"
+                        source={front}
+                        ref={imageRef}
                         onLayout={() => handleImageLayout()}
-                        style={{
-                            // resizeMode: deviceType === 'phone' ? 'contain' : 'stretch',
-                            // resizeMode:'cover',
-                            resizeMode: 'contain',
-                            // width: width > imageDimensions!.width ? imageDimensions?.width : '100%',
-                            width: '100%',
-                            // height:'100%',
-
-                            
-                            // width:width * .8,
-                            // aspectRatio: 1
-
-                            // borderColor: 'white',
-                            // borderWidth: 1,
-                        }}
+                        style={styles.frontImage}
                     />
                 </Animated.View>
                 {/* Back */}
-                <Animated.View testID='flip-wrapper'
-                    style={[backAnimatedStyle, {
-                        width: '100%',
-                        height: '100%',
-                        backfaceVisibility: 'hidden',
-                        justifyContent: 'center',
-                        position: 'absolute',
-                    }]}
+                <Animated.View testID='back-wrapper'
+                    style={[backAnimatedStyle, styles.backWrapper]}
                 >
-                    <Image source={back}
-                        // onLayout={(e) => getImageSize(e)}
-                        style={{
-                            resizeMode: 'contain',
-                            width: '100%',
-                            height: '100%',
-                        }}
+                    <Image
+                        testID="back-image"
+                        source={back}
+                        style={styles.backImage}
                     />
                 </Animated.View>
 
             </View>
-            <Pressable
+            <Pressable testID="flip-button"
                 onPress={() => flipCard()}
-                style={{
-                    borderColor: 'white',
-                    borderRadius: 50,
-                    borderWidth: 1,
-                    width: 50,
-                    height: 48,
-                    zIndex: 50,
-                    backgroundColor: 'black',
-                    // marginBottom: -30,
-                    position: 'absolute',
-                    bottom: 0,
-                }}
+                style={ styles.flipButton}
             >
                 <Svg viewBox={iconData['flip'].viewBox}>
                     {
@@ -154,83 +94,52 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout }) => {
     )
 }
 
+const styles = StyleSheet.create({
+    flipcardContainer: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    flipcardWrapper: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+    },
+    frontWrapper: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        backfaceVisibility: 'hidden',
+    },
+    frontImage: {
+        resizeMode: 'contain',
+        width: '100%',
+    },
+    backWrapper: {
+        width: '100%',
+        height: '100%',
+        backfaceVisibility: 'hidden',
+        justifyContent: 'center',
+        position: 'absolute',
+    },
+    backImage: {
+        resizeMode: 'contain',
+        width: '100%',
+        height: '100%',
+    },
+    flipButton: {
+        borderColor: 'white',
+        borderRadius: 50,
+        borderWidth: 1,
+        width: 50,
+        height: 48,
+        zIndex: 50,
+        backgroundColor: 'black',
+        position: 'absolute',
+        bottom: 0,
+    }
+})
+
 export default FlipCard
 
-{/* <View style={{
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-                <View testID='flip-card-container'
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        alignItems:'center'
-                        // borderColor: 'white',
-                        // borderWidth: 1,
-                    }}>
-                    <Animated.View testID='flip-wrapper'
-                        style={[frontAnimatedStyle, {
-                            width: '100%',
-                            height: '100%',
-                            justifyContent: 'center',
-                            backfaceVisibility: 'hidden',
-                            // borderColor: 'white',
-                            // borderWidth: 1,
-                        }]}
-                    >
-                        <Image source={imageSource.front}
-                            onLayout={(e) => getImageSize(e)}
-                            style={{
-                                resizeMode: 'contain',
-                                width: '100%',
-                            }}
-                        />
-                    </Animated.View>
-
-                    <Animated.View testID='flip-wrapper'
-                        style={[backAnimatedStyle, {
-                            width: '100%',
-                            height: '100%',
-                            backfaceVisibility: 'hidden',
-                            // borderColor: 'white',
-                            // borderWidth: 1,
-                            justifyContent: 'center',
-                            position:'absolute',
-                        }]}
-                    >
-                        <Image source={imageSource.back}
-                            onLayout={(e) => getImageSize(e)}
-                            style={{
-                                resizeMode: 'contain',
-                                // resizeMode: 'cover',
-                                // margin: 0,
-                                width: '100%',
-
-                            }}
-                        />
-                    </Animated.View>
-                    <Pressable
-                        onPress={() => flipCard()}
-                        style={{
-                            borderColor: 'white',
-                            borderRadius: 50,
-                            borderWidth: 1,
-                            width: 50,
-                            height: 48,
-                            zIndex: 50,
-                            backgroundColor: 'black',
-                            // marginBottom: -30,
-                            position: 'absolute',
-                            bottom: 0,
-                        }}
-                    >
-                        <Svg viewBox={iconData['flip'].viewBox}>
-                            {
-                                iconData['flip'].pathData.map((p, i: number) => (<Path key={i} d={p.path} fill={p.fill} ></Path>))
-                            }
-                        </Svg>
-                    </Pressable>
-                </View>
-            </View> */}
