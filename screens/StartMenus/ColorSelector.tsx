@@ -71,6 +71,7 @@ const ColorSelector: React.FC = ({ }) => {
                                 width: `${squareWidth}%`
                             }]}
                                 onPressIn={() => colorPress(color[1])}
+                                accessibilityLabel={`${color[0]}`}
                             >
                                 <View style={[styles.color_square, {
                                     backgroundColor: color[1]

@@ -69,24 +69,24 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     return (
         <Pressable testID='player_container'
             style={[styles.player_container,
-                    {
-                    backgroundColor: theme.primary,
-                }
+            {
+                backgroundColor: theme.primary,
+            }
             ]}
             onLayout={(e) => getDimensions(e)}
             onPressIn={() => handleCDamageModal()}
         >
             {/* Commander Damage tracker */}
-            {gameType === 'oathbreaker' || gameType === 'commander'  ?
+            {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
                     style={styles.commander_damage_tracker} >
-                    <CommanderDamage playerID = {playerID}
-                        scaleTracker = {setScaleTracker}
-                        showScale = {scaleTracker} 
-                        gameType = {gameType}
-                        />
-                </View> 
-                : 
+                    <CommanderDamage playerID={playerID}
+                        scaleTracker={setScaleTracker}
+                        showScale={scaleTracker}
+                        gameType={gameType}
+                    />
+                </View>
+                :
                 <></>
             }
 
@@ -119,6 +119,8 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         style={styles.background_increment_wrapper}>
                         <Pressable
                             testID='background_plus'
+                            accessibilityLabel={`${playerName} Gain Life`}
+                            accessibilityHint='Press to add, hold to add by 10'
                             style={
                                 ({ pressed }) =>
                                     [
@@ -147,6 +149,8 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             </View>
                         </Pressable>
                         <Pressable
+                            accessibilityLabel={`${playerName} lose Life`}
+                            accessibilityHint='Press to subtract, hold to subtract by 10'
                             testID='background_minus'
                             style={({ pressed }) => [
                                 {
@@ -176,6 +180,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     {/* Life Total */}
                     <View testID='life_total_text_container' style={styles.life_total_text_container}>
                         <Text testID='life_total'
+                        accessibilityLabel={`${playerName} ${globalPlayerData[playerID].lifeTotal} life`}
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.life_total, {
@@ -207,8 +212,10 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         { backgroundColor: pressed ? 'grey' : theme.secondary }
                     ]}
                     onPressIn={() => toCounters()}
+                    accessibilityLabel={`${playerName} Counters`}
                 >
                     <Text testID='counter_pressable_text'
+                    // accessibilityLabel={`${playerName} Counters`}
                         numberOfLines={1}
                         adjustsFontSizeToFit={true}
                         style={[styles.counter_pressable_text, {
@@ -343,7 +350,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         bottom: 5,
-        height:'90%',
+        height: '90%',
         zIndex: 10,
         width: '20%',
     }

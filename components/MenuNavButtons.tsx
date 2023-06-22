@@ -40,6 +40,7 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                     <Pressable style={styles.back_touchable}
                         onPressIn={() => handleBack()}
                         testID="back_press"
+                        accessibilityLabel={`Back to ${labelBack}`}
                     >
                         <Svg viewBox="-50 -50 600 600" style={{
                             height:'100%',
@@ -69,6 +70,7 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                     <Pressable style={styles.next_touchable}
                         testID="next_press"
                         onPressIn={() => handleNext()}
+                        accessibilityLabel={`Continue to ${labelTo}`}
                     >
                         <Svg viewBox="-50 -50 600 600"
                         style={{
@@ -101,9 +103,10 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
 const styles = StyleSheet.create({
     buttons_container: {
         width: '100%',
+        // height:'60%'
     },
     buttons_wrapper: {
-        height: '60%',
+        height: '50%',
         width: '100%',
         flexDirection: 'row',
         justifyContent:'space-between'

@@ -46,6 +46,9 @@ const GlobalMenu: React.FC = ({ }) => {
                             return (
                                 <View key={option} style={styles.button_wrapper} >
                                     <Pressable style={styles.button_touch} testID="iconPressIn"
+                                    accessibilityLabelledBy={option}
+                                    aria-labelledby={option}
+                                    accessibilityRole="button"
                                         onPressIn={() =>
                                             option === "New Game" ? resetGame() :
                                                 option === 'Players' ? toPlayerOptions() :
@@ -64,7 +67,7 @@ const GlobalMenu: React.FC = ({ }) => {
                                                 
                                         }
                                     </Pressable>
-                                    <Text style={styles.button_text}>{option}</Text>
+                                    <Text nativeID={option} style={styles.button_text}>{option}</Text>
                                 </View>
                             )
                         })}

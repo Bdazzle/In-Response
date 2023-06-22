@@ -38,19 +38,19 @@ const LifeMenu = () => {
                 <View style={styles.game_options_wrapper}>
                     <Pressable 
                     onPressIn={() => handleOptionDefault('commander')}
-                        style={styles.game_option}
+                        style={gameType ==='commander' ? styles.selected_game_option : styles.game_option}
                     >
                         <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
                     </Pressable>
                     <Pressable 
                     onPressIn={() => handleOptionDefault('normal')}
-                        style={styles.game_option}
+                        style={gameType ==='normal' ? styles.selected_game_option : styles.game_option}
                     >
                         <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
                     </Pressable>
                     <Pressable 
                     onPressIn={() => handleOptionDefault('oathbreaker')}
-                        style={styles.game_option}
+                        style={gameType ==='oathbreaker' ? styles.selected_game_option : styles.game_option}
                     >
                         <Text style={ gameType ==='oathbreaker' ? styles.selected_option : styles.option_text}>Oathbreaker</Text>
                     </Pressable>
@@ -64,7 +64,7 @@ const LifeMenu = () => {
                         return index !== chunkedOptions.length - 1 ? <View key={index} style={styles.options_subcontainer}>
                             {chunks.map((c: number) => {
                                 return <Pressable key={c}
-                                    style={styles.option_touch}
+                                    style={startingLife === c ? styles.selected_option_touch : styles.option_touch}
                                     onPressIn={() => handleSelectTotal(c)}
                                 >
                                     <Text key={`${c}_text`} 
@@ -87,6 +87,7 @@ const LifeMenu = () => {
                                 <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
                                     <Pressable testID="life_input_touch" style={styles.input_wrapper}>
                                         <TextInput testID="life_input" style={styles.input_text}
+                                        accessibilityLabel="Input custom starting life total"
                                             keyboardType='numeric'
                                             onSubmitEditing={(e) => handleSelectTotal(e.nativeEvent.text)}
                                         ></TextInput>
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     },
     gametype_container:{
         width:'100%',
-        height:'30%',
+        height:'40%',
         justifyContent: 'space-evenly'
     },
     title_text: {
@@ -134,19 +135,50 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
-        width:'80%'
+        width:'80%',
+        minHeight:80,
+        justifyContent:'center',
+    },
+    selected_game_option:{
+        backgroundColor:'white',
+        borderColor: 'white',
+        borderRadius: 5,
+        borderWidth: 2,
+        width:'80%',
+        minHeight:80,
+        justifyContent:'center',
     },
     option_touch: {
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
         width: '30%',
+        alignItems:'center',
+        justifyContent:'center',
+        minHeight:80,
+    },
+    selected_option_touch:{
+        backgroundColor:'white',
+        borderColor: 'white',
+        borderRadius: 5,
+        borderWidth: 2,
+        width: '30%',
+        alignItems:'center',
+        justifyContent:'center',
+        minHeight:80,
     },
     option_text: {
         color: 'white',
         textAlign: 'center',
         fontSize: 36,
-        fontFamily:'Beleren'
+        fontFamily:'Beleren',
+    },
+    selected_option :{
+        backgroundColor:'white',
+        color: 'black',
+        textAlign: 'center',
+        fontSize: 36,
+        fontFamily:'Beleren',
     },
     options_wrapper: {
         alignContent: 'center',
@@ -156,7 +188,9 @@ const styles = StyleSheet.create({
     },
     options_subcontainer: {
         flexDirection: 'row',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-evenly',
+        minHeight:80,
+        alignItems:'center'
     },
     input_wrapper: {
         flex: 1,
@@ -178,18 +212,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         width: '33%',
+        minHeight:80
     },
     fade_container: {
         height: '20%',
         width: '100%',
     },
-    selected_option :{
-        backgroundColor:'white',
-        color: 'black',
-        textAlign: 'center',
-        fontSize: 36,
-        fontFamily:'Beleren'
-    }
+    
 })
 
 export default LifeMenu

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { LayoutChangeEvent, View, StyleSheet, Pressable, Image } from 'react-native';
-import Animated, { Easing, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, min, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from '../../GameContext';
 import Svg, { Path } from 'react-native-svg'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -135,6 +135,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             <Pressable style={dungeonCompleted ? styles.dungeon_complete_touch : styles.dungeon_icon_touch}
                 onPress={() => showDungeon()}
                 testID="dungeon"
+                accessibilityLabel={dungeonCompleted ? `${playerName} Dungeon Completed` : `${playerName} Venture into the Dungeon`}
             >
                 {
                     dungeonCompleted &&
@@ -161,6 +162,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             {/*The Ring*/}
             <View style={styles.card_container}>
                 <Pressable testID='the_ring'
+                accessibilityLabel={`The Ring ${playerName}`}
                     onPress={() => cardLongPress('the ring')}
                     style={[styles.card_overlay, {
                         width: imageDimensions && imageDimensions.height * .75,
@@ -209,6 +211,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             <Animated.View testID={"initiative"}
                 style={styles.card_container}>
                 <Pressable
+                accessibilityLabel={currentInitiative === playerName ? `${playerName} has the Initiative` : `activate the initiative for ${playerName}`}
                     style={[currentInitiative === playerName ? styles.active_card_overlay : styles.card_overlay,
                     {
                         width: imageDimensions && imageDimensions.height * .75,
@@ -236,6 +239,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             <Animated.View testID={"monarch"}
                 style={styles.card_container}>
                 <Pressable
+                accessibilityLabel={currentMonarch === playerName ? `${playerName} is the Monarch` : `activate the Monarch for ${playerName}`}
                     style={[currentMonarch === playerName ? styles.active_card_overlay : styles.card_overlay,
                     {
                         width: imageDimensions && imageDimensions.height * .75,
@@ -262,6 +266,8 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
     )
 }
 
+const minHeight = 40;
+
 const styles = StyleSheet.create({
     /*
     container dimensions should be the height of a scaled up card,
@@ -277,6 +283,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: '100%',
         width: `${100 / staticCounterList.length}%`,
+        // minWidth:minWidth,
+        minHeight: minHeight,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -284,6 +292,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: '100%',
         width: '15%',
+        // minWidth:minWidth,
+        minHeight: minHeight,
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 10
@@ -291,12 +301,16 @@ const styles = StyleSheet.create({
     card_container: {
         height: '100%',
         width: `${100 / staticCounterList.length}%`,
+        // minWidth:minWidth,
+        minHeight: minHeight,
         alignItems: 'center',
     },
     active_card_overlay: {
         backgroundColor: 'rgba(200, 200, 200, 0)',
         height: '100%',
         width: '100%',
+        // minWidth: minWidth,
+        minHeight: minHeight,
         position: 'absolute',
         borderRadius: 5,
         zIndex: 1,
@@ -304,6 +318,7 @@ const styles = StyleSheet.create({
     card_overlay: {
         height: '100%',
         width: '100%',
+        // minWidth: minWidth,
         position: 'absolute',
         backgroundColor: 'rgba(200, 200, 200, 0.4)',
         borderRadius: 5,

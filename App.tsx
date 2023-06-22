@@ -22,8 +22,9 @@ TO DO/NOTES
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
 *) Add mechanics options screen, to have a less busy UI.
-*) for coin flipper, dice roller, etc. Navigates only to game. 
-  navigate to menu if no game is instantiated
+  *) make initiative go to Undercity Dungeon
+  *) add text input to mana totals in Storm CounterCard screen
+  *)take static counters out of life container to try and make hit boxes larger
 
 *) check text scaling functions to see if using component width instead of component height will refactor into clearer code 
 1) TABLET TO DO:

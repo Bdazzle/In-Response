@@ -110,7 +110,9 @@ interface PWSvg {
 
 export const PlaneswalkerSvg: React.FC<PWSvg> = ({ fillColor, viewBox }) => {
     return (
-        <Svg viewBox={viewBox}>
+        <Svg viewBox={viewBox}
+            accessibilityLabel="Planeswalker icon"
+        >
             <G transform={"translate(-128.125,398.84217)"} id="layer1" >
                 <G transform={"matrix(4.0816327,0,0,-4.0816327,128.125,815.48356)"} id="g3777">
                     <G test-id="g3779">

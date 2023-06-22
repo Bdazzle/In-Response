@@ -11,10 +11,11 @@ import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 interface ColorSquareParams {
     primary: string,
     secondary: string,
-    playerID: number
+    playerID: number,
+    playerName: string
 }
 
-const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID }) => {
+const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID, playerName }) => {
     const navigation = useNavigation<StartMenuStackNavProps>()
 
     const showColorMenu = () => {
@@ -26,8 +27,11 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
     }
 
     return (
-        <Pressable style={styles.color_touch}
+        <Pressable 
+        nativeID={`${playerID}_color_press`}
+        style={styles.color_touch}
             onPressIn={() => showColorMenu()}
+            accessibilityLabel={`${playerName} color options`}
         >
             <View style={[styles.color_square_outter, {
                 backgroundColor: secondary
@@ -105,6 +109,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
             <ColorSquare primary={globalPlayerData[playerID].colors.primary}
                 secondary={globalPlayerData[playerID].colors.secondary}
                 playerID={playerID}
+                playerName={globalPlayerData[playerID].screenName}
             />
             <Pressable style={styles.name_toucheable}>
                 <TextInput style={styles.player_name}

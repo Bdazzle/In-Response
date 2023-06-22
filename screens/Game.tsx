@@ -194,6 +194,7 @@ export const Game = () => {
                         >
                             <Pressable
                                 onPress={() => showResetModal()}
+                                accessibilityLabel="reset game"
                             >
                                 <Svg viewBox='0 0 25 25'>
                                     <Path d="M20,8 C18.5974037,5.04031171 15.536972,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 L12,21 C16.9705627,21 21,16.9705627 21,12 M21,3 L21,9 L15,9"
@@ -215,7 +216,9 @@ export const Game = () => {
                         <View testID='random_button'
                             style={[styles.icon_button, styles.button_background]}
                         >
-                            <Pressable onPress={() => getRandomPlayer()}>
+                            <Pressable onPress={() => getRandomPlayer()}
+                            accessibilityLabel="select random player"
+                            >
                                 <Svg viewBox='0 0 358 358' >
                                     <Path d="M179.006,0C80.141,0,0,80.141,0,179.006s80.141,179.006,179.006,179.006   s179.006-80.141,179.006-179.006S277.871,0,179.006,0z M277.668,281.04l-8.437-8.437l33.587-33.588l-79.091-0.376v-0.018   c-1.545,0-3.031-0.603-4.141-1.671l-51.411-49.65l-51.405,49.65c-1.116,1.074-2.602,1.671-4.147,1.671H41.022v-11.934h69.192   L159.59,179l-49.376-47.687H41.022v-11.934h71.602c1.545,0,3.031,0.603,4.147,1.677l51.405,49.65l51.411-49.65   c1.116-1.074,2.602-1.677,4.141-1.677h25.389v0.137l53.642,0.257l-34.363-34.369l8.437-8.437l48.797,48.797l-47.962,47.962   l-8.437-8.437l33.588-33.588l-76.704-0.364L176.768,179l49.376,47.687h22.972v0.137l53.642,0.257l-34.363-34.369l8.437-8.437   l48.797,48.797L277.668,281.04z"
                                         fill={"#010002"}
@@ -230,7 +233,9 @@ export const Game = () => {
                         style={[styles.modal, scaleStyle]}
                     >
                         <Pressable style={[styles.random_modal_pressable]}
-                            onPress={() => hideRandomPlayer()}>
+                            onPress={() => hideRandomPlayer()}
+                            accessibilityLabel="Close random player modal"
+                            >
                             <Text style={[styles.modal_text]}>{randomPlayer} Selected</Text>
                         </Pressable>
                     </Animated.View>
@@ -581,12 +586,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     reset_modal: {
+        flex:1,
         position: 'absolute',
         backgroundColor: 'black',
         top: '30%',
         right: '40%',
         width: '17%',
-        height: '7%',
+        height: '10%',
         alignItems: 'center',
         borderRadius: 10,
         borderWidth: 3,

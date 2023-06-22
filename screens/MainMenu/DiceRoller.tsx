@@ -1,12 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { Image, Text, StyleSheet, TextInput, Pressable, View, KeyboardAvoidingView, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { Path, Polygon } from "react-native-svg";
 import { AllScreenNavProps } from "../..";
 import { ColorLibrary } from "../../constants/Colors";
 import { textScaler } from "../../functions/textScaler";
+import { GameContext } from "../../GameContext";
 
 /* Die rolling animations in future? */
 const D20 = () => {
@@ -20,7 +21,9 @@ const D20 = () => {
                 width: '100%',
                 height: '100%'
             }}
-                source={require("../../assets/images/filled-d20.png")} />
+                source={require("../../assets/images/filled-d20.png")} 
+                accessibilityLabel="twenty sided die"
+                />
             {/* {
                 [...Array(20)].map((_, i) => {
                     const num = i + 1
@@ -43,6 +46,7 @@ const D20 = () => {
 
 const DiceRoller = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
+    const { globalPlayerData } = useContext(GameContext)
     const [amount, setAmount] = useState<number>(1)
     const [sides, setSides] = useState<number>(20)
     const [results, setResults] = useState<number[]>()
@@ -59,7 +63,7 @@ const DiceRoller = () => {
                 withTiming(1.1, {
                     duration: 150
                 }),
-            4),
+                4),
             withTiming(1)
         )
     }
@@ -75,7 +79,7 @@ const DiceRoller = () => {
     make dice slightly small when pressed
     */
     const handlePressIn = () => {
-        diceScale.value  = .9
+        diceScale.value = .9
     }
 
     const roll = () => {
@@ -91,7 +95,7 @@ const DiceRoller = () => {
     }
 
     const handleBack = () => {
-        navigation.navigate('Game')
+        Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
 
     const changeAmount = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
@@ -108,10 +112,11 @@ const DiceRoller = () => {
             {/* Back Button */}
             <Pressable style={styles.back_button}
                 onPressIn={() => handleBack()}
+                accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
             >
                 <Svg viewBox="0 0 800 800" style={{
-                    width: 60,
-                    height: 60,
+                    width: '100%',
+                    height: '100%',
                     transform: [
                         { rotate: '180deg' }
                     ]
@@ -131,38 +136,45 @@ const DiceRoller = () => {
                 </Svg>
             </Pressable>
 
-            <KeyboardAvoidingView style={styles.text_wrapper}>
-                {/* Amount of Dice */}
-                <Pressable style={styles.input_press}>
-                    <TextInput
-                        style={[styles.input_text, styles.number_text]}
-                        defaultValue={`${amount}`}
-                        keyboardType='numeric'
-                        onChange={(e) => changeAmount(e)}
-                    >
-                    </TextInput>
-                </Pressable>
+            <View nativeID="input_wrapper"
+            style={styles.input_wrapper}
+            >
+                <KeyboardAvoidingView style={styles.text_wrapper}>
+                    {/* Amount of Dice */}
+                    <View style={styles.input_press}>
+                        <TextInput
+                            style={[styles.input_text, styles.number_text]}
+                            keyboardType='numeric'
+                            onChange={(e) => changeAmount(e)}
+                            accessibilityLabel="amount of dice"
+                            textAlignVertical="bottom"
+                            aria-label="amount of dice"
+                        >
+                        </TextInput>
+                    </View>
 
-                <View style={{
-                    justifyContent: 'flex-end'
+                    <View style={{
+                        justifyContent: 'flex-end'
 
-                }}>
-                    <Text style={styles.all_text}> Deez </Text>
-                </View>
+                    }}>
+                        <Text style={styles.all_text}> Deez </Text>
+                    </View>
 
 
-                {/* Sides */}
-                <Pressable style={styles.input_press}>
-                    <TextInput
-                        style={[styles.input_text, styles.number_text]}
-                        defaultValue={`${sides}`}
-                        keyboardType='numeric'
-                        onChange={(e) => changeSides(e)}
-                    >
-                    </TextInput>
-                </Pressable>
-            </KeyboardAvoidingView>
-
+                    {/* Sides */}
+                    <View style={styles.input_press}>
+                        <TextInput
+                            style={[styles.input_text, styles.number_text]}
+                            keyboardType='numeric'
+                            onChange={(e) => changeSides(e)}
+                            textAlignVertical="bottom"
+                            accessibilityLabel="dice sides"
+                            aria-label="dice sides"
+                        >
+                        </TextInput>
+                    </View>
+                </KeyboardAvoidingView>
+            </View>
             {/* Dice image/Roller button */}
             <Animated.View style={[styles.dice_container, springStyle]}>
                 <Pressable style={styles.dice_press}
@@ -207,18 +219,23 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: 0,
         top: 0,
-        width: 60,
-        height: 60,
+        width: 100,
+        height: 100,
+    },
+    input_wrapper:{
+        minHeight: 100,
     },
     text_wrapper: {
         flexDirection: 'row',
         width: '60%',
         justifyContent: 'center',
+        alignItems: 'flex-end',
     },
     input_press: {
         width: '33%',
     },
     input_text: {
+        minHeight: 100,
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         fontFamily: "Beleren"
@@ -228,9 +245,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: "Beleren"
     },
-    number_text:{
+    number_text: {
         fontSize: textScaler(24),
-        color:'white',
         textAlign: 'center',
         fontFamily: "Beleren"
     },

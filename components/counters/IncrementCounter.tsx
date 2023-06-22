@@ -55,6 +55,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
         }]}>
             <Pressable style={styles.touchable_wrapper}
                 onPress={() => handleCounterPress(counterType)}
+                accessibilityLabel={`${globalPlayerData[playerID].screenName} ${counterType}`}
             >
                 {
                     resources.SvgPaths &&
@@ -95,6 +96,7 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                     style={styles.counter_total_container}
                 >
                     <Text
+                    accessibilityLabel={`${globalPlayerData[playerID].screenName} ${total} ${counterType}`}
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
                         allowFontScaling={true}

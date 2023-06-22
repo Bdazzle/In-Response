@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, Image, View, StyleSheet, Dimensions, TextInput, TextInputChangeEventData, NativeSyntheticEvent, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions } from 'react-native';
+import { Text, Image, View, StyleSheet, Dimensions, TextInput, TextInputChangeEventData, NativeSyntheticEvent, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions, AccessibilityInfo } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
@@ -15,10 +15,11 @@ import TheRing from '../components/overlays/TheRingOverlay';
 
 
 interface ManaCounterProps {
-    source: ImageSourcePropType
+    source: ImageSourcePropType,
+    manaColor: string
 }
 
-const ManaCounter: React.FC<ManaCounterProps> = ({ source }) => {
+const ManaCounter: React.FC<ManaCounterProps> = ({ source, manaColor }) => {
     const { deviceType } = useContext(OptionsContext)
     const [total, setTotal] = useState<number>(0)
 
@@ -27,17 +28,24 @@ const ManaCounter: React.FC<ManaCounterProps> = ({ source }) => {
             {/*Mana Symbol/Plus*/}
             <Pressable onPressIn={() => setTotal(total + 1)}
                 style={styles().mana_pressable}
+                accessibilityLabel={`Add ${manaColor} Mana`}
             >
                 <Image source={source}
                     resizeMode='contain'
                     style={styles().mana_image}
+                    alt={`${manaColor} mana`}
                 />
             </Pressable>
             {/* Total */}
-            <Text testID='mana_total' style={styles(undefined, deviceType).mana_total} >{total}</Text>
+            <Text testID='mana_total' style={styles(undefined, deviceType).mana_total} 
+            accessibilityRole="none"
+            accessibilityLabel={`${total} ${manaColor} mana`}
+            // placeholder={`${total} ${manaColor}`}
+            >{total}</Text>
             {/* Minus */}
             <Pressable onPressIn={() => setTotal(total - 1)}
                 style={styles().mana_minus}
+                accessibilityLabel={`Minus ${manaColor} Mana`}
             >
                 <Svg viewBox='0 -100 520 520' height={'100%'} width={'50%'}>
                     <Path d="M281.633,48.328C250.469,17.163,209.034,0,164.961,0C120.888,0,79.453,17.163,48.289,48.328   c-64.333,64.334-64.333,169.011,0,233.345C79.453,312.837,120.888,330,164.962,330c44.073,0,85.507-17.163,116.671-48.328   c31.165-31.164,48.328-72.599,48.328-116.672S312.798,79.492,281.633,48.328z M260.42,260.46   C234.922,285.957,201.021,300,164.962,300c-36.06,0-69.961-14.043-95.46-39.54c-52.636-52.637-52.636-138.282,0-190.919   C95,44.042,128.901,30,164.961,30s69.961,14.042,95.459,39.54c25.498,25.499,39.541,59.4,39.541,95.46   S285.918,234.961,260.42,260.46z"
@@ -150,6 +158,8 @@ const CounterCard: React.FC = ({ }) => {
                                 <Pressable testID='card_pressable'
                                     onPressIn={() => handleSaveAndClose()}
                                     style={styles().card_pressable}
+                                    accessibilityLabel={`${route.params.card} card image`}
+                                    accessibilityHint='Press image to go back to game'
                                 >
                                     <Image
                                         style={Object.keys(counters).includes(route.params.card) || route.params.card === 'storm'
@@ -157,6 +167,8 @@ const CounterCard: React.FC = ({ }) => {
                                         source={cardImageSource.cardImage!}
                                         resizeMethod='scale'
                                         resizeMode="contain"
+                                        alt={`${route.params.card} card`}
+                                       
                                     />
                                 </Pressable>
                         }
@@ -169,6 +181,7 @@ const CounterCard: React.FC = ({ }) => {
                                     onPress={() => setTotal(total + 1)}
                                     onLongPress={() => setTotal(total + 10)}
                                     style={styles().increment_pressable}
+                                    accessibilityLabel={`Plus ${route.params.card}`}
                                 >
                                     <Svg
                                         viewBox={`0 0 650 650`}
@@ -183,20 +196,27 @@ const CounterCard: React.FC = ({ }) => {
                                     </Svg>
                                 </Pressable>
 
-                                <Pressable style={styles().total_wrapper}>
+                                <View style={styles().total_wrapper}
+                                accessibilityLabel={`${route.params.card} total`}
+                                >
                                     <TextInput style={styles(route.params.card).total_text}
                                         value={`${total}`}
+                                        accessibilityRole="none"
+                                        placeholder={`${total} ${route.params.card} counters`}
                                         testID="counter_total"
                                         keyboardType='numeric'
                                         onChange={(e) => handleInputChange(e)}
+                                        editable={true}
+                                        accessibilityLabel={`${route.params.card} total input`}
                                     ></TextInput>
-                                </Pressable>
+                                </View>
 
                                 <Pressable
                                     testID='minus'
                                     onPress={() => setTotal(total - 1)}
                                     onLongPress={() => setTotal(total - 10)}
                                     style={styles().increment_pressable}
+                                    accessibilityLabel={`Minus ${route.params.card}`}
                                 >
                                     <Svg
                                         viewBox={`-80 0 420 420`}
@@ -222,9 +242,12 @@ const CounterCard: React.FC = ({ }) => {
                     <View testID='mana_wrapper'
                         style={styles().mana_wrapper}>
                         {
-                            manaSymbols.map((m, i) => {
-                                return <ManaCounter key={`manasymbol_${i}`} source={m} />
+                            Object.entries(manaSymbols).map((m) =>{
+                                return <ManaCounter key={m[0]} source={m[1]} manaColor={m[0]} />
                             })
+                            // manaSymbols.map((m, i) => {
+                            //     return <ManaCounter key={`manasymbol_${i}`} source={m} />
+                            // })
                         }
                     </View>
                 </View>

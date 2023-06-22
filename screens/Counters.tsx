@@ -67,6 +67,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                 style={{
                     width: '33%'
                 }}
+                accessibilityLabel={`add ${counterType} counter`}
             >
                 <Svg viewBox='0 0 550 550'
                     style={{
@@ -117,7 +118,9 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                         })
                     }
                 </Svg>
-                <Text style={[styles.total_text, {
+                <Text 
+                accessibilityLabel={`${displayTotal} ${counterType}`}
+                style={[styles.total_text, {
                     fontSize: textScaler(24),
                     height: '35%'
                 }]}>{displayTotal}</Text>
@@ -131,6 +134,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                 style={{
                     width: '33%'
                 }}
+                accessibilityLabel={`minus ${counterType} counter`}
             >
                 <Svg viewBox='0 0 360 360'
                     style={{

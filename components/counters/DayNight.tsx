@@ -78,11 +78,14 @@ const DayNight: React.FC<DayNightProps> = ({ activeCycle, setActiveCycle }) => {
         <Pressable onPress={() => changeCycle()}
             onLongPress={() => cardLongPress()}
             style={styles.cycle_pressable}
+            accessibilityLabel="Day/Night Cycle"
         >
             {activeCycle === "neutral" ?
                 <CombinedSvg />
                 :
-                <Svg viewBox={resources.SvgViewbox}>
+                <Svg viewBox={resources.SvgViewbox}
+                accessibilityLabel={activeCycle}
+                >
                     {resources.SvgPaths &&
                         resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
                             return path.path ? <Path key={`${activeCycle} path ${i}`} d={path.path}

@@ -28,11 +28,12 @@ const ColorMenu: React.FC = ({ }) => {
         <View style={styles.container}>
             <View style={styles.options_wrapper}>
 
-                {/* Primary */}
+                {/* Primary/Background */}
                 <View style={styles.option_container}>
                     <Text style={styles.option_label}>Background {'\n'} Color</Text>
                     <Pressable style={styles.color_touch} 
                     onPressIn={() => handleColorSelect('primary', route.params.primary)}
+                    accessibilityLabel="background color"
                     >
                         <View style={[styles.color_square, {
                             backgroundColor: route.params.primary,
@@ -41,11 +42,12 @@ const ColorMenu: React.FC = ({ }) => {
                     </Pressable>
                 </View>
 
-                {/* Secondary */}
+                {/* Secondary/Text */}
                 <View style={styles.option_container}>
                     <Text style={styles.option_label}>Text {'\n'} Color</Text>
                     <Pressable style={styles.color_touch} 
                     onPressIn={() => handleColorSelect('secondary', route.params.secondary)}
+                    accessibilityLabel="text color"
                     >
                         <View style={[styles.color_square, {
                             backgroundColor: route.params.secondary,

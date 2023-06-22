@@ -31,7 +31,7 @@ const TotalPlayers = () => {
                     return <View key={index} style={styles.options_subcontainer}>
                         {chunks.map((c: number) => {
                             return <Pressable key={c}
-                                style={styles.option_touch}
+                                style={totalPlayers === c ? styles.selected_option_touch :styles.option_touch}
                                 onPressIn={() => handleSelectPlayers(c)}
                             >
                                 <Text key={`${c}_text`} 
@@ -71,7 +71,17 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 2,
         width: '30%',
-
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    selected_option_touch:{
+        backgroundColor:'white',
+        borderColor: 'white',
+        borderRadius: 5,
+        borderWidth: 2,
+        width: '30%',
+        alignItems:'center',
+        justifyContent:'center'
     },
     option_text: {
         color: 'white',
@@ -87,7 +97,8 @@ const styles = StyleSheet.create({
     },
     options_subcontainer: {
         flexDirection: 'row',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-evenly',
+        minHeight:80
     },
     input_wrapper: {
         flex: 1,

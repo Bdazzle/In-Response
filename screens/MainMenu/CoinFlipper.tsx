@@ -1,11 +1,12 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
 import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
 import { AllScreenNavProps } from "../.."
 import { textScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
+import { GameContext } from "../../GameContext"
 
 const Heads = () => {
     return (
@@ -25,6 +26,7 @@ const Tails = () => {
 
 const CoinFlipper = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
+    const { globalPlayerData } = useContext(GameContext)
     const [results, setResults] = useState<string[]>([])
     const [quantity, setQuantity] = useState<number>(1)
 
@@ -61,8 +63,9 @@ const CoinFlipper = () => {
     })
 
     const handleBack = () => {
-        navigation.navigate('Game')
+        Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
+
 
     const changeQuantity = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
         setQuantity(Number(event.nativeEvent.text))
@@ -92,10 +95,11 @@ const CoinFlipper = () => {
             {/* Back Button */}
             <Pressable style={styles.back_button}
                 onPressIn={() => handleBack()}
+                accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
             >
                 <Svg viewBox="0 0 800 800" style={{
-                    width: 60,
-                    height: 60,
+                    width: '100%',
+                    height: '100%',
                     transform: [
                         { rotate: '180deg' }
                     ]
@@ -121,20 +125,26 @@ const CoinFlipper = () => {
                 style={styles.input_wrapper}
             >
                 <Text style={styles.all_text}>How many flips?</Text>
-
-                <Pressable style={styles.input_touch}>
+                <View style={styles.input_touch}>
                     <TextInput style={[styles.input_text, styles.all_text]}
-                        defaultValue={`${quantity}`}
+                        nativeID="flips input"
+                        // defaultValue={`${quantity}`}
                         keyboardType='numeric'
+                        accessibilityLabel="input number of coin flips"
+                        accessibilityHint={`Flip ${quantity} coins`}
                         onChange={(e) => changeQuantity(e)}
+                        textAlignVertical="bottom"
                     ></TextInput>
-                </Pressable>
+                </View>
             </KeyboardAvoidingView>
 
             {/* Coins/flip button */}
             <Animated.View style={styles.coins_container}>
                 <Pressable style={styles.coin_button}
                     onPressIn={() => handleFlip()}
+                    accessibilityLabel="Flip coins"
+                    accessibilityHint={`Flip ${quantity} coins`}
+                    nativeID="flips pressable"
                 >
                     <View style={styles.face_wrapper}>
                         <Animated.View
@@ -166,23 +176,24 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: 0,
         top: 0,
-        width: 60,
-        height: 60,
+        width: 100,
+        height: 100,
     },
     input_wrapper: {
         flexDirection: 'row',
-        alignContent: 'center',
+        minHeight:100,
+        alignItems:'flex-end',
         justifyContent: 'center',
         top: 10,
     },
     input_touch: {
         width: '20%',
-        alignContent: 'center',
-        justifyContent: 'center',
+        minHeight:100,
     },
     input_text: {
         borderBottomColor: 'white',
         borderBottomWidth: 1,
+        minHeight:100
     },
     all_text: {
         fontSize: textScaler(24),
@@ -198,11 +209,12 @@ const styles = StyleSheet.create({
     },
     coin_button: {
         height: '10%',
+        minHeight: 100
     },
-    face_wrapper:{
+    face_wrapper: {
         height: '100%',
     },
-    coin:{
+    coin: {
         resizeMode: 'contain',
         width: '100%',
         height: '100%',

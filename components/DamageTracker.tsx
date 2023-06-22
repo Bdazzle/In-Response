@@ -127,6 +127,8 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
             <Pressable testID={`${opponentName}_pressable`}
                 style={styles().player_pressable}
                 onPress={() => handlePress()}
+                accessibilityLabel={`Commander damage from ${opponentName}`}
+                accessibilityHint="press to enlarge, and add or subtract"
             >
                 {({ pressed }) => (
                     <>
@@ -152,6 +154,8 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                     onLongPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] + 10)}
                                     delayLongPress={300}
                                     style={styles().damage_pressable}
+                                    accessibilityLabel="Add Commander Damage"
+                                    accessibilityHint={`Add commander damage from ${opponentName}`}
                                 >
                                     <Svg viewBox='0 0 600 600'
                                         style={{
@@ -193,6 +197,8 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                     style={[styles().damage_pressable, {
                                         marginRight: '2%'
                                     }]}
+                                    accessibilityLabel="Subtract Commander Damage"
+                                    accessibilityHint={`subtract commander damage from ${opponentName}`}
                                 >
                                     <Svg viewBox='0 0 360 360'
                                         style={{
@@ -246,11 +252,14 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                 onPress={() => setTax(tax + 1)}
                 onLongPress={() => setTax(tax - 1)}
                 onLayout={(e) => getDimensions(e)}
+                accessibilityLabel={`Adjust ${globalPlayerData[playerID].screenName} Commander Tax`}
             >
                 {
                     gameType === 'oathbreaker' ?
                         <View style={styles().oath_tax_text_wrapper}>
-                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text, 
+                            <Text 
+                            accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
+                            style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text, 
                                 {
                                     // fontSize: pressDimensions && pressDimensions.height > 60 ? textScaler(20) : textScaler(18)
                                     // fontSize: width >= 900 ? textScaler(14) : textScaler(22)
@@ -261,7 +270,9 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             </Text>
                         </View>
                         :
-                        <View style={styles().tax_text_wrapper}>
+                        <View style={styles().tax_text_wrapper}
+                        accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
+                        >
                             <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
                             >T</Text>
                             <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
@@ -276,6 +287,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                 <Text
                     adjustsFontSizeToFit={true}
                     numberOfLines={1}
+                    accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax} commander tax`}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     {
                         fontSize: pressDimensions && taxScaler(deviceType, pressDimensions, totalPlayers, tax, gameType),
@@ -301,9 +313,12 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     onPress={() => setTax2(tax2 + 1)}
                     onLongPress={() => setTax2(tax2 - 1)}
                     onLayout={(e) => getDimensions(e)}
+                    accessibilityLabel={`Adjust ${globalPlayerData[playerID].screenName} spell Tax`}
                 >
                     <View style={styles().oath_tax_text_wrapper}>
-                        <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
+                        <Text 
+                        accessibilityLabel={`${globalPlayerData[playerID].screenName} spell tax`}
+                        style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                         {
                             // fontSize: pressDimensions && pressDimensions.height > 60 ? textScaler(16) : textScaler(14)
                             // fontSize: width >= 900 ? textScaler(10) : textScaler(16)
@@ -314,6 +329,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         </Text>
                     </View>
                     <Text
+                    accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax2} spell tax`}
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
                         style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
@@ -341,6 +357,7 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceTyp
         paddingLeft: '10%',
         height: gameType === 'oathbreaker' ? '35%' : '25%',
         width: '70%',
+        minHeight:40,
         flexDirection: gameType === 'commander' ? 'row' : 'column',
         marginBottom: gameType === 'oathbreaker' ? 20 : 0,
         alignItems: 'center',

@@ -54,7 +54,10 @@ const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay, touchResponse 
     })
 
     return (
-        <Animated.View key="pulse_container" onTouchEnd={(e) => touchResponse(e)} style={[styles.pulse_container, containerMoveStyle,
+        <Animated.View key="pulse_container" 
+        accessibilityLabel="Room Marker"
+        onTouchEnd={(e) => touchResponse(e)} 
+        style={[styles.pulse_container, containerMoveStyle,
         {
             height: radius * 2,
             width: radius * 2,
