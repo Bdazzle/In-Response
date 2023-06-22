@@ -67,10 +67,11 @@ const Instructions: React.FC = ({ }) => {
             >
                 <Pressable style={styles.back_button}
                     onPressIn={() => handleBack()}
+                    accessibilityLabel="back to menu"
                 >
                     <Svg viewBox="0 0 800 800" style={{
-                        width: 60,
-                        height: 60,
+                        width: 80,
+                        height: 80,
                         transform: [
                             { rotate: '180deg' }
                         ]
@@ -119,22 +120,19 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         textAlign: 'center',
-        justifyContent: 'center',
-        alignItems: 'flex-end',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
         zIndex: 1
     },
     content: {
         marginTop:'5%'
     },
     back_button: {
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: 60,
-        height: 60,
+        width: 80,
+        height: 80,
     },
     header_text: {
-        fontSize: textScaler(38),
+        fontSize: textScaler(36),
         color: 'white',
         fontFamily: 'Beleren',
     },
