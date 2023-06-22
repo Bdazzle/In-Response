@@ -7,7 +7,7 @@
     "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/appIcons/Color_Wheel.png",
+      "image": "./assets/appIcons/splash/Color_Wheel.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,10 +22,8 @@
         "foregroundImage": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.beedazzle.In_Response"
-    },
-    "web": {
-      "favicon": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png"
+      "package": "com.beedazzle.In_Response",
+      "versionCode": 3
     },
     "plugins": [
       [

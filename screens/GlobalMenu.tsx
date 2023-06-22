@@ -2,7 +2,6 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React, { useContext } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
-import Svg, { Path } from "react-native-svg"
 import { AllScreenNavProps } from ".."
 import { iconData } from "../reducers/imageResources"
 import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
@@ -59,17 +58,10 @@ const GlobalMenu: React.FC = ({ }) => {
                                     >
                                         {
                                             option === "Planechase" ?
-                                                <PlaneswalkerSvg viewBox="-50 0 1300 1300" fillColor="white" />
+                                                <PlaneswalkerSvg viewBox="-150 -50 1300 1300" fillColor="white" />
                                                 :
-                                                <Svg viewBox={iconData[option].viewBox}>
-                                                    {iconData[option].pathData.map((p, i) => {
-                                                        return (
-                                                            <Path key={`${option} path ${i}`} d={p.path}
-                                                                fill={p.fill}
-                                                            />
-                                                        )
-                                                    })}
-                                                </Svg>
+                                                iconData[option]
+                                                
                                         }
                                     </Pressable>
                                     <Text style={styles.button_text}>{option}</Text>
@@ -103,11 +95,15 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 1,
         border: '2px solid white',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     button_touch: {
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 1,
+        height: '100%',
+        width: '30%',
     },
     button_text: {
         color: 'white',

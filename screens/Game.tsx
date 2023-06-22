@@ -248,9 +248,11 @@ export const Game = () => {
                             totalPlayers === 2 ? <TwoPlayerScreen playerIDs={designationMap}
                                 p1style={{
                                     transform: [{ rotate: "180deg" }],
-                                    height: '50%'
+                                    // height: '50%'
                                 }}
-                                p2style={{ height: '50%' }}
+                                p2style={{ 
+                                    // height: '50%' 
+                                }}
                                 containerStyle={{
                                     height: '100%',
                                     transform: [{ rotate: "180deg" }],

@@ -85,11 +85,12 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip }) =>
                 onPress={() => flipCard()}
                 style={styles.flipButton}
             >
-                <Svg viewBox={iconData['flip'].viewBox}>
+                {iconData['flip']}
+                {/* <Svg viewBox={iconData['flip'].viewBox}>
                     {
                         iconData['flip'].pathData.map((p, i: number) => (<Path key={i} d={p.path} fill={p.fill} ></Path>))
                     }
-                </Svg>
+                </Svg> */}
             </Pressable>
         </View>
     )

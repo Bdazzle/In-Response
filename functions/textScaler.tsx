@@ -36,17 +36,6 @@ export function lifeTotalScaler(totalPlayers: number, lifeTotal: number): number
 }
 
 export function counterScaler(deviceType: string, totalCountersTypes: number) {
-  // if (totalCountersTypes === 1) {
-  //   return width >= 900 ? textScaler(40) : textScaler(60)
-  // } else if (totalCountersTypes === 2) {
-  //   return width >= 900 ? textScaler(35) : textScaler(60)
-  // } else if (totalCountersTypes === 3) {
-  //   return width >= 900 ? textScaler(35) : textScaler(60)
-  // } else if (totalCountersTypes === 4) {
-  //   return width >= 900 ? textScaler(32) : textScaler(60)
-  // } else {
-  //   return width >= 900 ? textScaler(25) : textScaler(35)
-  // }
   if (totalCountersTypes === 1) {
     return deviceType === 'tablet' ? textScaler(40) : textScaler(60)
   } else if (totalCountersTypes === 2) {
@@ -61,15 +50,6 @@ export function counterScaler(deviceType: string, totalCountersTypes: number) {
 }
 
 export function cdmgLineHeight(deviceType: string, componentHeight: number, totalPlayers: number) {
-  // if (width >= 900) {
-  //   return totalPlayers === 4 ? componentHeight * .75 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
-  // }
-  // if (width >= 600 && width < 900) {
-  //   return totalPlayers === 4 ? componentHeight * .7 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .9
-  // }
-  // if (width < 600) {
-  //   return totalPlayers === 4 ? componentHeight * .8 : totalPlayers === 3 ? componentHeight : componentHeight * .8
-  // }
   if (deviceType === 'tablet') {
     return totalPlayers === 4 ? componentHeight * .75 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
   }
@@ -82,15 +62,6 @@ export function cdmgLineHeight(deviceType: string, componentHeight: number, tota
 }
 
 export function cdmgScaler(deviceType: string, componentHeight: number, totalPlayers: number) {
-  // if (width >= 900) {
-  //   return totalPlayers === 4 ? componentHeight * .8 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
-  // }
-  // if (width >= 600 && width < 900) {
-  //   return totalPlayers === 4 ? componentHeight * .7 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .9
-  // }
-  // if (width < 600) {
-  //   return totalPlayers === 4 ? componentHeight * .85 : totalPlayers === 3 ? componentHeight : componentHeight * .8
-  // }
   if (deviceType === 'tablet') {
     return totalPlayers === 4 ? componentHeight * .8 : totalPlayers === 3 ? componentHeight * .9 : componentHeight * .7
   }
@@ -103,15 +74,6 @@ export function cdmgScaler(deviceType: string, componentHeight: number, totalPla
 }
 
 export function taxLineHeight( deviceType: string, componentHeight : number, playerID : number, totalPlayers : number, gameType: string) {
-  // if (width >= 900) {
-  //   return totalPlayers === 3 && playerID === 3 ? (gameType === 'oathbreaker' ? componentHeight : componentHeight * 1.1 ) : componentHeight * .9
-  // }
-  // if (width >= 600 && width < 900) {
-  //   return componentHeight * .9
-  // }
-  // if (width < 600) {
-  //   return gameType === 'commander' ? componentHeight * 1.1 : componentHeight * .9
-  // }
   if (deviceType === 'tablet') {
     return totalPlayers === 3 && playerID === 3 ? (gameType === 'oathbreaker' ? componentHeight : componentHeight * 1.1 ) : componentHeight * .9
   }
