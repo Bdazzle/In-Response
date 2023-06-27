@@ -85,13 +85,14 @@ const LifeMenu = () => {
                                     </Pressable>
                                 })}
                                 <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
-                                    <Pressable testID="life_input_touch" style={styles.input_wrapper}>
+                                    <View testID="life_input_touch" style={styles.input_wrapper}>
                                         <TextInput testID="life_input" style={styles.input_text}
                                         accessibilityLabel="Input custom starting life total"
+                                        editable={true}
                                             keyboardType='numeric'
                                             onSubmitEditing={(e) => handleSelectTotal(e.nativeEvent.text)}
                                         ></TextInput>
-                                    </Pressable>
+                                    </View>
                                 </KeyboardAvoidingView>
                             </View>
                     }

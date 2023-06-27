@@ -140,6 +140,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 fontSize: totalPlayers === 2 ? textScaler(13) : textScaler(11),
                             }
                             ]}
+                            accessibilityLabel={`opponent ${opponentName}`}
                         >
                             {opponentName}
                         </Text>
@@ -183,6 +184,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                     }]}
                                     adjustsFontSizeToFit={true}
                                     numberOfLines={1}
+                                    accessibilityLabel={`${globalPlayerData[playerID!].commander_damage![oppponentID]} commander damage from ${opponentName}`}
                                 >
                                     {globalPlayerData[playerID!].commander_damage![oppponentID]}
                                 </Text>
@@ -261,9 +263,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                             style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text, 
                                 {
-                                    // fontSize: pressDimensions && pressDimensions.height > 60 ? textScaler(20) : textScaler(18)
-                                    // fontSize: width >= 900 ? textScaler(14) : textScaler(22)
-                                    fontSize: deviceType === 'tablet' ? textScaler(14) : textScaler(22)
+                                    fontSize: deviceType === 'tablet' ? textScaler(14) : textScaler(22),
                                 }
                                 ]}>
                                 Tax
@@ -274,12 +274,15 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                         >
                             <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
+                            accessible={false}
                             >T</Text>
                             <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
+                            accessible={false}
                             >a</Text>
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
                                 paddingBottom: 10
                             }]}
+                            accessible={false}
                             >x</Text>
                         </View>
                 }
@@ -320,8 +323,6 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         accessibilityLabel={`${globalPlayerData[playerID].screenName} spell tax`}
                         style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                         {
-                            // fontSize: pressDimensions && pressDimensions.height > 60 ? textScaler(16) : textScaler(14)
-                            // fontSize: width >= 900 ? textScaler(10) : textScaler(16)
                             fontSize: deviceType === 'tablet' ? textScaler(10) : textScaler(16)
                         }
                         ]}>
@@ -375,11 +376,11 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceTyp
     tax_text: {
         fontFamily: 'Beleren',
         color: textColor,
+        fontSize: deviceType === 'tablet' ? textScaler(10) : textScaler(16)
     },
     tax_letter:{
         fontFamily: 'Beleren',
         color: textColor,
-        // fontSize: width >= 900 ? textScaler(12) : textScaler(13)
         fontSize: deviceType === 'tablet' ? textScaler(12) : textScaler(13)
     },
     tax_total: {

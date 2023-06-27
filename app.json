@@ -22,8 +22,8 @@
         "foregroundImage": "./assets/appIcons/adaptive_mtg_counter_icon_1024.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.beedazzle.In_Response",
-      "versionCode": 3
+      "package": "com.beedazzle.mtg_counter",
+      "versionCode": 10
     },
     "plugins": [
       [

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { CSSProperties, useContext, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
@@ -79,7 +79,14 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
-                    style={styles.commander_damage_tracker} >
+                    style={[styles.commander_damage_tracker,
+                    {
+                        //80% height for oath, 90 for commander?
+                        // height: totalPlayers === 2 ? '80%' : '90%'
+                        height: gameType === 'commander' || totalPlayers === 4 ? '90%' : '80%'
+                        // width: gameType === 'oathbreaker' ?
+                    }
+                    ]} >
                     <CommanderDamage playerID={playerID}
                         scaleTracker={setScaleTracker}
                         showScale={scaleTracker}
@@ -95,7 +102,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                 <View testID="static_counter_wrapper"
                     style={[styles.static_counter_wrapper, {
                         width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : gameType === "oathbreaker" ? '70%' : '55%',
-                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : gameType === "oathbreaker" ? '18%' : '20%',
+                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : gameType === "oathbreaker" ? '15%' : '20%',
                     }]}
                 >
                     <StaticCounterContainer
@@ -180,7 +187,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     {/* Life Total */}
                     <View testID='life_total_text_container' style={styles.life_total_text_container}>
                         <Text testID='life_total'
-                        accessibilityLabel={`${playerName} ${globalPlayerData[playerID].lifeTotal} life`}
+                            accessibilityLabel={`${playerName} ${globalPlayerData[playerID].lifeTotal} life`}
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.life_total, {
@@ -198,7 +205,8 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         {
                             fontSize: dimensions.height * .13,
                             color: theme.secondary,
-                        }]} >{playerName}
+                        }]} >
+                            {playerName}
                         </Text>
                     </View>
                 </View>
@@ -212,10 +220,10 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         { backgroundColor: pressed ? 'grey' : theme.secondary }
                     ]}
                     onPressIn={() => toCounters()}
-                    accessibilityLabel={`${playerName} Counters`}
+                // accessibilityLabel={`${playerName} Counters button`}
                 >
                     <Text testID='counter_pressable_text'
-                    // accessibilityLabel={`${playerName} Counters`}
+                        accessibilityLabel={`${playerName} Counters`}
                         numberOfLines={1}
                         adjustsFontSizeToFit={true}
                         style={[styles.counter_pressable_text, {
@@ -350,8 +358,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         bottom: 5,
-        height: '90%',
-        zIndex: 10,
+        zIndex: 9,
         width: '20%',
     }
 })

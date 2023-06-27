@@ -15,6 +15,13 @@ interface RingProps {
     }
 }
 
+const ringRules = `The Ring tempts you. As the ring tempts you, you get an emblem named The Ring if you don't have one. 
+Then your emblem gains its next ability and you choose a creature you control to become or remain your ring-bearer.
+The Ring can tempt you even if you don't control a creature.
+the ring gains its abilities in order from top to bottom. Once it gains an ability, it has that ability for the rest of the game.
+Each time the ring tempts you, you must choose a creature if you control one.
+Each player can have only one emblem named the ring and only one ring-bearer at a time.`
+
 const TheRing: React.FC<RingProps> = ({ imageSource }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext)
     const { deviceType } = useContext(OptionsContext)
@@ -59,7 +66,13 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
         <View testID="ring_overlay_container"
             style={styles().ring_container}
         >
-            <FlipCard front={imageSource.front} back={imageSource.back} onFlip={flipCard} />
+            <FlipCard 
+            front={imageSource.front} 
+            back={imageSource.back} 
+            onFlip={flipCard} 
+            altBack={ringRules}
+            altFront={`the Ring abilities`}
+            />
             {showLevels &&
                 <View testID='ring_overlay_wrapper'
                     style={deviceType === 'tablet' ?
@@ -67,9 +80,13 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                         styles().ring_overlay_wrapper}
                 >
                     <Pressable testID="level1"
+                        focusable={true}
+                        accessibilityRole="button"
                         onPress={() => levelChange(1)}
                         style={[level >= 1 ? styles().visible_level : styles().hidden_level,
                         styles(deviceType).level1]}
+                        accessibilityLabel={level >= 1 ? "active level 1" : 'level 1'}
+                        accessibilityHint="Your Ring-bearer is legendary and can't be blocked by creatures with greater power"
                     >
                         <Animated.View
                             style={[frontAnimatedStyle, styles().levelImageWrapper]}
@@ -77,14 +94,19 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             <Image
                                 source={require('../../assets/cards/ring_overlay/level1.png')}
                                 style={styles().levelImage}
+                                alt={"Your Ring-bearer is legendary and can't be blocked by creatures with greater power"}
                             />
                         </Animated.View>
                     </Pressable>
 
                     <Pressable testID="level2"
+                        focusable={true}
+                        accessibilityRole="button"
                         onPress={() => levelChange(2)}
                         style={[level >= 2 ? styles().visible_level : styles().hidden_level,
                         styles(deviceType).level2]}
+                        accessibilityLabel={level >= 2 ? 'active level 2' : 'level 2'}
+                        accessibilityHint="Whenever your ring-bearer attacks, draw a card, then discard a card."
                     >
                         <Animated.View
                             style={[frontAnimatedStyle, styles().levelImageWrapper]}
@@ -92,14 +114,19 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             <Image
                                 source={require('../../assets/cards/ring_overlay/level2.png')}
                                 style={styles().levelImage}
+                                alt={"Whenever your ring-bearer attacks, draw a card, then discard a card."}
                             />
                         </Animated.View>
                     </Pressable>
 
                     <Pressable testID="level3"
+                        focusable={true}
+                        accessibilityRole="button"
                         onPress={() => levelChange(3)}
                         style={[level >= 3 ? styles().visible_level : styles().hidden_level,
                         styles(deviceType).level3]}
+                        accessibilityLabel={level >= 3 ? 'active level 3' : 'level 3'}
+                        accessibilityHint="whenever your ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat"
                     >
                         <Animated.View
                             style={[frontAnimatedStyle, styles().levelImageWrapper]}
@@ -107,14 +134,19 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             <Image
                                 source={require('../../assets/cards/ring_overlay/level3.png')}
                                 style={styles().levelImage}
+                                alt={"whenever your ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat"}
                             />
                         </Animated.View>
                     </Pressable>
 
                     <Pressable testID="level4"
+                        focusable={true}
+                        accessibilityRole="button"
                         onPress={() => levelChange(4)}
                         style={[level === 4 ? styles().visible_level : styles().hidden_level,
                         styles(deviceType).level4]}
+                        accessibilityLabel={level >= 4 ? 'active level 4' : 'level 4'}
+                        accessibilityHint="whenever your ring-bearer deals combat damage to a player, each opponent loses 3 life."
                     >
                         <Animated.View
                             style={[frontAnimatedStyle, styles().levelImageWrapper]}
@@ -122,6 +154,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             <Image
                                 source={require('../../assets/cards/ring_overlay/level4.png')}
                                 style={styles().levelImage}
+                                alt={"whenever your ring-bearer deals combat damage to a player, each opponent loses 3 life."}
                             />
                         </Animated.View>
                     </Pressable>
@@ -163,7 +196,7 @@ const styles = (deviceType?: string) => StyleSheet.create({
         width: '100%'
     },
     hidden_level: {
-        opacity: 0,
+        opacity: 0.01,
         width: '100%',
     },
     level1: {

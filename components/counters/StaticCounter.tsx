@@ -166,9 +166,9 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     onPress={() => cardLongPress('the ring')}
                     style={[styles.card_overlay, {
                         width: imageDimensions && imageDimensions.height * .75,
-                        transform: [
-                            { scale: .5 }
-                        ]
+                        // transform: [
+                        //     { scale: .5 }
+                        // ]
                     }]}
                 >
                     <Image source={require('../../assets/cards/the_ring.png')}
@@ -215,9 +215,9 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     style={[currentInitiative === playerName ? styles.active_card_overlay : styles.card_overlay,
                     {
                         width: imageDimensions && imageDimensions.height * .75,
-                        transform: [
-                            { scale: currentInitiative === playerName ? 1 : .5 }
-                        ]
+                        // transform: [
+                        //     { scale: currentInitiative === playerName ? 1 : .5 }
+                        // ]
                     }
                     ]}
                     onPress={() => activeInitiative()}
@@ -227,7 +227,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                 <Animated.Image 
                 source={require('../../assets/cards/initiative.png')}
                     style={[styles.counter_card,
-                        initiativeScaleStyle,
+                        // initiativeScaleStyle,
                     imageDimensions && {
                         width: imageDimensions.height * .75
                     }
@@ -243,9 +243,9 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     style={[currentMonarch === playerName ? styles.active_card_overlay : styles.card_overlay,
                     {
                         width: imageDimensions && imageDimensions.height * .75,
-                        transform: [
-                            { scale: currentMonarch === playerName ? 1 : .5 }
-                        ]
+                        // transform: [
+                        //     { scale: currentMonarch === playerName ? 1 : .5 }
+                        // ]
                     }
                     ]}
                     onPress={() => activateMonarch()}
@@ -254,7 +254,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                 />
                 <Animated.Image source={require('../../assets/cards/monarch.png')}
                     style={[styles.counter_card,
-                        monarchScaleStyle,
+                        // monarchScaleStyle,
                     imageDimensions && {
                         width: imageDimensions.height * .75
                     }
@@ -278,12 +278,14 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         paddingTop: '1%',
+
+        // borderColor:'white',
+        // borderWidth:1
     },
     dungeon_complete_touch: {
         flexDirection: 'row',
         height: '100%',
         width: `${100 / staticCounterList.length}%`,
-        // minWidth:minWidth,
         minHeight: minHeight,
         justifyContent: 'center',
         alignItems: 'center',
@@ -291,25 +293,25 @@ const styles = StyleSheet.create({
     dungeon_icon_touch: {
         flexDirection: 'row',
         height: '100%',
-        width: '15%',
-        // minWidth:minWidth,
+        width: '20%',
         minHeight: minHeight,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 10
+        zIndex: 10,
     },
     card_container: {
         height: '100%',
         width: `${100 / staticCounterList.length}%`,
-        // minWidth:minWidth,
         minHeight: minHeight,
-        alignItems: 'center',
+        // alignItems: 'center',
+
+        // borderColor:'white',
+        // borderWidth:1
     },
     active_card_overlay: {
         backgroundColor: 'rgba(200, 200, 200, 0)',
         height: '100%',
         width: '100%',
-        // minWidth: minWidth,
         minHeight: minHeight,
         position: 'absolute',
         borderRadius: 5,
@@ -318,9 +320,8 @@ const styles = StyleSheet.create({
     card_overlay: {
         height: '100%',
         width: '100%',
-        // minWidth: minWidth,
         position: 'absolute',
-        backgroundColor: 'rgba(200, 200, 200, 0.4)',
+        backgroundColor: 'rgba(200, 200, 200, 0.7)',
         borderRadius: 5,
         zIndex: 1,
     },

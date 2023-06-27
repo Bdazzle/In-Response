@@ -81,3 +81,5 @@ hooks/useCachedResources.ts
 hooks/useColorScheme.ts
 hooks/useDebounce.tsx
 hooks/useSwipe.tsx
+credentials.json
+/credentials

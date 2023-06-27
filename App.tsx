@@ -22,13 +22,14 @@ TO DO/NOTES
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
 *) Add mechanics options screen, to have a less busy UI.
-  *) make initiative go to Undercity Dungeon
-  *) add text input to mana totals in Storm CounterCard screen
-  *)take static counters out of life container to try and make hit boxes larger
+*) add text input to mana totals in Storm CounterCard screen
+*) some kind of reducer for StaticCounters container width and DamageTracker container height/width
+*) Accessibility:
+  -planes alt properties and alt properties for images that have text
+  -in game Touch targets...
 
 *) check text scaling functions to see if using component width instead of component height will refactor into clearer code 
 1) TABLET TO DO:
-*) Add expo-device checks to textScaler function and The Ring overlay
 */
 
 // SplashScreen.preventAutoHideAsync();

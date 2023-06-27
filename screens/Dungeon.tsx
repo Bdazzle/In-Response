@@ -76,7 +76,6 @@ const Dungeon: React.FC = ({ }) => {
     )
     const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [promptComplete, setPromptComplete] = useState<boolean>(false)
-    const [flipped, setFlipped] = useState<boolean>(false)
     const [rotate] = useScreenRotation(Object.keys(globalPlayerData).length, route.params.playerID)
     const marker_radius = 75
     const { width, height } = Dimensions.get('screen')
@@ -99,7 +98,7 @@ const Dungeon: React.FC = ({ }) => {
     }, [])
 
     const markerDrag = (event: GestureResponderEvent) => {
-        if (flipped) {
+        if (rotate) {
             setMarker_coords({
                 x: width - event.nativeEvent.pageX,
                 y: height - event.nativeEvent.pageY - 70,
@@ -165,7 +164,8 @@ const Dungeon: React.FC = ({ }) => {
         dispatchDungeon({dungeon: "Completed", imageHeight:0})
         setPromptComplete(false)
     }
-    
+
+
     return (
         <View style={[styles.dungeon_container,
         rotate && {

@@ -10,9 +10,11 @@ interface FlipCardProps {
     back: ImageSourcePropType,
     onLayout?: ({ width, height }: { width: number, height: number }) => void,
     onFlip?: () => void,
+    altFront?: string,
+    altBack?: string,
 }
 
-const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip }) => {
+const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altFront, altBack }) => {
     const flipVal = useSharedValue(0)
     const imageRef = useRef<Image>(null)
 
@@ -61,12 +63,15 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip }) =>
                 {/* Front */}
                 <Animated.View testID='front-wrapper'
                     style={[frontAnimatedStyle, styles.frontWrapper]}
+                    // accessibilityLabel={altFront}
                 >
                     <Image testID="front-image"
                         source={front}
                         ref={imageRef}
                         onLayout={() => handleImageLayout()}
                         style={styles.frontImage}
+                        alt={altFront}
+                        // accessibilityLabel={altFront}
                     />
                 </Animated.View>
                 {/* Back */}
@@ -77,6 +82,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip }) =>
                         testID="back-image"
                         source={back}
                         style={styles.backImage}
+                        alt={altBack}
                     />
                 </Animated.View>
 
