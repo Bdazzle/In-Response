@@ -24,7 +24,7 @@ export default function useContainerDimensions(gameType: string, totalPlayers: n
             else if (totalPlayers === 4) {
                 setStaticCounterDim({
                     width: '60%',
-                    marginLeft: '20%'
+                    marginLeft: '19%'
                 })
                 setCommanderDim({
                     height: '90%'
@@ -42,7 +42,7 @@ export default function useContainerDimensions(gameType: string, totalPlayers: n
         } else if (gameType === 'oathbreaker') {
             if(totalPlayers === 2){
                 setStaticCounterDim({
-                    width: '80%',
+                    width: '82%',
                     marginLeft: 0
                 })
                 setCommanderDim({
@@ -51,16 +51,16 @@ export default function useContainerDimensions(gameType: string, totalPlayers: n
             } 
             else if(totalPlayers === 4){
                 setStaticCounterDim({
-                    width: '75%',
-                    marginLeft: '15%'
+                    width: '70%',
+                    marginLeft: '11.5%'
                 })
                 setCommanderDim({
-                    height: '85%'
+                    height: '83%'
                 })
             }
             else {
                 setStaticCounterDim({
-                    width: '75%',
+                    width: '71%',
                     marginLeft: '10%'
                 })
                 setCommanderDim({

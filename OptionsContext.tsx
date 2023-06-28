@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react"
 import * as Device from 'expo-device'
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export interface OptionsContextProps {
     deviceType: string,
@@ -25,8 +26,6 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const deviceData = await Device.getDeviceTypeAsync()
             const deviceCode = deviceData === 1 ? 'phone' : deviceData === 2 ? 'tablet' : deviceData === 0 ? 'unknown' : 'unspecified device'
             setDeviceType(deviceCode)
-            //   console.log(deviceData)
-            //   return deviceData === 1 ? 'phone' : deviceData === 2 ? 'tablet' : deviceData === 0 ? 'unknown' : 'unspecified device'
         } catch (error) {
             console.log(`error getting device type ${error}`)
         }

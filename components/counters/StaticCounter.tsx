@@ -108,13 +108,18 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             >
                 {
                     dungeonCompleted &&
-                    <Svg viewBox='2 -10 15 30' width={22} height={30} >
+                    <Svg viewBox='2 -10 15 30' 
+                    style={styles().dungeonCheck}
+                    >
                         <Path d="M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27   c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0   L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z"
                             fill={colorTheme.primary === 'rgba(0,0,0,1)' ? 'white' : 'rgba(0,0,0,1)'} />
                     </Svg>
                 }
                 {/* Dungeon symbol */}
-                <Svg viewBox='0 0 524 524' width={30} height={30} style={{
+                <Svg viewBox='0 0 524 524' 
+                // width={30} height={30} 
+                width={"60%"} height={"100%"}
+                style={{
                     marginLeft: dungeonCompleted ? 0 : 10,
                 }}>
                     <Path d="M128.73 195.32l-82.81-51.76c-8.04-5.02-18.99-2.17-22.93 6.45A254.19 254.19 0 0 0 .54 239.28C-.05 248.37 7.59 256 16.69 256h97.13c7.96 0 14.08-6.25 15.01-14.16 1.09-9.33 3.24-18.33 6.24-26.94 2.56-7.34.25-15.46-6.34-19.58zM319.03 8C298.86 2.82 277.77 0 256 0s-42.86 2.82-63.03 8c-9.17 2.35-13.91 12.6-10.39 21.39l37.47 104.03A16.003 16.003 0 0 0 235.1 144h41.8c6.75 0 12.77-4.23 15.05-10.58l37.47-104.03c3.52-8.79-1.22-19.03-10.39-21.39zM112 288H16c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm0 128H16c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm77.31-283.67l-36.32-90.8c-3.53-8.83-14.13-12.99-22.42-8.31a257.308 257.308 0 0 0-71.61 59.89c-6.06 7.32-3.85 18.48 4.22 23.52l82.93 51.83c6.51 4.07 14.66 2.62 20.11-2.79 5.18-5.15 10.79-9.85 16.79-14.05 6.28-4.41 9.15-12.17 6.3-19.29zM398.18 256h97.13c9.1 0 16.74-7.63 16.15-16.72a254.135 254.135 0 0 0-22.45-89.27c-3.94-8.62-14.89-11.47-22.93-6.45l-82.81 51.76c-6.59 4.12-8.9 12.24-6.34 19.58 3.01 8.61 5.15 17.62 6.24 26.94.93 7.91 7.05 14.16 15.01 14.16zm54.85-162.89a257.308 257.308 0 0 0-71.61-59.89c-8.28-4.68-18.88-.52-22.42 8.31l-36.32 90.8c-2.85 7.12.02 14.88 6.3 19.28 6 4.2 11.61 8.9 16.79 14.05 5.44 5.41 13.6 6.86 20.11 2.79l82.93-51.83c8.07-5.03 10.29-16.19 4.22-23.51zM496 288h-96c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm0 128h-96c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zM240 177.62V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V177.62c-5.23-.89-10.52-1.62-16-1.62s-10.77.73-16 1.62zm-64 41.51V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V189.36c-12.78 7.45-23.84 17.47-32 29.77zm128-29.77V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V219.13c-8.16-12.3-19.22-22.32-32-29.77z"
@@ -129,21 +134,26 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             </Pressable>
 
             {/*The Ring*/}
-            <View style={styles().card_container}>
+            <View style={styles(gameType).card_container}>
                 <Pressable testID='the_ring'
                     accessibilityLabel={`The Ring ${playerName}`}
                     onPress={() => cardLongPress('the ring')}
                     style={styles().card_overlay}
                 >
-                    <Svg viewBox="256.092 59.688 201.573 202.369"
-                        height={40}
-                        width={40}
+                    <Svg 
+                    viewBox='0 0 32 32'
                     >
                         <Defs>
                             <LinearGradient gradientUnits='userSpaceOnUse'
                                 x1="16.029" y1="3.987" x2="16.029" y2="28.102"
                                 id="gradient-0"
-                                gradientTransform="matrix(8.378566, 0, 0, 8.391918, 222.577942, 26.227707)"
+                            >
+                                <Stop offset={0} stopColor={"rgba(225, 189, 6, 1)"} />
+                                <Stop offset={1} stopColor={"rgba(126, 105, 3, 1)"} />
+                            </LinearGradient>
+                            <LinearGradient gradientUnits="userSpaceOnUse"
+                                x1="16.861" y1="8.044" x2="16.861" y2="26.096"
+                                id="gradient-1"
                             >
                                 <Stop offset={0} stopColor={"rgba(225, 189, 6, 1)"} />
                                 <Stop offset={1} stopColor={"rgba(126, 105, 3, 1)"} />
@@ -151,40 +161,31 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                             <LinearGradient gradientUnits="userSpaceOnUse"
                                 x1="16.029" y1="3.987" x2="16.029" y2="28.102"
                                 id="gradient-2"
-                                gradientTransform="matrix(8.378566, 0, 0, 8.391918, 222.577942, 26.227707)"
+                                gradientTransform={"matrix(0.75253, 0.658558, -0.80918, 0.924644, 18.325373, -9.752842)"}
                             >
                                 <Stop offset={0} stopColor={"rgb(250, 239, 126)"} />
                                 <Stop offset={1} stopColor={"rgb(207, 130, 5)"} />
                             </LinearGradient>
                             <LinearGradient gradientUnits="userSpaceOnUse"
-                                x1="16.861" y1="8.044" x2="16.861" y2="26.096"
-                                id="gradient-1"
-                                gradientTransform="matrix(8.378566, 0, 0, 8.391918, 222.577942, 26.227707)"
-                            >
-                                <Stop offset={0} stopColor={"rgba(225, 189, 6, 1)"} />
-                                <Stop offset={1} stopColor={"rgba(126, 105, 3, 1)"} />
-                            </LinearGradient>
-                            <LinearGradient gradientUnits="userSpaceOnUse"
                                 x1="14.117" y1="5.801" x2="14.117" y2="22.048"
                                 id="gradient-3"
-                                gradientTransform="matrix(6.312479, 5.518132, -8.075296, 9.267203, 366.161145, -64.122868)"
+                                gradientTransform={"matrix(0.753408, 0.657553, -0.963804, 1.104301, 17.136967, -10.766379)"}
                             >
                                 <Stop offset={0} stopColor={"rgb(207, 130, 5)"} />
                                 <Stop offset={1} stopColor={"rgb(250, 239, 126)"} />
                             </LinearGradient>
                         </Defs>
-                        <Path d="M 440.421 84.971 L 437.899 82.445 C 423.664 66.517 402.717 61.465 402.717 61.465 C 377.581 53.929 338.211 70.713 303.029 105.095 C 273.704 132.797 256.092 166.364 256.092 191.54 C 256.092 194.922 256.947 198.262 256.947 201.602 C 258.614 218.386 269.515 236.026 278.706 244.418 C 290.461 256.149 305.509 262.057 322.266 262.057 C 349.924 262.057 382.625 246.088 412.763 217.572 C 459.7 171.416 471.413 116.869 440.421 84.971 Z M 306.364 208.324 C 306.364 197.406 318.077 174.756 343.213 149.581 C 367.536 125.261 392.671 118.539 404.384 116.013 C 398.528 131.983 385.96 151.251 367.536 169.746 C 349.924 186.53 329.832 199.932 312.22 206.654 C 310.553 207.51 308.031 207.51 306.364 208.324 Z M 314.742 116.869 C 342.4 89.167 371.725 75.723 390.149 75.723 C 396.006 75.723 401.05 77.435 404.384 80.775 C 407.761 84.115 409.428 90.837 408.574 98.415 C 398.528 99.229 364.159 105.095 331.499 137.849 C 310.553 158.828 288.752 189.014 290.461 209.994 C 285.417 209.994 280.373 208.324 277.893 205.798 C 276.184 204.128 274.517 201.602 273.704 198.262 C 273.704 198.262 272.849 194.066 272.849 191.54 C 273.704 170.56 289.606 141.189 314.742 116.869 Z M 401.05 204.984 C 360.824 245.274 314.742 256.149 290.461 232.686 C 288.752 230.974 287.085 229.304 285.417 226.778 C 287.085 227.634 289.606 227.634 292.128 227.634 C 299.652 227.634 308.886 225.964 318.077 222.582 C 338.211 215.046 359.97 200.788 379.249 181.478 C 408.574 152.106 425.331 118.539 425.331 94.219 L 428.707 96.703 C 452.134 121.065 440.421 166.364 401.05 204.984 Z"
+                        <Path d='M 26 7 L 25.699 6.699 C 24 4.801 21.5 4.199 21.5 4.199 C 18.5 3.301 13.801 5.301 9.602 9.398 C 6.102 12.699 4 16.699 4 19.699 C 4 20.102 4.102 20.5 4.102 20.898 C 4.301 22.898 5.602 25 6.699 26 C 8.102 27.398 9.898 28.102 11.898 28.102 C 15.199 28.102 19.102 26.199 22.699 22.801 C 28.301 17.301 29.699 10.801 26 7 Z M 10 21.699 C 10 20.398 11.398 17.699 14.398 14.699 C 17.301 11.801 20.301 11 21.699 10.699 C 21 12.602 19.5 14.898 17.301 17.102 C 15.199 19.102 12.801 20.699 10.699 21.5 C 10.5 21.602 10.199 21.602 10 21.699 Z M 11 10.801 C 14.301 7.5 17.801 5.898 20 5.898 C 20.699 5.898 21.301 6.102 21.699 6.5 C 22.102 6.898 22.301 7.699 22.199 8.602 C 21 8.699 16.898 9.398 13 13.301 C 10.5 15.801 7.898 19.398 8.102 21.898 C 7.5 21.898 6.898 21.699 6.602 21.398 C 6.398 21.199 6.199 20.898 6.102 20.5 C 6.102 20.5 6 20 6 19.699 C 6.102 17.199 8 13.699 11 10.801 Z M 21.301 21.301 C 16.5 26.102 11 27.398 8.102 24.602 C 7.898 24.398 7.699 24.199 7.5 23.898 C 7.699 24 8 24 8.301 24 C 9.199 24 10.301 23.801 11.398 23.398 C 13.801 22.5 16.398 20.801 18.699 18.5 C 22.199 15 24.199 11 24.199 8.102 L 24.602 8.398 C 27.398 11.301 26 16.699 21.301 21.301 Z' 
                             stroke={"url(#gradient-0)"}
                             fill={"rgb(6, 6, 6)"}
-                            // fill={globalPlayerData[playerID].colors.secondary}
                             strokeWidth={0}
                         />
-                        <Path d="M 428.666 95.637 C 430.19 94.001 469.327 137.471 401.804 204.363 C 392.16 216.556 327.168 270.928 290.545 233.172 L 285.116 227.197 L 292.983 227.189 C 292.045 228.313 316.518 224.504 319.04 221.474 C 318.856 224.285 377.255 188.553 378.738 180.975 C 393.057 172.516 429.286 111.255 425.147 92.918 L 428.666 95.637 Z"
+                        <Path d='M 24.597 8.271 C 24.779 8.076 29.45 13.256 21.391 21.227 C 20.24 22.68 12.483 29.159 8.112 24.66 L 7.464 23.948 L 8.403 23.947 C 8.291 24.081 11.212 23.627 11.513 23.266 C 11.491 23.601 18.461 19.343 18.638 18.44 C 20.347 17.432 24.671 10.132 24.177 7.947 L 24.597 8.271 Z' 
                             strokeWidth={0}
                             stroke={"url(#gradient-1)"}
                             fill={"url(#gradient-2)"}
                         />
-                        <Path d="M 291.416 210.758 C 291.416 212.931 277.751 207.317 277.751 206.025 C 277.566 206.209 273.059 198.875 273.545 198.388 C 272.489 199.093 270.554 191.683 271.609 190.978 C 275.07 158.753 306.498 122.945 313.971 115.895 C 316.116 110.759 370.594 69.337 390.015 75.237 C 394.808 75.069 408.44 79.718 405.298 80.238 C 412.411 79.76 411.967 98.23 408.942 99.221 C 390.803 96.233 341.352 127.3 331.809 137.891 C 294.558 179.254 287.931 204.061 291.416 210.758 Z"
+                        <Path d='M 8.216 21.989 C 8.216 22.248 6.585 21.579 6.585 21.425 C 6.563 21.447 6.025 20.573 6.083 20.515 C 5.957 20.599 5.726 19.716 5.852 19.632 C 6.265 15.792 10.016 11.525 10.908 10.685 C 11.164 10.073 17.666 5.137 19.984 5.84 C 20.556 5.82 22.183 6.374 21.808 6.436 C 22.657 6.379 22.604 8.58 22.243 8.698 C 20.078 8.342 14.176 12.044 13.037 13.306 C 8.591 18.235 7.8 21.191 8.216 21.989 Z'
                             stroke={"rgb(0, 0, 0)"}
                             strokeWidth={0}
                             fill={"url(#gradient-3)"}
@@ -195,7 +196,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
             {/* Initiative */}
             <View testID={"initiative"}
-                style={styles().card_container}>
+                style={styles(gameType).card_container}>
                 <Pressable
                     accessibilityLabel={currentInitiative === playerName ? `${playerName} has the Initiative` : `activate the initiative for ${playerName}`}
                     style={styles().card_overlay}
@@ -207,7 +208,6 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     style={initiativeScaleStyle}
                 >
                     <Path
-                        // fill={globalPlayerData[playerID].colors.secondary === "rgba(0,0,0,1)" ? 'white' : 'black'} 
                         fill={
                             globalPlayerData[playerID].colors.primary === "rgba(0,0,0,1)" ? 'white' :
                                 currentInitiative === playerName ? 'black' : globalPlayerData[playerID].colors.secondary
@@ -248,7 +248,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
             {/* Monarch */}
             <View testID={"monarch"}
-                style={styles().card_container}>
+                style={styles(gameType).card_container}>
                 <Pressable
                     accessibilityLabel={currentMonarch === playerName ? `${playerName} is the Monarch` : `activate the Monarch for ${playerName}`}
                     style={styles().card_overlay}
@@ -257,7 +257,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     testID={"monarch_pressable"}
                 />
                 <AnimatedSvg viewBox='0 0 512 512' fill={globalPlayerData[playerID].colors.secondary}
-                style={monarchScaleStyle}
+                    style={monarchScaleStyle}
                 >
                     <Defs>
                         <RadialGradient gradientUnits="userSpaceOnUse" cx="254.484" cy="367.256" r="226.878" id="gradient-0">
@@ -269,12 +269,12 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                     <Path d='M46.66,211.508c0-12.883-10.454-23.321-23.33-23.321C10.454,188.187,0,198.625,0,211.508   c0,12.884,10.454,23.322,23.33,23.322C36.206,234.83,46.66,224.392,46.66,211.508z' />
                     <Path d='M387.464,178.991c12.892,0,23.33-10.438,23.33-23.322s-10.438-23.322-23.33-23.322   c-12.876,0-23.314,10.438-23.314,23.322S374.588,178.991,387.464,178.991z' />
                     <Path d="M488.686,188.187c-12.892,0-23.33,10.438-23.33,23.321c0,12.884,10.438,23.322,23.33,23.322   c12.876,0,23.314-10.438,23.314-23.322C512,198.625,501.562,188.187,488.686,188.187z" />
-                    <Rect x="80.101" y="399.236" width="351.815" height="36.296" 
-                    fill={currentMonarch === playerName ? "url(#gradient-0)" : globalPlayerData[playerID].colors.secondary}
+                    <Rect x="80.101" y="399.236" width="351.815" height="36.296"
+                        fill={currentMonarch === playerName ? "url(#gradient-0)" : globalPlayerData[playerID].colors.secondary}
                     />
                     <Path d='M400.193,272.999c-33.932-23.322-14.839-82.694-14.839-82.694l-19.388-5.661   c-40.721,77.385-100.608,73.761-95.937-12.728v-27.715h33.686v-28.05h-33.686V76.468h-28.058v39.682h-33.702v28.05h33.702v27.715   c4.679,86.49-55.2,90.113-95.938,12.728l-19.371,5.661c0,0,19.076,59.372-14.839,82.694   c-33.932,23.321-63.626-33.923-63.626-33.923l-19.076,8.474L82.13,374.777H429.87l53.008-127.226l-19.076-8.474   C463.802,239.076,434.125,296.32,400.193,272.999z M170.852,321.058c-9.26,0-16.77-7.501-16.77-16.762   c0-9.252,7.51-16.753,16.77-16.753c9.244,0,16.753,7.501,16.753,16.753C187.606,313.557,180.096,321.058,170.852,321.058z    M256.008,312.681c-9.26,0-16.762-7.501-16.762-16.762c0-9.252,7.501-16.753,16.762-16.753c9.252,0,16.753,7.501,16.753,16.753   C272.762,305.18,265.26,312.681,256.008,312.681z M341.164,321.058c-9.26,0-16.753-7.501-16.753-16.762   c0-9.252,7.493-16.753,16.753-16.753c9.26,0,16.753,7.501,16.753,16.753C357.918,313.557,350.425,321.058,341.164,321.058z'
-                    fill={currentMonarch === playerName ? "url(#gradient-0)" : globalPlayerData[playerID].colors.secondary}
-                    stroke={'black'}
+                        fill={currentMonarch === playerName ? "url(#gradient-0)" : globalPlayerData[playerID].colors.secondary}
+                        stroke={'black'}
                     />
                 </AnimatedSvg>
             </View>
@@ -298,7 +298,8 @@ const styles = (gameType?: string) => StyleSheet.create({
     dungeon_complete_touch: {
         flexDirection: 'row',
         height: '100%',
-        width: gameType === 'oathbreaker' ? '20%' : `${100 / staticCounterList.length}%`,//works for commander, pushes cards too far on oathbreaker
+        // width: gameType === 'oathbreaker' ? '20%' : `${100 / staticCounterList.length}%`,//works for commander, pushes cards too far on oathbreaker
+        width:'20%',
         minHeight: minHeight,
         alignItems: 'center',
     },
@@ -310,19 +311,23 @@ const styles = (gameType?: string) => StyleSheet.create({
         alignItems: 'center',
         zIndex: 10,
     },
+    dungeonCheck :{
+        height:'50%',
+        width:'40%',
+        minHeight: 30
+    },
     card_container: {
         height: '100%',
-        width: `${100 / staticCounterList.length}%`,
+        width:`${100 / staticCounterList.length}%`,
         minHeight: minHeight,
+        justifyContent:'center',
+        alignItems:'center',
     },
     card_overlay: {
         height: '100%',
         width: '100%',
         position: 'absolute',
-        borderRadius: 5,
         zIndex: 1,
-        justifyContent:'center',
-        alignItems:'center',
     },
 })
 

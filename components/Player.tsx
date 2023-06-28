@@ -81,13 +81,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
-                    style={[styles.commander_damage_tracker, commanderDim
-                    // {
-                    //     //80% height for oath, 90 for commander?
-                    //     // height: totalPlayers === 2 ? '80%' : '90%'
-                    //     height: gameType === 'commander' || totalPlayers === 4 ? '90%' : '80%'
-                    // }
-                    ]} >
+                    style={[styles.commander_damage_tracker, commanderDim]} >
                     <CommanderDamage playerID={playerID}
                         scaleTracker={setScaleTracker}
                         showScale={scaleTracker}

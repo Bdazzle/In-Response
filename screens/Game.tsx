@@ -17,7 +17,7 @@ const window = Dimensions.get("window")
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 */
 export const Game = () => {
-    const { totalPlayers, startingLife } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, startingLife, deviceType } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
@@ -185,12 +185,20 @@ export const Game = () => {
                                 { translateX: window.width / 5 },
                                 { translateY: window.width / 6 }
                             ]
-                                : [],
+                            : 
+                            deviceType === 'tablet' ? [
+                                { translateY : -7 }
+                            ]
+                            : [],
                         }}
                     >
                         {/* Reset button */}
                         <View testID='reset_button'
-                            style={[styles.icon_button, styles.button_background]}
+                        // styles.icon_button,
+                            style={[ styles.button_background,{
+                                height: deviceType === 'phone' ? 38 : 58,
+                                width: deviceType === 'phone' ? 38 : 58,
+                            }]}
                         >
                             <Pressable
                                 onPress={() => showResetModal()}
@@ -207,14 +215,22 @@ export const Game = () => {
 
                         {/* Day/night Cycle button */}
                         <View testID='cycle_icon_container'
-                            style={styles.icon_button}
+                            // style={styles.icon_button}
+                            style={{
+                                height: deviceType === 'phone' ? 38 : 58,
+                                width: deviceType === 'phone' ? 38 : 58,
+                            }}
                         >
                             <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
                         </View>
 
                         {/* Random Player button */}
                         <View testID='random_button'
-                            style={[styles.icon_button, styles.button_background]}
+                        // styles.icon_button, 
+                            style={[styles.button_background,{
+                                height: deviceType === 'phone' ? 38 : 58,
+                                width: deviceType === 'phone' ? 38 : 58,
+                            }]}
                         >
                             <Pressable onPress={() => getRandomPlayer()}
                             accessibilityLabel="select random player"
@@ -602,10 +618,10 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: 'white'
     },
-    icon_button: {
-        height: 38,
-        width: 38,
-    },
+    // icon_button: {
+    //     height: 38,
+    //     width: 38,
+    // },
     button_background: {
         backgroundColor: 'white',
         borderRadius: 50
