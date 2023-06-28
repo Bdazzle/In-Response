@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { lifeTotalScaler, textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useLuminance from '../hooks/useLuminance'
+import useContainerDimensions from '../hooks/useContainerDimensions';
 
 interface PlayerProps {
     playerName: string,
@@ -34,6 +35,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 })
     const [scaleTracker, setScaleTracker] = useState<boolean>(false)
     const luminance = useLuminance(theme.secondary.slice(theme.secondary.indexOf('(') + 1, theme.secondary.lastIndexOf(',')).split(','))
+    const [staticCounterDim, commanderDim] = useContainerDimensions(gameType, totalPlayers)
 
     const handleLifeChange = (val: number): void => {
         dispatchGlobalPlayerData({
@@ -79,13 +81,12 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
-                    style={[styles.commander_damage_tracker,
-                    {
-                        //80% height for oath, 90 for commander?
-                        // height: totalPlayers === 2 ? '80%' : '90%'
-                        height: gameType === 'commander' || totalPlayers === 4 ? '90%' : '80%'
-                        // width: gameType === 'oathbreaker' ?
-                    }
+                    style={[styles.commander_damage_tracker, commanderDim
+                    // {
+                    //     //80% height for oath, 90 for commander?
+                    //     // height: totalPlayers === 2 ? '80%' : '90%'
+                    //     height: gameType === 'commander' || totalPlayers === 4 ? '90%' : '80%'
+                    // }
                     ]} >
                     <CommanderDamage playerID={playerID}
                         scaleTracker={setScaleTracker}
@@ -100,10 +101,12 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
                 <View testID="static_counter_wrapper"
-                    style={[styles.static_counter_wrapper, {
-                        width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : gameType === "oathbreaker" ? '70%' : '55%',
-                        marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : gameType === "oathbreaker" ? '15%' : '20%',
-                    }]}
+                    style={[styles.static_counter_wrapper, staticCounterDim
+                    //     {
+                    //     width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : gameType === "oathbreaker" ? '70%' : '55%',
+                    //     marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : gameType === "oathbreaker" ? '15%' : '20%',
+                    // }
+                ]}
                 >
                     <StaticCounterContainer
                         playerID={playerID}
@@ -360,5 +363,8 @@ const styles = StyleSheet.create({
         bottom: 5,
         zIndex: 9,
         width: '20%',
+
+        // borderColor:'white',
+        // borderWidth:1
     }
 })

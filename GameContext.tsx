@@ -62,32 +62,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [startingLife])
 
-  /*
-  parse saved data : names, colors.
-  sets as default options through rest of app
-  */
-  // useEffect(() => {
-  //   if (savedData && Object.keys(globalPlayerData).length > 0) {
-  //     // console.log('gamecontext',savedData)
-  //     let newPlayerData = globalPlayerData;
-  //       savedData.forEach((arr: KeyValuePair) => {
-  //         if(arr[0].includes('screenName')){
-  //           newPlayerData[arr[0].charAt(0)].screenName = arr[1]
-  //         }
-  //         if(arr[0].includes('colors')){
-  //           newPlayerData[arr[0].charAt(0)].colors = JSON.parse(arr[1] as string)
-  //           // newPlayerData[arr[0].charAt(0)].colors = arr[1]
-  //         }
-  //       })
-  //       dispatchGlobalPlayerData({
-  //         field:'init',
-  //         value: newPlayerData,
-  //         playerID: 0
-  //       })
-  //       // console.log(newPlayerData)
-  //   }
-  // }, [savedData])
-
   return <GameContext.Provider value={{
     currentMonarch: currentMonarch,
     setCurrentMonarch: setCurrentMonarch,

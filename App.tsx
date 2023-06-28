@@ -21,9 +21,8 @@ TO DO/NOTES
 *) move player translates to a reducer or hooks?
 *) customizeable color inputs?
 *) additional tax for commander if partners/backgrounds?
-*) Add mechanics options screen, to have a less busy UI.
 *) add text input to mana totals in Storm CounterCard screen
-*) some kind of reducer for StaticCounters container width and DamageTracker container height/width
+*)change tax counter to something like scaling damage trackers ( to remove long press from tax reducing)
 *) Accessibility:
   -planes alt properties and alt properties for images that have text
   -in game Touch targets...
