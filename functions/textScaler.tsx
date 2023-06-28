@@ -75,7 +75,7 @@ export function cdmgScaler(deviceType: string, componentHeight: number, totalPla
 
 export function taxLineHeight( deviceType: string, componentHeight : number, playerID : number, totalPlayers : number, gameType: string) {
   if (deviceType === 'tablet') {
-    return totalPlayers === 3 && playerID === 3 ? (gameType === 'oathbreaker' ? componentHeight : componentHeight * 1.1 ) : componentHeight * .9
+    return totalPlayers === 3 && playerID === 3 ? (gameType === 'oathbreaker' ? componentHeight : componentHeight * 1.2 ) : componentHeight * 1
   }
   if (width >= 600 && width < 900) {
     return componentHeight * .9

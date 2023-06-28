@@ -83,3 +83,4 @@ hooks/useDebounce.tsx
 hooks/useSwipe.tsx
 credentials.json
 /credentials
+notes.txt

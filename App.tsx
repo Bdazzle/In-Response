@@ -6,30 +6,7 @@ import { useFonts } from "expo-font";
 import React, { useCallback } from 'react';
 // import * as SplashScreen from 'expo-splash-screen';
 
-/*
-TO DO/NOTES
-*)npx expo start. other cli commands not working?
-*) build command for apk: eas build -p android --profile preview
-  -eas build uses .gitignore to access files, so change access to assets files after build so it's not uploaded to github
-*) Animated.View prevents any child components onPress and onLongPress from firing normally,
-  Because the touch event is intercepted by the Animated API. 
-  Swipeable components from React Native Gesture Handler used instead.
-*) example of passing variables to StyleSheet as function: CommanderDamageTracker
-*) implement a better reset (like in commander tax tracker) to improve performance? (may be unnecessary)
-*) all rotated screens have a Y difference of 70, this might be device related or aspect ratio related?
-*) Create options for a less busy display (options for Static Counter, maybe Incremental counters later)
-*) move player translates to a reducer or hooks?
-*) customizeable color inputs?
-*) additional tax for commander if partners/backgrounds?
-*) add text input to mana totals in Storm CounterCard screen
-*)change tax counter to something like scaling damage trackers ( to remove long press from tax reducing)
-*) Accessibility:
-  -planes alt properties and alt properties for images that have text
-  -in game Touch targets...
 
-*) check text scaling functions to see if using component width instead of component height will refactor into clearer code 
-1) TABLET TO DO:
-*/
 
 // SplashScreen.preventAutoHideAsync();
 
