@@ -5,7 +5,7 @@ import { Image, Text, StyleSheet, TextInput, Pressable, View, KeyboardAvoidingVi
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { Path, Polygon } from "react-native-svg";
 import { AllScreenNavProps } from "../..";
-import { ColorLibrary } from "../../constants/Colors";
+import { colorLibrary } from "../../constants/Colors";
 import { textScaler } from "../../functions/textScaler";
 import { GameContext } from "../../GameContext";
 
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         height: '100%',
         width: "100%",
-        backgroundColor: ColorLibrary.vapePink,
+        backgroundColor: colorLibrary.vapePink,
         justifyContent: 'center',
         alignItems: 'center'
     },

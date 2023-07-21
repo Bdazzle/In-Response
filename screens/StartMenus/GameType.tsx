@@ -30,7 +30,7 @@ const LifeMenu = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} testID="GameType-screen">
             <View testID="gametype_container" 
             style={styles.gametype_container}
             >

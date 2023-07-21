@@ -42,7 +42,7 @@ export type CounterData = {
 }
 
 export interface PlayerData {
-    colors: ColorScheme,
+    colors: ColorTheme,
     screenName: string,
     dungeonData?: Partial<DungeonData>,
     dungeonCompleted?: boolean,
@@ -78,3 +78,19 @@ NativeStackNavigationProp<GlobalMenuParamsList, keyof GlobalMenuParamsList>
 
 export type StartMenuStackNavProps = NativeStackNavigationProp<StartMenuStackParamList, keyof StartMenuStackParamList>
 
+export type RGBAValues = {
+    red: number,
+    green: number,
+    blue: number,
+    alpha: number
+}
+
+/*
+number & { __wholeNumber: never } = typeguard to represent type has to be whole number
+*/
+export type HSLAVals = {
+    hue: number,
+    saturation: number,
+    lightness: number,
+    alpha? : number
+}

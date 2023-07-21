@@ -131,7 +131,7 @@ const PlayerOptions = ({ }) => {
 
     return (
         <View style={styles.container}
-            testID="player_name"
+            testID="player_options"
         >
             <Text style={styles.title_text} >Player Names</Text>
             

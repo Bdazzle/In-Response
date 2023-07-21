@@ -24,7 +24,7 @@ const TotalPlayers = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} testID="total-players-screen">
             <Text style={styles.title_text} >Total Players</Text>
             <View style={styles.options_wrapper}>
                 {chunkedOptions.map((chunks: number[], index: number) => {
@@ -33,6 +33,7 @@ const TotalPlayers = () => {
                             return <Pressable key={c}
                                 style={totalPlayers === c ? styles.selected_option_touch :styles.option_touch}
                                 onPressIn={() => handleSelectPlayers(c)}
+                                testID={`${c}-players`}
                             >
                                 <Text key={`${c}_text`} 
                                 style={totalPlayers === c ? styles.selected_option : styles.option_text} 

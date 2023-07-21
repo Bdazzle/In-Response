@@ -20,10 +20,10 @@ const ColorMenu: React.FC = ({ }) => {
         navigation.navigate('ColorSelector', {
             playerID: route.params.playerID,
             currentColor: currentColor,
-            colorPosition: position
+            themePosition: position
         })
     }
-
+   
     return (
         <View style={styles.container}>
             <View style={styles.options_wrapper}>

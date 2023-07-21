@@ -79,8 +79,10 @@ screen_shots/
 *.doc
 hooks/useCachedResources.ts
 hooks/useColorScheme.ts
-hooks/useDebounce.tsx
 hooks/useSwipe.tsx
+components/color picker/useHSLtoRGBA.ts
 credentials.json
 /credentials
 notes.txt
+/__tests__
+/__mocks__

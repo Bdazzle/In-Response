@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 
+/*
+finds out how bright a color is.
+Used to tell if contrast is high or low between player color themes (primary and secondary)
+and adjusts some text accordingly
+*/
 export default function useLuminance(val: any | undefined){
     const [luminance, setLumina] = useState<any>()
     useEffect(()=>{

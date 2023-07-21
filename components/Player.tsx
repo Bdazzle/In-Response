@@ -69,7 +69,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
     }
 
     return (
-        <Pressable testID='player_container'
+        <Pressable testID={`${playerID}-player-container`}
             style={[styles.player_container,
             {
                 backgroundColor: theme.primary,

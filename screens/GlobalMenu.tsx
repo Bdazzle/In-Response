@@ -15,7 +15,7 @@ const GlobalMenu: React.FC = ({ }) => {
     const { setTotalPlayers } = useContext(OptionsContext) as OptionsContextProps
 
     const resetGame = () => {
-        navigation.navigate('StartMenu', { screen: "Life"})
+        navigation.navigate('StartMenu', { screen: "Life" })
         setTotalPlayers(0)
     }
 
@@ -40,40 +40,41 @@ const GlobalMenu: React.FC = ({ }) => {
     }
 
     return (
-                <View style={styles.menu_container}>
-                    <View style={styles.icons_container}  >
-                        {options.map(option => {
-                            return (
-                                <View key={option} style={styles.button_wrapper} >
-                                    <Pressable style={styles.button_touch} testID="iconPressIn"
-                                    accessibilityLabelledBy={option}
-                                    aria-labelledby={option}
-                                    accessibilityRole="button"
-                                        onPressIn={() =>
-                                            option === "New Game" ? resetGame() :
-                                                option === 'Players' ? toPlayerOptions() :
-                                                    option === 'Coin Flip' ? toCoin() :
-                                                        option === 'Dice' ? toDice() :
-                                                            option === "Planechase" ? toPlane() :
-                                                                option === "Instructions" ? toInstructions() :
-                                                                    ''
-                                        }
-                                    >
-                                        {
-                                            option === "Planechase" ?
-                                                <PlaneswalkerSvg viewBox="-150 -50 1300 1300" fillColor="white" />
-                                                :
-                                                iconData[option]
-                                                
-                                        }
-                                    </Pressable>
-                                    <Text nativeID={option} style={styles.button_text}>{option}</Text>
-                                </View>
-                            )
-                        })}
-                        <Text style={styles.button_text} >Swipe to access this menu. Press/hold icons to interact</Text>
-                    </View>
-                </View >
+        <View style={styles.menu_container}>
+            <View style={styles.icons_container}  >
+                {options.map(option => {
+                    return (
+                        <Pressable key={option} style={styles.button_wrapper}
+                            testID={`${option}-button`}
+                            accessibilityLabelledBy={option}
+                            aria-labelledby={option}
+                            accessibilityRole="button"
+                            onPressIn={() =>
+                                option === "New Game" ? resetGame() :
+                                    option === 'Players' ? toPlayerOptions() :
+                                        option === 'Coin Flip' ? toCoin() :
+                                            option === 'Dice' ? toDice() :
+                                                option === "Planechase" ? toPlane() :
+                                                    option === "Instructions" ? toInstructions() :
+                                                        ''
+                            }
+                        >
+                            <View style={styles.button_touch} testID="iconWrapper">
+                                {
+                                    option === "Planechase" ?
+                                        <PlaneswalkerSvg viewBox="-150 -50 1300 1300" fillColor="white" />
+                                        :
+                                        iconData[option]
+
+                                }
+                            </View>
+                            <Text nativeID={option} style={styles.button_text}>{option}</Text>
+                        </Pressable>
+                    )
+                })}
+                <Text style={styles.button_text} >Swipe to access this menu. Press/hold icons to interact</Text>
+            </View>
+        </View >
     )
 }
 
