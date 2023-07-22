@@ -17,7 +17,7 @@ const window = Dimensions.get("window")
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 */
 export const Game = () => {
-    const { totalPlayers, startingLife, deviceType } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, startingLife, deviceType, simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
@@ -101,7 +101,7 @@ export const Game = () => {
             if (newPlayerData[playerID].dungeonData) {
                 delete newPlayerData[playerID].dungeonData
             }
-            if(newPlayerData[playerID].theRing){
+            if (newPlayerData[playerID].theRing) {
                 delete newPlayerData[playerID].theRing
             }
         }
@@ -185,17 +185,17 @@ export const Game = () => {
                                 { translateX: window.width / 5 },
                                 { translateY: window.width / 6 }
                             ]
-                            : 
-                            deviceType === 'tablet' ? [
-                                { translateY : -7 }
-                            ]
-                            : [],
+                                :
+                                deviceType === 'tablet' ? [
+                                    { translateY: -7 }
+                                ]
+                                    : [],
                         }}
                     >
                         {/* Reset button */}
                         <View testID='reset_button'
-                        // styles.icon_button,
-                            style={[ styles.button_background,{
+                            // styles.icon_button,
+                            style={[styles.button_background, {
                                 height: deviceType === 'phone' ? 38 : 58,
                                 width: deviceType === 'phone' ? 38 : 58,
                             }]}
@@ -214,30 +214,31 @@ export const Game = () => {
 
 
                         {/* Day/night Cycle button */}
-                        <View testID='cycle_icon_container'
-                            // style={styles.icon_button}
-                            style={{
-                                height: deviceType === 'phone' ? 38 : 58,
-                                width: deviceType === 'phone' ? 38 : 58,
-                            }}
-                        >
-                            <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
-                        </View>
+                        {!simpleDisplay &&
+                            <View testID='cycle_icon_container'
+                                style={{
+                                    height: deviceType === 'phone' ? 38 : 58,
+                                    width: deviceType === 'phone' ? 38 : 58,
+                                }}
+                            >
+                                <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
+                            </View>
+                        }
 
                         {/* Random Player button */}
                         <View testID='random_button'
-                        // styles.icon_button, 
-                            style={[styles.button_background,{
+                            // styles.icon_button, 
+                            style={[styles.button_background, {
                                 height: deviceType === 'phone' ? 38 : 58,
                                 width: deviceType === 'phone' ? 38 : 58,
                             }]}
                         >
                             <Pressable onPress={() => getRandomPlayer()}
-                            accessibilityLabel="select random player"
-                            style={{
-                                height:'100%',
-                                width:'100%'
-                            }}
+                                accessibilityLabel="select random player"
+                                style={{
+                                    height: '100%',
+                                    width: '100%'
+                                }}
                             >
                                 <Svg viewBox='0 0 358 358' >
                                     <Path d="M179.006,0C80.141,0,0,80.141,0,179.006s80.141,179.006,179.006,179.006   s179.006-80.141,179.006-179.006S277.871,0,179.006,0z M277.668,281.04l-8.437-8.437l33.587-33.588l-79.091-0.376v-0.018   c-1.545,0-3.031-0.603-4.141-1.671l-51.411-49.65l-51.405,49.65c-1.116,1.074-2.602,1.671-4.147,1.671H41.022v-11.934h69.192   L159.59,179l-49.376-47.687H41.022v-11.934h71.602c1.545,0,3.031,0.603,4.147,1.677l51.405,49.65l51.411-49.65   c1.116-1.074,2.602-1.677,4.141-1.677h25.389v0.137l53.642,0.257l-34.363-34.369l8.437-8.437l48.797,48.797l-47.962,47.962   l-8.437-8.437l33.588-33.588l-76.704-0.364L176.768,179l49.376,47.687h22.972v0.137l53.642,0.257l-34.363-34.369l8.437-8.437   l48.797,48.797L277.668,281.04z"
@@ -255,7 +256,7 @@ export const Game = () => {
                         <Pressable style={[styles.random_modal_pressable]}
                             onPress={() => hideRandomPlayer()}
                             accessibilityLabel="Close random player modal"
-                            >
+                        >
                             <Text style={[styles.modal_text]}>{randomPlayer} Selected</Text>
                         </Pressable>
                     </Animated.View>
@@ -275,7 +276,7 @@ export const Game = () => {
                                     transform: [{ rotate: "180deg" }],
                                     // height: '50%'
                                 }}
-                                p2style={{ 
+                                p2style={{
                                     // height: '50%' 
                                 }}
                                 containerStyle={{
@@ -606,7 +607,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     reset_modal: {
-        flex:1,
+        flex: 1,
         position: 'absolute',
         backgroundColor: 'black',
         top: '30%',

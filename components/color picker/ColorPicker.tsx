@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
-import { GameContext, GameContextProps } from "../../GameContext";
+import React, { useEffect, useState } from "react"
 import { HSLAVals } from "../..";
 import ColorSlider from "./ColorSlider";
 import { StyleSheet, View } from "react-native";

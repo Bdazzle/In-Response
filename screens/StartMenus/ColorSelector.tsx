@@ -46,7 +46,7 @@ const ColorSelector: React.FC = ({ }) => {
             playerID: route.params.playerID
         })
 
-        // saveColors(colorString)
+        saveColors(colorString)
 
         navigation.navigate('ColorMenu', {
             playerID: route.params.playerID,

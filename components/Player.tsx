@@ -31,7 +31,7 @@ everything not in GameContext gets reset when navigating.
 export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
-    const { totalPlayers, gameType } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, gameType, simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
     const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 })
     const [scaleTracker, setScaleTracker] = useState<boolean>(false)
     const luminance = useLuminance(theme.secondary.slice(theme.secondary.indexOf('(') + 1, theme.secondary.lastIndexOf(',')).split(','))
@@ -94,22 +94,19 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
 
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
-                <View testID="static_counter_wrapper"
-                    style={[styles.static_counter_wrapper, staticCounterDim
-                    //     {
-                    //     width: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? '80%' : gameType === "oathbreaker" ? '70%' : '55%',
-                    //     marginLeft: gameType === 'normal' || (gameType === 'commander' && totalPlayers === 2) ? 0 : gameType === "oathbreaker" ? '15%' : '20%',
-                    // }
-                ]}
-                >
-                    <StaticCounterContainer
-                        playerID={playerID}
-                        playerName={playerName}
-                        colorTheme={theme}
-                        dungeonCompleted={globalPlayerData[playerID].dungeonCompleted as boolean}
-                    />
-                </View>
-
+                { !simpleDisplay &&
+                    <View testID="static_counter_wrapper"
+                        style={[styles.static_counter_wrapper, staticCounterDim
+                        ]}
+                    >
+                        <StaticCounterContainer
+                            playerID={playerID}
+                            playerName={playerName}
+                            colorTheme={theme}
+                            dungeonCompleted={globalPlayerData[playerID].dungeonCompleted as boolean}
+                        />
+                    </View>
+                }
 
                 {/* 
                 Life Total container

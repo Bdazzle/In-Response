@@ -12,7 +12,7 @@ const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Inst
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { setTotalPlayers } = useContext(OptionsContext) as OptionsContextProps
+    const { setTotalPlayers, simpleDisplay, saveDisplay } = useContext(OptionsContext) as OptionsContextProps
 
     const resetGame = () => {
         navigation.navigate('StartMenu', { screen: "Life" })
@@ -72,6 +72,18 @@ const GlobalMenu: React.FC = ({ }) => {
                         </Pressable>
                     )
                 })}
+                <Pressable nativeID="simpleDisplayButton"
+                    accessibilityLabel="Simple Display"
+                    accessibilityRole="button"
+                    onPressIn={() => saveDisplay(!simpleDisplay)}
+                    style={[styles.button_wrapper, {
+                        backgroundColor: simpleDisplay == true ? 'white' : 'black'
+                    }]}
+                >
+                    <Text style={simpleDisplay === true ? styles.active_button_text : styles.button_text}>
+                        Simple Display
+                    </Text>
+                </Pressable>
                 <Text style={styles.button_text} >Swipe to access this menu. Press/hold icons to interact</Text>
             </View>
         </View >
@@ -114,6 +126,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'Beleren',
         fontSize: textScaler(16)
+    },
+    active_button_text: {
+        color: 'black',
+        textAlign: 'center',
+        fontFamily: 'Beleren',
+        fontSize: textScaler(16),
+        backgroundColor: 'white'
     },
 })
 

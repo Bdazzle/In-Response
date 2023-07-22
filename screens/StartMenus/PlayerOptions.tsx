@@ -72,7 +72,9 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
         })
     }
 
-
+/*
+maybe move this to a context? somewhere higher up in app hierarchy?
+*/
     useEffect(() => {
         (async () => {
             try {
