@@ -16,13 +16,18 @@ interface ColorPaletteParams {
 }
 
 type Measurements = {
+    x: number,
+    y: number,
     width: number,
     height: number,
     pageX: number,
     pageY: number,
-    x: number,
-    y: number
 }
+
+type Coordinates = {
+    x: number;
+    y: number;
+};
 
 interface PaletteMarkerProps {
     x: number,
@@ -31,6 +36,36 @@ interface PaletteMarkerProps {
     // paletteDimensions: Measurements
     // paletteDimensions: LayoutRectangle
 }
+
+/* 
+may have to use pageX and pageY for drag events.
+take the pageX and Y, subtract palletRef.current.measure() pageX and pageY (the offsets)
+*/
+const normalizeCoords = (x: number, y: number, pageOffsetX: number, pageOffsetY: number, maxX: number, maxY: number) => {
+    const adjustedX = x - pageOffsetX <= 0 ? 0
+        : x - pageOffsetX > maxX ? maxX
+            : x - pageOffsetX
+    const adjustedY = y - pageOffsetY <= 0 ? 0
+        : y - pageOffsetY > maxY ? maxY
+            : y - pageOffsetY
+    return { x: adjustedX, y: adjustedY }
+}
+// let adjustedX, adjustedY;
+// if(x - pageOffsetX <= 0){
+//     adjustedX = 0
+// } else if(x-pageOffsetX > maxX){
+//     adjustedX = maxX
+// } else {
+//     adjustedX = x - pageOffsetX
+// }
+
+// if(y - pageOffsetY <= 0){
+//     adjustedY = 0
+// } else if(y-pageOffsetY > maxY){
+//     adjustedY = maxY
+// } else {
+//     adjustedY = y - pageOffsetY
+// }
 
 const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
     const translateX = useDerivedValue<number>(() => { return x });
@@ -65,7 +100,7 @@ const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
     //     }
     // }, [translateX])
 
-    const containerMoveStyle = useAnimatedStyle(() => {
+    const markerMoveStyle = useAnimatedStyle(() => {
         return {
             transform: [
                 {
@@ -86,9 +121,11 @@ const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
         }
     })
 
+    // console.log('marker coords', translateX.value, translateY.value)
+
     return (
         <Animated.View
-            style={[containerMoveStyle, styles.markerStyle]}
+            style={[markerMoveStyle, styles.markerStyle]}
         >
         </Animated.View>
     )
@@ -100,18 +137,11 @@ Should be static while hue value changes?
 */
 const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, onColorPress }) => {
     const [color, setColor] = useState<HSLAVals>()
-    const [hue, setHue] = useState<number>()
-    const [paletteDimensions, setPaletteDimensions] = useState<LayoutRectangle>()
-    // const [paletteDimensions, setPaletteDimensions] = useState<Measurements>()
+    const [paletteDimensions, setPaletteDimensions] = useState<Measurements>()
     const [markerCoordinate, setMarkerCoordinates] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
-    // const debouncedMarker = useDebounce<{ x: number, y: number }>(markerCoordinate, 75);
     const palettePressRef = useRef<View>(null)
-    // const lastPressedCoordinates = useRef({ x: 0, y: 0 });
-    // const { width, height } = useWindowDimensions()
 
     useEffect(() => {
-        // setColor(initialColor)
-        // setHue(initialHue)
         if (color) {
             setColor({
                 ...color,
@@ -127,27 +157,44 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
         setColor(initialColor)
     }, [])
 
-    const getPaletteMeasurements = (event: LayoutChangeEvent) => {
-        const { width, height, x, y } = event.nativeEvent.layout
-        setPaletteDimensions({ width, height, x, y })
-        /* 
-        convert color values from percents to decimals for maths.
-        */
-        const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100, initialColor.lightness / 100, width, height)
-        setMarkerCoordinates(initialMarkerCoords)
+    const getPaletteMeasurements = async (event: LayoutChangeEvent) => {
+        // const { width, height, x, y } = event.nativeEvent.layout
+        // setPaletteDimensions({ width, height, x, y })
+        if (palettePressRef.current) {
+            const paletteMeasurements: Measurements = await new Promise((resolve) => {
+                palettePressRef.current!.measure((x, y, width, height, pageX, pageY) => {
+                    resolve({ x, y, width, height, pageX, pageY });
+                });
+            });
+            setPaletteDimensions(paletteMeasurements)
+            /* 
+      convert color values from percents to decimals for maths.
+      */
+            // const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100, initialColor.lightness / 100, width, height)
+            const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100,
+                initialColor.lightness / 100,
+                paletteMeasurements.width,
+                paletteMeasurements.height
+            )
+            setMarkerCoordinates(initialMarkerCoords)
+        }
+
+
     }
 
     /* 
     having marker View as child of Pressable was setting View "in front" of Pressable,
     preventing onPress or onTouchMove to fire, and reseting locationX and locationY to origin (0,0),
     and screwing up anything that refered to them. See Notes.
+    Have to use pageX and Y
     */
     const handlePalettePress = (event: GestureResponderEvent) => {
-        const { locationX, locationY } = event.nativeEvent;
+        const { pageX, pageY } = event.nativeEvent;
         if (paletteDimensions) {
-            const [saturation, brightness] = convertCoordinatesToHSB(locationX, locationY, paletteDimensions!.width, paletteDimensions!.height)
+            const { x, y } = normalizeCoords(pageX, pageY, paletteDimensions.pageX, paletteDimensions.pageY, paletteDimensions.width, paletteDimensions.height)
+            const [saturation, brightness] = convertCoordinatesToHSB(x, y, paletteDimensions!.width, paletteDimensions!.height)
             const lightness = brightnessToLightness(saturation, brightness)
-            setMarkerCoordinates({ x: locationX, y: locationY })
+            setMarkerCoordinates({ x, y })
             if (onColorPress) {
                 onColorPress({
                     saturation: colorValToPercent(saturation),
@@ -158,51 +205,57 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
     }
 
     const markerDrag = (event: GestureResponderEvent) => {
-        const { locationX, locationY } = event.nativeEvent;
-        setMarkerCoordinates({ x: locationX, y: locationY })
+        const { pageX, pageY } = event.nativeEvent;
+        if (paletteDimensions) {
+            const { x, y } = normalizeCoords(pageX, pageY, paletteDimensions.pageX, paletteDimensions.pageY, paletteDimensions.width, paletteDimensions.height)
+
+            const [saturation, brightness] = convertCoordinatesToHSB(x, y, paletteDimensions!.width, paletteDimensions!.height)
+            const lightness = brightnessToLightness(saturation, brightness)
+
+            setMarkerCoordinates({ x, y })
+            if (onColorPress) {
+                onColorPress({
+                    saturation: colorValToPercent(saturation),
+                    lightness: colorValToPercent(lightness)
+                })
+            }
+        }
     }
 
-    // console.log(markerCoordinate)
-    // console.log('palette color', color)
-    // console.log('test', initialHue, initialColor)
     return (
         <View nativeID="color_palette_container" style={styles.container}>
 
             {color &&
-                // <View nativeID="paletteTouchWraper" 
-                
-                // >
-                    <Pressable
-                        ref={palettePressRef}
-                        nativeID="colorPalettePress"
-                        accessibilityLabel="Color Gradient"
-                        onLayout={(event) => getPaletteMeasurements(event)}
-                        onPress={(event) => handlePalettePress(event)}
-                        // onTouchMove={(e) => markerDrag(e)}
+                <Pressable
+                    ref={palettePressRef}
+                    nativeID="colorPalettePress"
+                    accessibilityLabel="Color Gradient"
+                    style={styles.palettePressable}
+                    onLayout={(event) => getPaletteMeasurements(event)}
+                    onPressOut={(event) => handlePalettePress(event)}
+                    onTouchMove={(e) => markerDrag(e)}
+                >
+                    <Svg style={styles.paletteSVG}
                     >
-                        <Svg style={styles.paletteSVG}
-                        >
-                            <Defs>
-                                <LinearGradient id="saturationGradient" x1="0" y1="0" x2="1" y2="1">
-                                    <Stop offset="0%" stopColor="white" stopOpacity="1" />
-                                    <Stop offset="100%" stopColor="black" stopOpacity="0" />
-                                </LinearGradient>
-                                <LinearGradient id="hueGradient" x1="1" y1="1" x2="0" y2="1">
-                                    <Stop offset="0%" stopColor={`hsla(${color.hue}, 100%, 50%, 1)`} stopOpacity="1" />
-                                    <Stop offset="100%" stopColor="black" stopOpacity={0} />
-                                    {/* <Stop offset="0%" stopColor={`hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${color.alpha})`} stopOpacity="1" /> */}
-                                </LinearGradient>
-                                <LinearGradient id="black" x1="0" y1="0" x2="0" y2="1">
-                                    <Stop offset="0%" stopColor="black" stopOpacity={0} />
-                                    <Stop offset="100%" stopColor="black" stopOpacity={1} />
-                                </LinearGradient>
-                            </Defs>
-                            <Rect width="100%" height="100%" fill="url(#saturationGradient)" />
-                            <Rect width="100%" height="100%" fill="url(#hueGradient)" />
-                            <Rect width="100%" height="100%" fill="url(#black)" />
-                        </Svg>
-                    </Pressable>
-                // </View>
+                        <Defs>
+                            <LinearGradient id="saturationGradient" x1="0" y1="0" x2="1" y2="1">
+                                <Stop offset="0%" stopColor="white" stopOpacity="1" />
+                                <Stop offset="100%" stopColor="black" stopOpacity="0" />
+                            </LinearGradient>
+                            <LinearGradient id="hueGradient" x1="1" y1="1" x2="0" y2="1">
+                                <Stop offset="0%" stopColor={`hsla(${color.hue}, 100%, 50%, 1)`} stopOpacity="1" />
+                                <Stop offset="100%" stopColor="black" stopOpacity={0} />
+                            </LinearGradient>
+                            <LinearGradient id="black" x1="0" y1="0" x2="0" y2="1">
+                                <Stop offset="0%" stopColor="black" stopOpacity={0} />
+                                <Stop offset="100%" stopColor="black" stopOpacity={1} />
+                            </LinearGradient>
+                        </Defs>
+                        <Rect width="100%" height="100%" fill="url(#saturationGradient)" />
+                        <Rect width="100%" height="100%" fill="url(#hueGradient)" />
+                        <Rect width="100%" height="100%" fill="url(#black)" />
+                    </Svg>
+                </Pressable>
             }
             <PaletteMarker
                 x={markerCoordinate.x} y={markerCoordinate.y}
@@ -216,22 +269,24 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
-
         borderColor: 'white',
         borderWidth: 1
     },
+    palettePressable: {
+        // zIndex:1
+    },
     paletteSVG: {
         width: '100%',
-        height: '100%'
+        height: '100%',
     },
     markerStyle: {
+        pointerEvents: 'none',
         borderColor: 'white',
         borderWidth: 2,
         borderRadius: 50,
         width: 40,
         height: 40,
         position: 'absolute',
-        // zIndex: 10
     }
 })
 

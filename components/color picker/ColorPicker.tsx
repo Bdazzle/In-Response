@@ -14,10 +14,6 @@ Color Slider will select hue (color).
 Color Palette will select saturation and lightness
 */
 const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColor }) => {
-    // const { globalPlayerData,
-    //     dispatchGlobalPlayerData
-    // } = useContext(GameContext) as GameContextProps
-    // const [savedColor, setSavedColor] = useState<HSLAVals>()
     const [color, setColor] = useState<HSLAVals>()
     const [hue, setHue] = useState<number>(Number(initialColor?.hue))
 
@@ -37,21 +33,6 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColor }
             ...initialColor as HSLAVals,
             hue: hue
         })
-        // if(!initialColor?.lightness || !initialColor.saturation){
-        //     setColor({
-        //         hue: hue,
-        //         saturation: 100,
-        //         lightness: 50,
-        //         alpha:1
-        //     })
-        // } else {
-        //     setColor({
-        //         hue: hue,
-        //         saturation: initialColor.saturation,
-        //         lightness: initialColor.lightness,
-        //         alpha:1
-        //     })
-        // }
     }
 
     const getColorFromPalette = (val: Pick<HSLAVals, 'saturation' | 'lightness'>) =>{
@@ -63,8 +44,6 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColor }
             alpha : 1 
         } as HSLAVals)
     }
-
-    // console.log(color)
     
     return (
         <View style={styles.colorComponentsContainer}>
@@ -89,21 +68,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     swatchContainer: {
-        // width: 200,
-        // height: 200,
-
         width: '80%',
-        height: 200,
-
-        // borderColor: 'white',
-        // borderWidth: 1
+        maxHeight:200
     },
-    // colorPreview:{
-    //     height:100,
-    //     width:100,
-    //     borderRadius: 50,
-    //     backgroundColor:color && `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
-    // },
     sliderContainer:{
         width:'100%',
         height:20

@@ -7,8 +7,6 @@ import { StartMenuStackParamList } from "../../navigation";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorPicker from "../../components/color picker/ColorPicker";
 import deriveHSLAValues from "../../components/color picker/convertColorTypes";
-import FadeContainer from "../../components/FadeContainer";
-import MenuNavButtons from "../../components/MenuNavButtons";
 
 export interface ColorSelectorProps {
     playerID: number;
@@ -23,14 +21,7 @@ const ColorSelector: React.FC = ({ }) => {
     const navigation = useNavigation<AllScreenNavProps>()
     const route = useRoute<RouteProp<StartMenuStackParamList, 'ColorSelector'>>()
     const [color, setColor] = useState<HSLAVals>()
-    const [colorString, setColorString] = useState<string>(globalPlayerData[route.params.playerID].colors[route.params.themePosition as keyof ColorTheme])
-
-    // const filteredColors = Object.entries(colorLibrary).filter(([_, value]) => value !== route.params.currentColor)
-    // const chunk = 4
-    // const totalChunks = Math.ceil(filteredColors.length / chunk)
-    // const chunkedColors = [...Array(totalChunks)].map((_) => filteredColors.splice(0, chunk))
-    // const rows = chunkedColors.length
-    // const squareWidth = 100 / chunk
+    const [colorString, setColorString] = useState<string>(globalPlayerData[route.params.playerID].colors[route.params.themePosition as keyof ColorTheme]);
 
     const saveColors = async (val: string) => {
         try {
@@ -69,8 +60,6 @@ const ColorSelector: React.FC = ({ }) => {
         setColorString(`hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`)
     }
 
-    // console.log('selector level color', color)
-
 return (
         <View style={styles().container}>
             <View nativeID="saveColorWrapper"
@@ -93,30 +82,6 @@ return (
             <ColorPicker onColorChange={handleColorChange}
                 initialColor={deriveHSLAValues(globalPlayerData[route.params.playerID].colors[route.params.themePosition as keyof ColorTheme]) as HSLAVals}
             />
-
-            {/* {
-                chunkedColors.map((colorsArr, i) => {
-                    return <View key={`color array ${i}`} style={[styles.color_row, {
-                        height: `${80 / rows}%`
-                    }]}>
-                        {colorsArr.map(color => {
-                            return <Pressable key={color[0]} style={[styles.color_touch, {
-                                width: `${squareWidth}%`
-                            }]}
-                                onPressIn={() => colorPress(color[1])}
-                                accessibilityLabel={`${color[0]}`}
-                            >
-                                <View style={[styles.color_square, {
-                                    backgroundColor: color[1]
-                                }]}></View>
-                            </Pressable>
-                        })}
-                    </View>
-                })
-            } */}
-            {/* <FadeContainer style={styles.fade_container}>
-                <MenuNavButtons navBack='ColorSelector' labelBack="Player Options" />
-            </FadeContainer> */}
         </View>
     )
 }
@@ -133,43 +98,13 @@ const styles = (color?: HSLAVals) => StyleSheet.create({
         height: 50,
         width: '40%',
         borderRadius: 50,
-        // borderColor: 'white',
-        // borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
     },
-    // primaryColorSelector: {
-    //     backgroundColor: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
-    // },
-    // secondaryColorSelector: {
-    //     color: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
-    // },
     saveColorText: {
-        // color: color && color?.lightness < 50 ? 'black' : 'white'
         color: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
     }
-    // color_row: {
-    //     width: '100%',
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-around',
-    //     margin: 5
-    // },
-    // color_touch: {
-    //     height: '80%',
-    // },
-    // color_square: {
-    //     height: '80%',
-    //     width: '80%',
-    //     borderColor: 'white',
-    //     borderWidth: .5,
-    //     borderRadius: 5
-    // },
-    // fade_container: {
-    //     height: '20%',
-    //     width: '100%',
-    //     bottom: 0,
-    // }
 })
 
 export default ColorSelector

@@ -15,7 +15,7 @@ Color Slider controls only hue
 */
 const ColorSlider: React.FC<ColorSliderProps> = ({initialHue, passHue }) => {
     const [hue, setHue] = useState<number>(0);
-    const debouncedHue = useDebounce<number>(hue, 75);
+    // const debouncedHue = useDebounce<number>(hue, 1);
 
     const handleHueChange = (value: number) => {
         setHue(value);
@@ -25,11 +25,17 @@ const ColorSlider: React.FC<ColorSliderProps> = ({initialHue, passHue }) => {
         setHue(initialHue)
     },[])
 
+    // useEffect(() => {
+    //     if (passHue && debouncedHue) {
+    //         passHue(Math.round(debouncedHue))
+    //     }
+    // }, [debouncedHue])
+
     useEffect(() => {
-        if (passHue && debouncedHue) {
-            passHue(Math.round(debouncedHue))
+        if (passHue && hue) {
+            passHue(Math.round(hue))
         }
-    }, [debouncedHue])
+    }, [hue])
 
     return (
         <View style={styles.container}>

@@ -80,6 +80,7 @@ screen_shots/
 hooks/useCachedResources.ts
 hooks/useColorScheme.ts
 hooks/useSwipe.tsx
+hooks/useDebouncedDrag.ts
 components/color picker/useHSLtoRGBA.ts
 credentials.json
 /credentials
