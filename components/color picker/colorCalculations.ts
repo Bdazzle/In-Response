@@ -12,9 +12,9 @@ export const brightnessToLightness = (saturation: number, brightness: number) : 
     const lightnessFromBrightness = (2 - saturation) * brightness / 2;
     const lightnessFromSaturation = (1 - Math.abs(2 * brightness - 1)) * saturation;
 
-    const lightness = lightnessFromBrightness > lightnessFromSaturation
-      ? lightnessFromBrightness
-      : lightnessFromSaturation;
+    // const lightness = lightnessFromBrightness > lightnessFromSaturation
+    //   ? lightnessFromBrightness
+    //   : lightnessFromSaturation;
   
     // return lightness;
     return lightnessFromBrightness
@@ -52,14 +52,3 @@ to be used in hsla(h,s,l,a) CSS syntax.
 export const colorValToPercent =(number: number) =>{
     return Math.round(number * 100)
 }
-
-//   const [hsbHue, hsbSaturation, hsbBrightness] = convertCoordinatesToHSB(x, y, width, height);
-// const [hslHue, hslSaturation, hslLightness] = convertHSBToHSL(hue, hsbSaturation, hsbBrightness);
-
-/*
-lightness goes along x axis from 100-50
-lightness goes along y axis on the left from 0-100
-lightness goes along y axis on the right from 50-100
-saturation goes along x axis from 0-100
-hue (color) is set by slider, not by palette
-*/

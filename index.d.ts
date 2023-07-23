@@ -3,8 +3,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ImageSourcePropType } from "react-native";
 import { GlobalMenuParamsList } from "./navigation";
 
-
-
 // export type SubNavigator<T extends ParamListBase> = {
 //     [K in keyof T]: { screen: K; params?: T[K] };
 //   }[keyof T];

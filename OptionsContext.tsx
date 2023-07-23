@@ -51,7 +51,7 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
             if(savedOptions){
                 setSimpleDisplay(JSON.parse(savedOptions))
             }
-            console.log('loaded display options')
+            // console.log('loaded display options')
         }
         catch(e) {
             console.log('error loading saved options', e)

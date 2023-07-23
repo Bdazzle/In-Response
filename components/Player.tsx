@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
-import React, { CSSProperties, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
@@ -214,7 +214,6 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         { backgroundColor: pressed ? 'grey' : theme.secondary }
                     ]}
                     onPressIn={() => toCounters()}
-                // accessibilityLabel={`${playerName} Counters button`}
                 >
                     <Text testID='counter_pressable_text'
                         accessibilityLabel={`${playerName} Counters`}
@@ -354,8 +353,5 @@ const styles = StyleSheet.create({
         bottom: 5,
         zIndex: 9,
         width: '20%',
-
-        // borderColor:'white',
-        // borderWidth:1
     }
 })

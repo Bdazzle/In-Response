@@ -4,11 +4,11 @@ import Svg, { Path } from 'react-native-svg'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GameContext, GameContextProps } from '../GameContext';
-import { CompleteDungeonModal } from '../components/DungeonModals';
 import { RootStackParamList } from '../navigation';
 import { textScaler } from '../functions/textScaler';
 import useScreenRotation from '../hooks/useScreenRotation';
 import Marker from '../components/Marker';
+import AnimatedModal from '../components/modals/AnimatedModal';
 
 type dungeonInfo = {
     name: string | undefined,
@@ -222,9 +222,13 @@ const Dungeon: React.FC = ({ }) => {
                                 />
                             </Svg>
                         </Pressable>
-                        {
-                            promptComplete && <CompleteDungeonModal OnAccept={completeDungeon} OnCancel={cancelCompleteModal} />
-                        }
+                        
+                        <AnimatedModal visible={promptComplete} 
+                        modalTitle={'Complete Dungeon?'} 
+                        close={cancelCompleteModal} 
+                        accept={completeDungeon} 
+                        decline={cancelCompleteModal}  
+                        />
 
                         {/* Cancel Dungeon */}
                         <Pressable style={styles.cancel_icon}

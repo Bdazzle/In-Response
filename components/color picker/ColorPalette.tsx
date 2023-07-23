@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
-import { GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, Pressable, PressableProps, StyleSheet, useWindowDimensions, View } from "react-native"
-import Animated, { Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated";
+import React, { useEffect, useRef, useState } from "react"
+import { GestureResponderEvent, Pressable, StyleSheet, View } from "react-native"
+import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import Svg, {
     Defs, Rect, Stop,
     LinearGradient
 } from "react-native-svg"
 import { HSLAVals } from "../.."
-import { useDebounce } from "../../hooks/useDebounce";
 import convertCoordinatesToHSB, { brightnessToLightness, colorValToPercent, convertHSLToCoordinates } from "./colorCalculations";
 
 interface ColorPaletteParams {
@@ -24,17 +23,10 @@ type Measurements = {
     pageY: number,
 }
 
-type Coordinates = {
-    x: number;
-    y: number;
-};
-
 interface PaletteMarkerProps {
     x: number,
     y: number,
     moveDelay: number,
-    // paletteDimensions: Measurements
-    // paletteDimensions: LayoutRectangle
 }
 
 /* 
@@ -50,55 +42,11 @@ const normalizeCoords = (x: number, y: number, pageOffsetX: number, pageOffsetY:
             : y - pageOffsetY
     return { x: adjustedX, y: adjustedY }
 }
-// let adjustedX, adjustedY;
-// if(x - pageOffsetX <= 0){
-//     adjustedX = 0
-// } else if(x-pageOffsetX > maxX){
-//     adjustedX = maxX
-// } else {
-//     adjustedX = x - pageOffsetX
-// }
-
-// if(y - pageOffsetY <= 0){
-//     adjustedY = 0
-// } else if(y-pageOffsetY > maxY){
-//     adjustedY = maxY
-// } else {
-//     adjustedY = y - pageOffsetY
-// }
 
 const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
     const translateX = useDerivedValue<number>(() => { return x });
     const translateY = useDerivedValue<number>(() => { return y });
-    // const translateX = useDerivedValue<number>(() => { return paletteDimensions.x });
-    // const translateY = useDerivedValue<number>(() => { return paletteDimensions.y });
-    // const translateX = useSharedValue<number>(x);
-    // const translateY = useSharedValue<number>(y);
     const radius = 20;// 1/2 width or height from styles.
-    // console.log('marker x/y',x,y)
-    /*
-    if translateX < palette pageX, translateX should be pageX,
-    if translateX > palette pageX, translateX should be pageX + pallete width,
-    if translateY < palette pageY, translateY should be pageY,
-    if translateY > palette pageY, translateY should be pageY + pallete height,
-    */
-    // useEffect(() => {
-    //     if (translateX.value < paletteDimensions.pageX) {
-    //         translateX.value = paletteDimensions.pageX
-    //     }
-    //     if (translateX.value > paletteDimensions.pageX) {
-    //         translateX.value = paletteDimensions.pageX + paletteDimensions.height
-    //     }
-    // }, [translateX])
-
-    // useEffect(() => {
-    //     if (translateY.value < paletteDimensions.pageY) {
-    //         translateY.value = paletteDimensions.pageY
-    //     }
-    //     if (translateY.value > paletteDimensions.pageY) {
-    //         translateY.value = paletteDimensions.pageY + paletteDimensions.width
-    //     }
-    // }, [translateX])
 
     const markerMoveStyle = useAnimatedStyle(() => {
         return {
@@ -120,8 +68,6 @@ const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
             ]
         }
     })
-
-    // console.log('marker coords', translateX.value, translateY.value)
 
     return (
         <Animated.View
@@ -157,9 +103,7 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
         setColor(initialColor)
     }, [])
 
-    const getPaletteMeasurements = async (event: LayoutChangeEvent) => {
-        // const { width, height, x, y } = event.nativeEvent.layout
-        // setPaletteDimensions({ width, height, x, y })
+    const getPaletteMeasurements = async () => {
         if (palettePressRef.current) {
             const paletteMeasurements: Measurements = await new Promise((resolve) => {
                 palettePressRef.current!.measure((x, y, width, height, pageX, pageY) => {
@@ -170,7 +114,6 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
             /* 
       convert color values from percents to decimals for maths.
       */
-            // const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100, initialColor.lightness / 100, width, height)
             const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100,
                 initialColor.lightness / 100,
                 paletteMeasurements.width,
@@ -178,8 +121,6 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
             )
             setMarkerCoordinates(initialMarkerCoords)
         }
-
-
     }
 
     /* 
@@ -230,8 +171,7 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
                     ref={palettePressRef}
                     nativeID="colorPalettePress"
                     accessibilityLabel="Color Gradient"
-                    style={styles.palettePressable}
-                    onLayout={(event) => getPaletteMeasurements(event)}
+                    onLayout={() => getPaletteMeasurements()}
                     onPressOut={(event) => handlePalettePress(event)}
                     onTouchMove={(e) => markerDrag(e)}
                 >
@@ -271,9 +211,6 @@ const styles = StyleSheet.create({
         height: '100%',
         borderColor: 'white',
         borderWidth: 1
-    },
-    palettePressable: {
-        // zIndex:1
     },
     paletteSVG: {
         width: '100%',

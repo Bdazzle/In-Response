@@ -1,12 +1,12 @@
-import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet } from 'react-native';
-import React, { useContext, useRef, useState } from 'react';
+import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet, DeviceEventEmitter, PressableProps } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 import { GameContext, GameContextProps } from '../GameContext';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import Svg, { Path } from 'react-native-svg';
 import DayNight from '../components/counters/DayNight';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import ResetModal from '../components/ResetModal';
+import AnimatedModal from '../components/modals/AnimatedModal';
 import GlobalMenu from './GlobalMenu'
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import shuffle from '../functions/shuffler';
@@ -21,10 +21,8 @@ export const Game = () => {
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
-    const randomPlayerScaleVal = useSharedValue(0)
-    const randomPlayerZVal = useSharedValue(0)
-    const resetModalScaleVal = useSharedValue(0)
-    const resetModalZVal = useSharedValue(0)
+    const [resetModalVis, setResetModalVis] = useState<boolean>(false)
+    const [randomPlayerModalVis, setRandomPlayerModalVis] = useState<boolean>(false)
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
     const swipeRef = useRef<Swipeable>(null)
 
@@ -42,45 +40,18 @@ export const Game = () => {
         // const random = Math.ceil(Math.random() * totalPlayers)
         // setRandomPlayer(globalPlayerData[random].screenName)
 
-        randomPlayerScaleVal.value = 5
-        randomPlayerZVal.value = 10
+        setRandomPlayerModalVis(true)
     }
 
     const hideRandomPlayer = () => {
+        setRandomPlayerModalVis(false)
         setRandomPlayer(undefined)
-        randomPlayerScaleVal.value = 0
-        randomPlayerZVal.value = 0
-    }
-
-    const scaleStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    scale: withTiming(randomPlayerScaleVal.value, {
-                        duration: 100,
-                        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                    })
-                }
-            ],
-            zIndex: withTiming(randomPlayerZVal.value, {
-                duration: 100,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            })
-        }
-    })
-
-    /*
-    Reset button functions
-    */
-    const showResetModal = () => {
-        resetModalScaleVal.value = 5
-        resetModalZVal.value = 10
     }
 
     const hideResetModal = () => {
-        resetModalScaleVal.value = 0
-        resetModalZVal.value = 0
+        setResetModalVis(false)
     }
+    
     /* 
     reset need to change life totals/commander damage to starting,
     set dungeons and static/incrementing counters to 0,
@@ -132,26 +103,8 @@ export const Game = () => {
         }
 
         resetData()
-        hideResetModal()
+        setResetModalVis(false)
     }
-
-    const resetModalStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    scale: withTiming(resetModalScaleVal.value, {
-                        duration: 100,
-                        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                    })
-                }
-            ],
-            zIndex: withTiming(resetModalZVal.value, {
-                duration: 100,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            })
-        }
-    })
-
 
     const renderLeftActions = () => {
         return (
@@ -168,8 +121,8 @@ export const Game = () => {
             >
                 <View
                     testID='game_container'
-                    style={styles.game_container}>
-
+                    style={styles.game_container}
+                >
                     <View testID='middle_buttons'
                         style={{
                             zIndex: 10,
@@ -194,14 +147,13 @@ export const Game = () => {
                     >
                         {/* Reset button */}
                         <View testID='reset_button'
-                            // styles.icon_button,
                             style={[styles.button_background, {
                                 height: deviceType === 'phone' ? 38 : 58,
                                 width: deviceType === 'phone' ? 38 : 58,
                             }]}
                         >
                             <Pressable
-                                onPress={() => showResetModal()}
+                                onPress={() => setResetModalVis(true)}
                                 accessibilityLabel="reset game"
                             >
                                 <Svg viewBox='0 0 25 25'>
@@ -227,7 +179,6 @@ export const Game = () => {
 
                         {/* Random Player button */}
                         <View testID='random_button'
-                            // styles.icon_button, 
                             style={[styles.button_background, {
                                 height: deviceType === 'phone' ? 38 : 58,
                                 width: deviceType === 'phone' ? 38 : 58,
@@ -250,35 +201,28 @@ export const Game = () => {
                     </View>
 
                     {/* Random Player Modal */}
-                    <Animated.View testID='random_player_modal'
-                        style={[styles.modal, scaleStyle]}
-                    >
-                        <Pressable style={[styles.random_modal_pressable]}
-                            onPress={() => hideRandomPlayer()}
-                            accessibilityLabel="Close random player modal"
-                        >
-                            <Text style={[styles.modal_text]}>{randomPlayer} Selected</Text>
-                        </Pressable>
-                    </Animated.View>
+                    <AnimatedModal visible={randomPlayerModalVis} 
+                    modalTitle={`${randomPlayer} Selected`} 
+                    close={hideRandomPlayer}
+                    />
 
                     {/* Reset Modal */}
-                    <Animated.View testID='confirm_reset'
-                        style={[styles.reset_modal, resetModalStyle]}
-                    >
-                        <ResetModal accept={() => handleReset()} decline={() => hideResetModal()} />
-                    </Animated.View>
-
+                    {
+                            <AnimatedModal 
+                            close={() => hideResetModal()}
+                            visible={resetModalVis} 
+                            modalTitle={"Reset Game?"}
+                            accept={() => handleReset()} 
+                            decline={() => hideResetModal()} />
+                    }
                     {
                         totalPlayers === 1 ? <Oneplayer playerIDs={designationMap} />
                             :
                             totalPlayers === 2 ? <TwoPlayerScreen playerIDs={designationMap}
                                 p1style={{
                                     transform: [{ rotate: "180deg" }],
-                                    // height: '50%'
                                 }}
-                                p2style={{
-                                    // height: '50%' 
-                                }}
+                                p2style={{}}
                                 containerStyle={{
                                     height: '100%',
                                     transform: [{ rotate: "180deg" }],
@@ -582,47 +526,6 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         borderWidth: 2,
     },
-    modal: {
-        position: 'absolute',
-        backgroundColor: 'black',
-        top: '25%',
-        right: '40%',
-        width: '17%',
-        height: '10%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        borderWidth: 3,
-        borderColor: 'white'
-    },
-    modal_text: {
-        color: "white",
-        fontSize: 14,
-        fontFamily: "Beleren",
-        textAlign: 'center',
-    },
-    random_modal_pressable: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-    },
-    reset_modal: {
-        flex: 1,
-        position: 'absolute',
-        backgroundColor: 'black',
-        top: '30%',
-        right: '40%',
-        width: '17%',
-        height: '10%',
-        alignItems: 'center',
-        borderRadius: 10,
-        borderWidth: 3,
-        borderColor: 'white'
-    },
-    // icon_button: {
-    //     height: 38,
-    //     width: 38,
-    // },
     button_background: {
         backgroundColor: 'white',
         borderRadius: 50
