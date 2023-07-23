@@ -46,7 +46,7 @@ const ColorSelector: React.FC = ({ }) => {
             playerID: route.params.playerID
         })
 
-        saveColors(colorString)
+        // saveColors(colorString)
 
         navigation.navigate('ColorMenu', {
             playerID: route.params.playerID,
@@ -69,7 +69,8 @@ return (
             >
                 <Pressable
                     nativeID="save_color"
-                    accessibilityLabel="Save Color"
+                    style={styles().saveColorPress}
+                    // accessibilityLabel="Save Color"
                     onPressIn={() => handleColorAccept()}
                 >
                     <Text style={route.params.themePosition === 'secondary' ? 
@@ -101,6 +102,13 @@ const styles = (color?: HSLAVals) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
+    },
+    saveColorPress:{
+        width:'100%',
+        height:'100%',
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius: 50,
     },
     saveColorText: {
         color: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,

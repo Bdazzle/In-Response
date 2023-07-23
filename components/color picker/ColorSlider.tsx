@@ -13,7 +13,7 @@ interface ColorSliderProps {
 /* 
 Color Slider controls only hue
 */
-const ColorSlider: React.FC<ColorSliderProps> = ({initialHue, passHue }) => {
+const ColorSlider: React.FC<ColorSliderProps> = ({ initialHue, passHue }) => {
     const [hue, setHue] = useState<number>(0);
     // const debouncedHue = useDebounce<number>(hue, 1);
 
@@ -21,9 +21,9 @@ const ColorSlider: React.FC<ColorSliderProps> = ({initialHue, passHue }) => {
         setHue(value);
     };
 
-    useEffect(() =>{
+    useEffect(() => {
         setHue(initialHue)
-    },[])
+    }, [])
 
     // useEffect(() => {
     //     if (passHue && debouncedHue) {
@@ -55,13 +55,15 @@ const ColorSlider: React.FC<ColorSliderProps> = ({initialHue, passHue }) => {
                     <Rect width="100%" height="100%" fill="url(#colorGradient)" />
                 </Svg>
             </View>
-            <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={360}
-                value={hue}
-                onValueChange={handleHueChange}
-            />
+                <Slider
+                    style={styles.slider}
+                    aria-label='Color slider'
+                    accessibilityLabel="Color slider"
+                    minimumValue={0}
+                    maximumValue={360}
+                    value={hue}
+                    onValueChange={handleHueChange}
+                />
         </View>
     )
 }
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     },
     gradientContainer: {
         width: '100%',
-        height:20,
+        height: 20,
     },
     sliderGradient: {
         width: '100%',

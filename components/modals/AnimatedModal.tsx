@@ -55,8 +55,7 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
     }
 
     return (
-
-        <Modal visible={modalVisible} transparent onRequestClose={hideModal}>
+        <Modal visible={modalVisible} transparent onRequestClose={() =>{handlePress(close)}}>
             <Pressable nativeID="modalBackdropPress"
                 style={styles.backdrop}
                 onPress={() => handlePress(close)}
