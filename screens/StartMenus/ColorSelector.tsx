@@ -46,7 +46,7 @@ const ColorSelector: React.FC = ({ }) => {
             playerID: route.params.playerID
         })
 
-        // saveColors(colorString)
+        saveColors(colorString)
 
         navigation.navigate('ColorMenu', {
             playerID: route.params.playerID,
@@ -70,7 +70,6 @@ return (
                 <Pressable
                     nativeID="save_color"
                     style={styles().saveColorPress}
-                    // accessibilityLabel="Save Color"
                     onPressIn={() => handleColorAccept()}
                 >
                     <Text style={route.params.themePosition === 'secondary' ? 

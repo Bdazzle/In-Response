@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 2,
         width:'80%',
-        minHeight:80,
+        minHeight:60,
         justifyContent:'center',
     },
     selected_game_option:{
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 2,
         width:'80%',
-        minHeight:80,
+        minHeight:60,
         justifyContent:'center',
     },
     option_touch: {
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         width: '30%',
         alignItems:'center',
         justifyContent:'center',
-        minHeight:80,
+        minHeight:60,
     },
     selected_option_touch:{
         backgroundColor:'white',
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         width: '30%',
         alignItems:'center',
         justifyContent:'center',
-        minHeight:80,
+        minHeight:60,
     },
     option_text: {
         color: 'white',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     options_subcontainer: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        minHeight:80,
+        minHeight:60,
         alignItems:'center'
     },
     input_wrapper: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         width: '33%',
-        minHeight:80
+        minHeight:60
     },
     fade_container: {
         height: '20%',

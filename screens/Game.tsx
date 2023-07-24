@@ -1,11 +1,10 @@
-import { Text, View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet, DeviceEventEmitter, PressableProps } from 'react-native';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet } from 'react-native';
+import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 import { GameContext, GameContextProps } from '../GameContext';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import Svg, { Path } from 'react-native-svg';
 import DayNight from '../components/counters/DayNight';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import AnimatedModal from '../components/modals/AnimatedModal';
 import GlobalMenu from './GlobalMenu'
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
