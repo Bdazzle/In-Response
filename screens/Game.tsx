@@ -26,7 +26,6 @@ export const Game = () => {
     const swipeRef = useRef<Swipeable>(null)
 
     /* Random Player Functions */
-    //see if ppl notice difference between shuffler and Math random players
     const getRandomPlayer = () => {
         /*shuffled players */
         const playerNames = Object.keys(globalPlayerData).map((player) => {
