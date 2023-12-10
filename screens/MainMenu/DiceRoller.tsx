@@ -10,7 +10,7 @@ import { textScaler } from "../../functions/textScaler";
 import { GameContext } from "../../GameContext";
 
 /* Die rolling animations in future? */
-const D20 = () => {
+const Dice = () => {
     // const [front, setFront] = useState<string | number>()
     // const numbers = [...Array(20)].map((_, i) => i + 1)
 
@@ -181,7 +181,7 @@ const DiceRoller = () => {
                     onPressIn={() => handlePressIn()}
                     onPressOut={() => roll()}
                 >
-                    <D20 />
+                    <Dice />
 
                 </Pressable>
             </Animated.View>

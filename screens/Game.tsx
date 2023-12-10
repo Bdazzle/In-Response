@@ -3,7 +3,7 @@ import React, { useContext, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 import { GameContext, GameContextProps } from '../GameContext';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { G, Path } from 'react-native-svg';
 import DayNight from '../components/counters/DayNight';
 import AnimatedModal from '../components/modals/AnimatedModal';
 import GlobalMenu from './GlobalMenu'
@@ -154,10 +154,14 @@ export const Game = () => {
                                 onPress={() => setResetModalVis(true)}
                                 accessibilityLabel="reset game"
                             >
-                                <Svg viewBox='0 0 25 25'>
-                                    <Path d="M20,8 C18.5974037,5.04031171 15.536972,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,16.9705627 7.02943725,21 12,21 L12,21 C16.9705627,21 21,16.9705627 21,12 M21,3 L21,9 L15,9"
-                                        stroke={"#000"}
-                                    ></Path>
+                                <Svg viewBox='-3 -4 24 24' >
+                                    <G fill="none" fillRule="evenodd" stroke="#000000"
+                                    strokeWidth="1.5"
+                                    >
+                                        <Path d='m12.5 1.5c2.4138473 1.37729434 4 4.02194088 4 7 0 4.418278-3.581722 8-8 8s-8-3.581722-8-8 3.581722-8 8-8'>
+                                        </Path>
+                                        <Path d='m12.5 5.5v-4h4'></Path>
+                                    </G>
                                 </Svg>
                             </Pressable>
                         </View>

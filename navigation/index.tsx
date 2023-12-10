@@ -60,7 +60,8 @@ const StartMenuStack = createNativeStackNavigator<StartMenuStackParamList>();
 function StartMenuNavigator() {
   return (
     <StartMenuStack.Navigator screenOptions={{
-      headerShown: false
+      headerShown: false,
+      animation:'none'
     }}>
       <StartMenuStack.Screen name="Life" component={LifeMenu} />
       <StartMenuStack.Screen name="TotalPlayers" component={TotalPlayers} />
@@ -84,7 +85,8 @@ const GlobalMenuStack = createNativeStackNavigator<GlobalMenuParamsList>()
 function GlobalMenuNavigator() {
   return (
     <GlobalMenuStack.Navigator screenOptions={{
-      headerShown: false
+      headerShown: false,
+      animation:'none'
     }}>
       <GlobalMenuStack.Screen name="MainMenu" component={GlobalMenu} />
       <GlobalMenuStack.Screen name="CoinFlipper" component={CoinFlipper} />
@@ -100,7 +102,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{
-      headerShown: false
+      headerShown: false,
+      animation:'none'
     }}>
       <Stack.Screen name="GlobalMenu" component={GlobalMenuNavigator} />
       <Stack.Screen name="Game" component={Game} initialParams={{}} />
