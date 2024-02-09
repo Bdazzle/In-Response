@@ -1,8 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react"
+import React, { useState } from "react"
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg'
 import { AllScreenNavProps } from "..";
+import getDimensions from "../functions/getComponentDimensions";
 import { textScaler } from "../functions/textScaler";
 import { RootStackParamList, StartMenuStackParamList } from "../navigation";
 
@@ -17,6 +18,7 @@ interface MenuNavProps {
 
 const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, navTo, navToOptions, navBackOptions }) => {
     const navigation = useNavigation<AllScreenNavProps>()
+    const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>();
 
     const handleNext = () => {
         if (navTo !== undefined) {
@@ -39,12 +41,13 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                 {navBack !== undefined &&
                     <Pressable style={styles.back_touchable}
                         onPressIn={() => handleBack()}
+                        onLayout={(e) => getDimensions(e, setPressDimensions)}
                         testID="back_press"
                         accessibilityLabel={`Back to ${labelBack}`}
                     >
                         <Svg viewBox="-50 -50 600 600" style={{
-                            height:'100%',
-                            width:'100%',
+                            height: '100%',
+                            width: '100%',
                             transform: [
                                 { rotate: '180deg' }
                             ]
@@ -62,7 +65,11 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                                 fill={"#B2FA09"}
                             />
                         </Svg>
-                        <Text style={styles.label_text}>{labelBack}</Text>
+                        <Text style={[styles.label_text, {
+                            fontSize: (labelBack && pressDimensions?.width) ? textScaler(labelBack?.length, pressDimensions, 36, 18) : 18,
+                        }]}>
+                            {labelBack}
+                        </Text>
                     </Pressable>
                 }
                 {/* Next*/}
@@ -70,14 +77,15 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                     <Pressable style={styles.next_touchable}
                         testID="next_press"
                         onPressIn={() => handleNext()}
+                        onLayout={(e) => getDimensions(e, setPressDimensions)}
                         accessibilityLabel={`Continue to ${labelTo}`}
                     >
                         <Svg viewBox="-50 -50 600 600"
-                        style={{
-                            height:'100%',
-                            width:'100%',
-                        }}
-                         >
+                            style={{
+                                height: '100%',
+                                width: '100%',
+                            }}
+                        >
                             <Path d="M206.78,341.58v-47.04l-81.44,47.04V153.42l81.44,47.04v-47.04l40.72,23.52V0   C110.81,0,0,110.81,0,247.5S110.81,495,247.5,495V318.06L206.78,341.58z"
                                 fill={"#6D2C93"}
                             />
@@ -91,7 +99,11 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                                 fill={"#B2FA09"}
                             />
                         </Svg>
-                        <Text style={styles.label_text}>{labelTo}</Text>
+                        <Text style={[styles.label_text, {
+                            fontSize: (labelTo && pressDimensions?.width) ? textScaler(labelTo?.length, pressDimensions, 36, 18) : 18,
+                        }]}>
+                            {labelTo}
+                        </Text>
                     </Pressable>
                 }
             </View>
@@ -103,13 +115,12 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
 const styles = StyleSheet.create({
     buttons_container: {
         width: '100%',
-        // height:'60%'
     },
     buttons_wrapper: {
         height: '50%',
         width: '100%',
         flexDirection: 'row',
-        justifyContent:'space-between'
+        justifyContent: 'space-between'
     },
     next_touchable: {
         width: '40%',
@@ -121,7 +132,6 @@ const styles = StyleSheet.create({
     label_text: {
         color: 'white',
         fontFamily: 'Beleren',
-        fontSize: textScaler(18),
         textAlign: 'center'
     }
 })

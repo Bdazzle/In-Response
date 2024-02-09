@@ -9,6 +9,7 @@ import { textScaler } from '../functions/textScaler';
 import useScreenRotation from '../hooks/useScreenRotation';
 import Marker from '../components/Marker';
 import AnimatedModal from '../components/modals/AnimatedModal';
+import getDimensions from '../functions/getComponentDimensions';
 
 type dungeonInfo = {
     name: string | undefined,
@@ -76,6 +77,7 @@ const Dungeon: React.FC = ({ }) => {
     )
     const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [promptComplete, setPromptComplete] = useState<boolean>(false)
+    const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>();
     const [rotate] = useScreenRotation(Object.keys(globalPlayerData).length, route.params.playerID)
     const marker_radius = 75
     const { width, height } = Dimensions.get('screen')
@@ -87,7 +89,7 @@ const Dungeon: React.FC = ({ }) => {
                 x: route.params.dungeonCoords!.x,
                 y: route.params.dungeonCoords!.y,
             })
-            dispatchDungeon({dungeon: route.params.currentDungeon, imageHeight: height})
+            dispatchDungeon({ dungeon: route.params.currentDungeon, imageHeight: height })
         }
         else {
             setMarker_coords({
@@ -113,9 +115,9 @@ const Dungeon: React.FC = ({ }) => {
     }
 
 
-    const markerRelease = (event: GestureResponderEvent) =>{
+    const markerRelease = (event: GestureResponderEvent) => {
         const Ythreshold = height - (currentDungeon.lastroom_height as number)
-        if(event.nativeEvent.pageY >= Ythreshold){
+        if (event.nativeEvent.pageY >= Ythreshold) {
             setPromptComplete(true)
         }
     }
@@ -125,7 +127,7 @@ const Dungeon: React.FC = ({ }) => {
     reset marker coords to x = width/2, y = top of page (0) + marker radius
     */
     const completeDungeon = () => {
-        dispatchDungeon({dungeon: "Completed", imageHeight:0})
+        dispatchDungeon({ dungeon: "Completed", imageHeight: 0 })
         dispatchGlobalPlayerData({
             field: 'complete dungeon',
             playerID: route.params.playerID,
@@ -161,10 +163,9 @@ const Dungeon: React.FC = ({ }) => {
     }
 
     const cancelDungeon = () => {
-        dispatchDungeon({dungeon: "Completed", imageHeight:0})
+        dispatchDungeon({ dungeon: "Completed", imageHeight: 0 })
         setPromptComplete(false)
     }
-
 
     return (
         <View style={[styles.dungeon_container,
@@ -195,10 +196,16 @@ const Dungeon: React.FC = ({ }) => {
                             {dungeonList.map((d: string) => {
                                 return (
                                     <Pressable key={d} style={styles.dungeon_button}
-                                        onPressIn={() => dispatchDungeon({ dungeon : d, imageHeight : height })}
+                                        onPressIn={() => dispatchDungeon({ dungeon: d, imageHeight: height })}
+                                        onLayout={(e) => getDimensions(e, setPressDimensions)}
                                         accessibilityLabel={`Venture into ${d}`}
-                                        >
-                                        <Text style={styles.dungeon_name_text}>
+                                    >
+                                        <Text style={[styles.dungeon_name_text, {
+                                            fontSize: pressDimensions && (d === "Undercity" ?
+                                                textScaler(`${d} (Initiative Only)`.length, pressDimensions, 36, 24) :
+                                                textScaler(d.length, pressDimensions, 36, 24)
+                                            )
+                                        }]}>
                                             {d === "Undercity" ? `${d} (Initiative Only)` : d}
                                         </Text>
                                     </Pressable>
@@ -214,7 +221,7 @@ const Dungeon: React.FC = ({ }) => {
                             onPressIn={() => closeDungeon()}
                             accessibilityLabel="Close Dungeon"
                             accessibilityHint='Back to Game'
-                            >
+                        >
                             <Svg height={80} width={80} viewBox='0 0 512 512'
                                 style={styles.close_icon}>
                                 <Path d="M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4  L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1  c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1  c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z"
@@ -222,13 +229,14 @@ const Dungeon: React.FC = ({ }) => {
                                 />
                             </Svg>
                         </Pressable>
-                        
-                        <AnimatedModal visible={promptComplete} 
-                        modalTitle={'Complete Dungeon?'} 
-                        close={cancelCompleteModal} 
-                        accept={completeDungeon} 
-                        decline={cancelCompleteModal}  
-                        />
+
+                            <AnimatedModal visible={promptComplete}
+                                modalTitle={'Complete Dungeon?'}
+                                close={cancelCompleteModal}
+                                accept={completeDungeon}
+                                decline={cancelCompleteModal}
+                                rotate={rotate?.rotate}
+                            />
 
                         {/* Cancel Dungeon */}
                         <Pressable style={styles.cancel_icon}
@@ -251,22 +259,22 @@ const Dungeon: React.FC = ({ }) => {
                             <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={500} />
                             <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={350} />
                             <View style={styles.image_container}>
-                                    <ImageBackground
-                                        testID='dungeon_image'
-                                        source={currentDungeon.uri as ImageSourcePropType}
-                                        resizeMode="contain"
-                                        resizeMethod='scale'
-                                        style={styles.dungeon_image}
-                                    >
-                                        <Pressable key="lastroom"
-                                            onPressOut={() => setPromptComplete(true)}
-                                            accessibilityLabel="Last Room"
-                                            style={[styles.lastroom, {
-                                                //height needs to change depending on aspect ratio for phone() vs tablet
-                                                height: currentDungeon.lastroom_height as number
-                                            }]}>
-                                        </Pressable>
-                                    </ImageBackground>
+                                <ImageBackground
+                                    testID='dungeon_image'
+                                    source={currentDungeon.uri as ImageSourcePropType}
+                                    resizeMode="contain"
+                                    resizeMethod='scale'
+                                    style={styles.dungeon_image}
+                                >
+                                    <Pressable key="lastroom"
+                                        onPressOut={() => setPromptComplete(true)}
+                                        accessibilityLabel="Last Room"
+                                        style={[styles.lastroom, {
+                                            //height needs to change depending on aspect ratio for phone() vs tablet
+                                            height: currentDungeon.lastroom_height as number
+                                        }]}>
+                                    </Pressable>
+                                </ImageBackground>
                             </View>
                         </View>
                     </>
@@ -278,7 +286,6 @@ const Dungeon: React.FC = ({ }) => {
 const styles = StyleSheet.create({
     dungeon_name_text: {
         fontFamily: 'Beleren',
-        fontSize: textScaler(24)
     },
     dungeon_container: {
         position: 'absolute',
@@ -295,8 +302,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         right: 0,
         zIndex: 1,
-        width:80,
-        height:80
+        width: 80,
+        height: 80
     },
     cancel_icon: {
         position: "absolute",
@@ -316,7 +323,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     dungeon_image: {
-        width:'100%',
+        width: '100%',
         flex: 1,
         justifyContent: "flex-end",
     },
@@ -329,7 +336,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
 
     },
-    
+
 })
 
 export default Dungeon

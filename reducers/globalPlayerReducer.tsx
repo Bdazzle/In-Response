@@ -50,7 +50,7 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
             }
         }
         case 'counters': {
-            return {
+            return action.subField ? {
                 ...state,
                 [action.playerID]: {
                     ...state[action.playerID],
@@ -58,6 +58,14 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
                         ...state[action.playerID].counterData,
                         [action.subField as string]: action.value
                     }
+                }
+            } 
+            :
+            {
+                ...state,
+                [action.playerID]: {
+                    ...state[action.playerID],
+                    counterData: action.value
                 }
             }
         };
@@ -113,15 +121,6 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
                 }
             }
         }
-        // case "city's blessing" : {
-        //     return {
-        //         ...state,
-        //         [action.playerID] : {
-        //             ...state[action.playerID],
-        //             citysBlessing: action.value
-        //         }
-        //     }
-        // };
         case 'init': {
             return {
                 ...action.value as GlobalPlayerData

@@ -98,10 +98,10 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
 
     return (
-        <View testID='static_counter_container' style={styles().static_counter_container}>
+        <View testID='static_counter_container' style={styles.static_counter_container}>
 
             {/* Dungeon */}
-            <Pressable style={dungeonCompleted ? styles(gameType).dungeon_complete_touch : styles().dungeon_icon_touch}
+            <Pressable style={dungeonCompleted ? styles.dungeon_complete_touch : styles.dungeon_icon_touch}
                 onPress={() => showDungeon()}
                 testID="dungeon"
                 accessibilityLabel={dungeonCompleted ? `${playerName} Dungeon Completed` : `${playerName} Venture into the Dungeon`}
@@ -109,7 +109,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                 {
                     dungeonCompleted &&
                     <Svg viewBox='2 -10 15 30' 
-                    style={styles().dungeonCheck}
+                    style={styles.dungeonCheck}
                     >
                         <Path d="M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27   c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0   L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z"
                             fill={colorTheme.primary === 'rgba(0,0,0,1)' ? 'white' : 'rgba(0,0,0,1)'} />
@@ -117,7 +117,6 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
                 }
                 {/* Dungeon symbol */}
                 <Svg viewBox='0 0 524 524' 
-                // width={30} height={30} 
                 width={"60%"} height={"100%"}
                 style={{
                     marginLeft: dungeonCompleted ? 0 : 10,
@@ -134,11 +133,11 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
             </Pressable>
 
             {/*The Ring*/}
-            <View style={styles(gameType).card_container}>
+            <View style={styles.card_container}>
                 <Pressable testID='the_ring'
                     accessibilityLabel={`The Ring ${playerName}`}
                     onPress={() => cardLongPress('the ring')}
-                    style={styles().card_overlay}
+                    style={styles.card_overlay}
                 >
                     <Svg 
                     viewBox='0 0 32 32'
@@ -196,10 +195,10 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
             {/* Initiative */}
             <View testID={"initiative"}
-                style={styles(gameType).card_container}>
+                style={styles.card_container}>
                 <Pressable
                     accessibilityLabel={currentInitiative === playerName ? `${playerName} has the Initiative` : `activate the initiative for ${playerName}`}
-                    style={styles().card_overlay}
+                    style={styles.card_overlay}
                     onPress={() => activeInitiative()}
                     onLongPress={() => cardLongPress("initiative")}
                     testID={"initiative_pressable"}
@@ -248,10 +247,10 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
             {/* Monarch */}
             <View testID={"monarch"}
-                style={styles(gameType).card_container}>
+                style={styles.card_container}>
                 <Pressable
                     accessibilityLabel={currentMonarch === playerName ? `${playerName} is the Monarch` : `activate the Monarch for ${playerName}`}
-                    style={styles().card_overlay}
+                    style={styles.card_overlay}
                     onPress={() => activateMonarch()}
                     onLongPress={() => cardLongPress("monarch")}
                     testID={"monarch_pressable"}
@@ -284,7 +283,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
 
 const minHeight = 40;
 
-const styles = (gameType?: string) => StyleSheet.create({
+const styles = StyleSheet.create({
     /*
     container dimensions should be the height of a scaled up card,
     scaled up = 1.5. original height = 20% = 30% total height
@@ -298,7 +297,6 @@ const styles = (gameType?: string) => StyleSheet.create({
     dungeon_complete_touch: {
         flexDirection: 'row',
         height: '100%',
-        // width: gameType === 'oathbreaker' ? '20%' : `${100 / staticCounterList.length}%`,//works for commander, pushes cards too far on oathbreaker
         width:'20%',
         minHeight: minHeight,
         alignItems: 'center',

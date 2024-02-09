@@ -7,8 +7,8 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
-import { counterScaler, textScaler } from "../../functions/textScaler"
-import { OptionsContext } from "../../OptionsContext"
+import { textScaler } from "../../functions/textScaler"
+import getDimensions from "../../functions/getComponentDimensions"
 
 interface IncrementCounterProps {
     counterType: string
@@ -28,9 +28,10 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
             SvgPaths: undefined,
             SvgViewbox: undefined
         })
-    const { deviceType } = useContext(OptionsContext)
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
+    const [counterDimensions, setCounterDimensions] = useState<{ width: number, height: number }>();
     const [total, setTotal] = useState<number>()
+    const [textSize, setTextSize] = useState<number>()
 
     useEffect(() => {
         dispatchResources(counterType)
@@ -48,11 +49,24 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
         setTotal(globalPlayerData[playerID].counterData![counterType])
     }, [globalPlayerData[playerID].counterData![counterType]])
 
+    useEffect(() => {
+        if (counterDimensions) {
+            setTextSize(textScaler(
+                String(total).length,
+                counterDimensions,
+                64, 16
+             )
+            )
+        }
+    },[counterDimensions?.height])
+
     return (
-        <View style={[styles.increment_counter,
-        {
-            height: `${80 / Object.keys(globalPlayerData[playerID].counterData as CounterData).length}%`
-        }]}>
+        <View
+            onLayout={(e) => getDimensions(e, setCounterDimensions)}
+            style={[styles.increment_counter,
+            {
+                height: `${Math.round(80 / Object.keys(globalPlayerData[playerID].counterData as CounterData).length)}%`
+            }]}>
             <Pressable style={styles.touchable_wrapper}
                 onPress={() => handleCounterPress(counterType)}
                 accessibilityLabel={`${globalPlayerData[playerID].screenName} ${counterType}`}
@@ -96,13 +110,13 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                     style={styles.counter_total_container}
                 >
                     <Text
-                    accessibilityLabel={`${globalPlayerData[playerID].screenName} ${total} ${counterType}`}
+                        accessibilityLabel={`${globalPlayerData[playerID].screenName} ${total} ${counterType}`}
                         adjustsFontSizeToFit={true}
                         numberOfLines={1}
                         allowFontScaling={true}
                         maxFontSizeMultiplier={1}
                         style={[styles.total_text, {
-                            fontSize: total! < 10 ? counterScaler( deviceType, Object.keys(globalPlayerData[playerID].counterData as CounterData).length) : textScaler(36),
+                            fontSize: textSize,
                             color: colorTheme.secondary,
                         }]}>
                         {total}
@@ -118,6 +132,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
+
     },
     touchable_wrapper: {
         paddingTop: '2%',

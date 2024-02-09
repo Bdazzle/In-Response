@@ -88,6 +88,5 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setGameType: setGameType,
         simpleDisplay: simpleDisplay,
         saveDisplay: saveDisplay
-        // setSimpleDisplay: setSimpleDisplay
     }}>{children}</OptionsContext.Provider>
 }

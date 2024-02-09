@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue} from 'react-native';
+import { Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
-import { cdmgLineHeight, cdmgScaler, taxLineHeight, taxScaler, textScaler } from "../functions/textScaler";
+import { cdmgLineHeight, cdmgScaler, cNameScaler, handleTaxSize, taxLineHeight, textScaler } from "../functions/textScaler";
 import { OptionsContext } from "../OptionsContext";
+import getDimensions from "../functions/getComponentDimensions";
 
 interface CommanderDamageProps {
     playerID: number,
@@ -24,7 +25,7 @@ interface TrackerProps {
 }
 
 /*
-position is index order(starts @ 0) from top to bottom, 
+position is index order(starts @ 0) from top to bottom of individual commander damage trackers, 
 componentHeight is height of element being scaled
 */
 function scaleY(totalPlayers: number, position: number, componentHeight: number): number {
@@ -33,7 +34,7 @@ function scaleY(totalPlayers: number, position: number, componentHeight: number)
             return -componentHeight
         };
         case 3: {
-            return position === 0 ? componentHeight / 4 : -componentHeight
+            return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
         }
         case 4: {
             return position === 0 ? componentHeight / 1.5
@@ -52,16 +53,15 @@ Commander damage number display only works if opponent name is 1 line
 */
 const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, opponentName, scaleTracker, showScale, componentDimensions }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
-    const { deviceType } = useContext(OptionsContext)
     const [isPressed, setIsPressed] = useState<boolean>(false)
-    const [textWrapperDimensions, setTextWrapperDimensions] = useState<{width: number, height: number}>()
+    const [textWrapperDimensions, setTextWrapperDimensions] = useState<{ width: number, height: number }>()
     const scaleVal = useSharedValue(0)
     const translateXVal = useSharedValue(0)
     const translateYVal = useSharedValue(0)
     const totalPlayers = Object.keys(globalPlayerData).length
 
     const handleDamageChange = (val: number) => {
-        if(val < 0){
+        if (val < 0) {
             val = 0
         }
         dispatchGlobalPlayerData({
@@ -74,7 +74,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
 
     useEffect(() => {
         scaleVal.value = isPressed === false ? 1 : 3.5
-        translateXVal.value = isPressed === false ? 0 : componentDimensions!.width * 2.75
+        translateXVal.value = isPressed === false ? 0 : componentDimensions!.width * 2.25 //totalPlayers === 2 ? componentDimensions!.width * 2 :componentDimensions!.width * 2.75
         translateYVal.value = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height)
     }, [isPressed])
 
@@ -114,23 +114,21 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
         }
     })
 
-const getTextWrapperDimensions = (event: LayoutChangeEvent) =>{
-    const { width, height } = event.nativeEvent.layout
-    setTextWrapperDimensions({ width, height})
-}
-
     return (
-        <Animated.View testID={`${opponentName}_damage_container`}
-            style={[scaleStyles,
-                {
-                    backgroundColor: globalPlayerData[oppponentID].colors.primary,
-                    height: `${75 / (totalPlayers - 1)}%`,
-                    maxHeight: totalPlayers === 2 ? `25%` : totalPlayers === 3 ? `30%` : `33%`,// 100/maximum # of potential players - 1
-                    margin: '2%',
-                    zIndex: isPressed === true ? 10 : 0,
-                    borderRadius: 5,
-                }
-            ]}>
+        <Animated.View testID={`${opponentName}_damage_container`
+        }
+            style={
+                [scaleStyles,
+                    {
+                        backgroundColor: globalPlayerData[oppponentID].colors.primary,
+                        height: `${80 / (totalPlayers - 1)}%`,
+                        maxHeight: totalPlayers === 2 ? `25%` 
+                        : 
+                        totalPlayers === 3 ? `35%` : `33%`,// 100/maximum # of potential players - 1
+                        zIndex: isPressed === true ? 10 : 0,
+                        borderRadius: 5,
+                    }
+                ]} >
             <Pressable testID={`${opponentName}_pressable`}
                 style={styles().player_pressable}
                 onPress={() => handlePress()}
@@ -138,14 +136,21 @@ const getTextWrapperDimensions = (event: LayoutChangeEvent) =>{
                 accessibilityHint="press to enlarge, and add or subtract"
             >
                 {({ pressed }) => (
-                    <>
+                    <View>
                         <Text
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
                             {
-                                fontSize: totalPlayers === 2 ? textScaler(13) : textScaler(10),
-                                height:'25%'
+                                fontSize: totalPlayers === 3 && playerID !== 3 ? 
+                                cNameScaler(opponentName) * .8
+                                :
+                                totalPlayers === 4 ?
+                                cNameScaler(opponentName) * .7
+                                :
+                                cNameScaler(opponentName),
+            
+                                height: '25%',
                             }
                             ]}
                             accessibilityLabel={`opponent ${opponentName}`}
@@ -184,33 +189,25 @@ const getTextWrapperDimensions = (event: LayoutChangeEvent) =>{
                             {
                                 /*Player Damage total*/
                                 globalPlayerData[playerID!] &&
-                                <View nativeID="cdmgTotalWrapper" 
-                                onLayout={(event) => getTextWrapperDimensions(event) }
-                                style={{
-                                    width: isPressed ? '56%' : '100%',
-                                    height: '100%',
-                                    justifyContent:'center',
-                                    alignItems:'center',
-                                }}
+                                <View nativeID="cdmgTotalWrapper"
+                                    onLayout={(event) => getDimensions(event, setTextWrapperDimensions)}
+                                    style={{
+                                        width: isPressed ? '56%' : '100%',
+                                        height: '100%',
+                                        alignItems: 'center',
+                                    }}
                                 >
                                     <Text
                                         style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
-                                        {
-                                            fontSize: textWrapperDimensions && cdmgScaler(
-                                                deviceType,
+                                        textWrapperDimensions && {
+                                            fontSize: cdmgScaler(globalPlayerData[playerID!].commander_damage![oppponentID], totalPlayers, playerID, isPressed),
+                                            lineHeight: textWrapperDimensions && cdmgLineHeight(
                                                 textWrapperDimensions,
                                                 totalPlayers,
                                                 globalPlayerData[playerID!].commander_damage![oppponentID]
                                             ),
-                                            lineHeight: textWrapperDimensions && cdmgLineHeight(
-                                                deviceType, 
-                                                textWrapperDimensions, 
-                                                totalPlayers,
-                                                globalPlayerData[playerID!].commander_damage![oppponentID]
-                                                ),
+                                            paddingLeft: isPressed ? '6%' : 0
                                         }]}
-                                        // adjustsFontSizeToFit={true}
-                                        numberOfLines={1}
                                         accessibilityLabel={`${globalPlayerData[playerID!].commander_damage![oppponentID]} commander damage from ${opponentName}`}
                                     >
                                         {globalPlayerData[playerID!].commander_damage![oppponentID]}
@@ -225,14 +222,14 @@ const getTextWrapperDimensions = (event: LayoutChangeEvent) =>{
                                     onLongPress={() => handleDamageChange(globalPlayerData[playerID!].commander_damage![oppponentID] - 10)}
                                     delayLongPress={300}
                                     style={[styles().damage_pressable, {
-                                        marginRight: '2%'
+                                        marginRight: '4%'
                                     }]}
                                     accessibilityLabel="Subtract Commander Damage"
                                     accessibilityHint={`subtract commander damage from ${opponentName}`}
                                 >
                                     <Svg viewBox='0 0 360 360'
                                         style={{
-                                            width: componentDimensions && componentDimensions.width / 3,
+                                            width: componentDimensions && componentDimensions.width / 3.5,
                                             height: componentDimensions?.height && componentDimensions.height / 2,
                                         }}
                                     >
@@ -246,10 +243,10 @@ const getTextWrapperDimensions = (event: LayoutChangeEvent) =>{
                                 </Pressable>
                             }
                         </View>
-                    </>
+                    </View>
                 )}
             </Pressable>
-        </Animated.View>
+        </Animated.View >
     )
 }
 
@@ -257,14 +254,14 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     const { globalPlayerData, reset } = useContext(GameContext) as GameContextProps
     const { deviceType } = useContext(OptionsContext)
     const [tax, setTax] = useState<number>(0)
-    const [tax2, setTax2] = useState<number>(0)
+    const [spellTax, setSpellTax] = useState<number>(0)
     const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>()
     const totalPlayers = Object.keys(globalPlayerData).length
 
     useEffect(() => {
         if (reset === true) {
             setTax(0)
-            setTax2(0)
+            setSpellTax(0)
         }
     }, [reset])
 
@@ -291,7 +288,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                                 accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                                 style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                                 {
-                                    fontSize: deviceType === 'tablet' ? textScaler(18) : textScaler(18),
+                                    fontSize: pressDimensions && textScaler(3, pressDimensions, undefined, 18)
                                 }
                                 ]}>
                                 Tax
@@ -301,13 +298,18 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         <View style={styles().tax_text_wrapper}
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                         >
-                            <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
+                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 })
+                            }]}
                                 accessible={false}
                             >T</Text>
-                            <Text style={styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter}
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
+                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 })
+                            }]}
                                 accessible={false}
                             >a</Text>
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
+                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }),
                                 paddingBottom: 10
                             }]}
                                 accessible={false}
@@ -316,15 +318,17 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                 }
                 {/* Commander Tax  */}
                 <Text
-                    adjustsFontSizeToFit={true}
+                    // adjustsFontSizeToFit={true}
                     numberOfLines={1}
                     accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax} commander tax`}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
-                    {
-                        fontSize: pressDimensions && taxScaler(deviceType, pressDimensions, totalPlayers, tax, gameType),
-                        lineHeight: pressDimensions && taxLineHeight(deviceType, pressDimensions.height, playerID, totalPlayers, gameType),
-                        paddingLeft: gameType === 'commander' ? 4 : 0
-                    }]}>{tax}</Text>
+                    pressDimensions && {
+                        fontSize: handleTaxSize(totalPlayers, playerID, String(tax), gameType),
+                        lineHeight: taxLineHeight(pressDimensions.height, playerID, totalPlayers, gameType),
+                        paddingLeft: gameType === 'commander' ? 3 : 0,
+                    }]}>
+                    {tax}
+                </Text>
             </Pressable>
             {gameType === 'commander' ? Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
                 .map((id, index) => {
@@ -341,8 +345,8 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                 :
                 /* Spell Tax */
                 <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
-                    onPress={() => setTax2(tax2 + 1)}
-                    onLongPress={() => setTax2(tax2 - 1)}
+                    onPress={() => setSpellTax(spellTax + 1)}
+                    onLongPress={() => setSpellTax(spellTax - 1)}
                     onLayout={(e) => getDimensions(e)}
                     accessibilityLabel={`Adjust ${globalPlayerData[playerID].screenName} spell Tax`}
                 >
@@ -351,24 +355,24 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} spell tax`}
                             style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                             {
-                                fontSize: deviceType === 'tablet' ? (totalPlayers === 4 ? textScaler(12) : textScaler(15)) : textScaler(16)
+                                fontSize: pressDimensions && textScaler(9, pressDimensions, 36, 18)
                             }
                             ]}>
                             Spell Tax
                         </Text>
                     </View>
-                    <Text
-                        accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax2} spell tax`}
-                        adjustsFontSizeToFit={true}
-                        numberOfLines={1}
-                        style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
-                        {
-                            fontSize: pressDimensions && taxScaler(deviceType, pressDimensions, totalPlayers, tax2, gameType),
-                            lineHeight: pressDimensions && taxLineHeight(deviceType, pressDimensions.height, playerID, totalPlayers, gameType),
-                            paddingLeft: totalPlayers === 3 && playerID === 2 ? 4 : 0
-                        }]}>
-                        {tax2}
-                    </Text>
+                        <Text
+                            accessibilityLabel={`${globalPlayerData[playerID].screenName} ${spellTax} spell tax`}
+                            // adjustsFontSizeToFit={true}
+                            // numberOfLines={1}
+                            style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
+                            pressDimensions && {
+                                fontSize: handleTaxSize(totalPlayers, playerID, String(spellTax), gameType),
+                                lineHeight: pressDimensions && taxLineHeight(pressDimensions.height, playerID, totalPlayers, gameType),
+                                paddingLeft: totalPlayers === 3 && playerID === 2 ? 4 : 0
+                            }]}>
+                            {spellTax}
+                        </Text>
                 </Pressable>
             }
         </View>
@@ -380,38 +384,38 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceTyp
         height: '100%',
         width: '100%',
         justifyContent: 'center',
-        alignContent: 'center',
         marginLeft: 5,
         paddingBottom: 5,
     },
     tax: {
         paddingLeft: '10%',
         height: gameType === 'oathbreaker' ? '35%' : '25%',
-        width: '70%',
+        width:'90%',
         minHeight: 40,
         flexDirection: gameType === 'commander' ? 'row' : 'column',
         marginBottom: gameType === 'oathbreaker' ? 20 : 0,
         alignItems: 'center',
+        justifyContent: 'center',
     },
     tax_text_wrapper: {
-        width: '23%',
+        marginLeft:'10%',
+        width: '20%',
         justifyContent: 'center',
-        height: '100%'
+        height: '100%',
     },
     oath_tax_text_wrapper: {
         justifyContent: 'center',
         width: '100%',
-        marginTop: '15%'
+        marginTop: '15%',
     },
     tax_text: {
         fontFamily: 'Beleren',
         color: textColor,
-        fontSize: deviceType === 'tablet' ? textScaler(10) : textScaler(16)
+        textAlignVertical: 'top',
     },
     tax_letter: {
         fontFamily: 'Beleren',
         color: textColor,
-        fontSize: deviceType === 'tablet' ? textScaler(12) : textScaler(13)
     },
     tax_total: {
         color: textColor,
@@ -419,23 +423,25 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceTyp
         letterSpacing: -2,
         height: '100%',
         width: '100%',
+        textAlignVertical:'top',
     },
     damage_row: {
         flexDirection: 'row',
         justifyContent: 'center',
-        height:'75%'
+        height: '75%',
     },
     damage_pressable: {
         justifyContent: 'center',
         width: '20%',
     },
     player_pressable: {
-        height: '100%'
+        height: '100%',
     },
     all_text: {
         textAlign: 'center',
         fontFamily: 'Beleren',
-        color: textColor
+        color: textColor,
+        flexGrow: 1
     }
 })
 

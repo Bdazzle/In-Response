@@ -1,6 +1,6 @@
 
 import { ImageSourcePropType } from "react-native"
-import Svg, { LinearGradient, Path, Polygon, Stop } from "react-native-svg";
+import Svg, { Path } from "react-native-svg";
 
 type SvgCircleProps = {
     cx: string | number,

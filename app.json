@@ -23,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.beedazzle.mtg_counter",
-      "versionCode": 15
+      "versionCode": 22
     },
     "plugins": [
       [
@@ -31,7 +31,10 @@
         {
           "android": {
             "enableProguardInReleaseBuilds": true,
-            "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}"
+            "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
           }
         }
       ]

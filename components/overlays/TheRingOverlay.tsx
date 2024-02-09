@@ -1,13 +1,11 @@
 
 import React, { useContext, useEffect, useState } from "react"
-import { Image, View, StyleSheet, Pressable, ImageSourcePropType, useWindowDimensions, Dimensions } from "react-native"
-import { OptionsContext } from "../../OptionsContext"
+import { Image, View, StyleSheet, Pressable, ImageSourcePropType } from "react-native"
 import FlipCard from "../counters/Flipcard"
 import { GameContext } from "../../GameContext"
 import { RouteProp, useRoute } from "@react-navigation/native"
 import { RootStackParamList } from "../../navigation"
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
-import ring from '../../assets/cards/the_ring.png'
 
 interface RingProps {
     imageSource: {
@@ -15,10 +13,6 @@ interface RingProps {
         back: ImageSourcePropType
     }
 }
-
-
-const screenWidth = Dimensions.get('screen').width;
-const screenHeight = Dimensions.get('screen').height;
 
 const ringRules = `The Ring tempts you. As the ring tempts you, you get an emblem named The Ring if you don't have one. 
 Then your emblem gains its next ability and you choose a creature you control to become or remain your ring-bearer.
@@ -29,19 +23,20 @@ Each player can have only one emblem named the ring and only one ring-bearer at 
 
 const TheRing: React.FC<RingProps> = ({ imageSource }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext)
-    const { deviceType } = useContext(OptionsContext)
-    const [level, setLevel] = useState<number>(0)
+    const [level, setLevel] = useState<number | null>()
     const route = useRoute<RouteProp<RootStackParamList, 'Card'>>()
     const [showLevels, setShowLevels] = useState<boolean>(true)
     const flipVal = useSharedValue(0)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
 
     const levelChange = (num: number) => {
-        level === num ? setLevel(num - 1) : setLevel(num)
+        // for clicking on same level to make level go down, deselect level if highlighted
+        const newlevel = level === num ? num - 1 : num 
+        setLevel(newlevel)
         dispatchGlobalPlayerData({
             playerID: route.params.playerID as number,
             field: 'the ring',
-            value: level
+            value: newlevel as number
         })
     }
 
@@ -96,9 +91,9 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             focusable={true}
                             accessibilityRole="button"
                             onPress={() => levelChange(1)}
-                            style={[level >= 1 ? styles.visible_level : styles.hidden_level,
+                            style={[level! >= 1 ? styles.visible_level : styles.hidden_level,
                             styles.level1]}
-                            accessibilityLabel={level >= 1 ? "active level 1" : 'level 1'}
+                            accessibilityLabel={level! >= 1 ? "active level 1" : 'level 1'}
                             accessibilityHint="Your Ring-bearer is legendary and can't be blocked by creatures with greater power"
                         >
                             <Animated.View
@@ -116,9 +111,9 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             focusable={true}
                             accessibilityRole="button"
                             onPress={() => levelChange(2)}
-                            style={[level >= 2 ? styles.visible_level : styles.hidden_level,
+                            style={[level! >= 2 ? styles.visible_level : styles.hidden_level,
                             styles.level2]}
-                            accessibilityLabel={level >= 2 ? 'active level 2' : 'level 2'}
+                            accessibilityLabel={level! >= 2 ? 'active level 2' : 'level 2'}
                             accessibilityHint="Whenever your ring-bearer attacks, draw a card, then discard a card."
                         >
                             <Animated.View
@@ -136,9 +131,9 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             focusable={true}
                             accessibilityRole="button"
                             onPress={() => levelChange(3)}
-                            style={[level >= 3 ? styles.visible_level : styles.hidden_level,
+                            style={[level! >= 3 ? styles.visible_level : styles.hidden_level,
                             styles.level3]}
-                            accessibilityLabel={level >= 3 ? 'active level 3' : 'level 3'}
+                            accessibilityLabel={level! >= 3 ? 'active level 3' : 'level 3'}
                             accessibilityHint="whenever your ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat"
                         >
                             <Animated.View
@@ -158,7 +153,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             onPress={() => levelChange(4)}
                             style={[level === 4 ? styles.visible_level : styles.hidden_level,
                             styles.level4]}
-                            accessibilityLabel={level >= 4 ? 'active level 4' : 'level 4'}
+                            accessibilityLabel={level! >= 4 ? 'active level 4' : 'level 4'}
                             accessibilityHint="whenever your ring-bearer deals combat damage to a player, each opponent loses 3 life."
                         >
                             <Animated.View

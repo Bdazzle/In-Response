@@ -6,7 +6,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, w
 import Svg, { Path, Polygon } from "react-native-svg";
 import { AllScreenNavProps } from "../..";
 import { colorLibrary } from "../../constants/Colors";
-import { textScaler } from "../../functions/textScaler";
+import { staticTextScaler } from "../../functions/textScaler";
 import { GameContext } from "../../GameContext";
 
 /* Die rolling animations in future? */
@@ -182,7 +182,6 @@ const DiceRoller = () => {
                     onPressOut={() => roll()}
                 >
                     <Dice />
-
                 </Pressable>
             </Animated.View>
 
@@ -241,12 +240,12 @@ const styles = StyleSheet.create({
         fontFamily: "Beleren"
     },
     all_text: {
-        fontSize: textScaler(24),
+        fontSize: staticTextScaler(26),
         textAlign: 'center',
         fontFamily: "Beleren"
     },
     number_text: {
-        fontSize: textScaler(24),
+        fontSize: staticTextScaler(26),
         textAlign: 'center',
         fontFamily: "Beleren"
     },

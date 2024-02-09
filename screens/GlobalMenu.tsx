@@ -1,18 +1,20 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
 import { AllScreenNavProps } from ".."
 import { iconData } from "../reducers/imageResources"
 import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
 import { textScaler } from "../functions/textScaler"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
+import getComponentDimensions from "../functions/getComponentDimensions"
 
 const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions"]
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { setTotalPlayers, simpleDisplay, saveDisplay } = useContext(OptionsContext) as OptionsContextProps
+    const [containerDimensions, setContainerDimensions] = useState<{height: number, width: number}>();
 
     const resetGame = () => {
         navigation.navigate('StartMenu', { screen: "Life" })
@@ -41,7 +43,9 @@ const GlobalMenu: React.FC = ({ }) => {
 
     return (
         <View style={styles.menu_container}>
-            <View style={styles.icons_container}  >
+            <View style={styles.icons_container}  
+            onLayout={(e) => getComponentDimensions(e, setContainerDimensions)}
+            >
                 {options.map(option => {
                     return (
                         <Pressable key={option} style={styles.button_wrapper}
@@ -68,7 +72,11 @@ const GlobalMenu: React.FC = ({ }) => {
 
                                 }
                             </View>
-                            <Text nativeID={option} style={styles.button_text}>{option}</Text>
+                            <Text nativeID={option} style={[styles.button_text, {
+                                fontSize: containerDimensions && textScaler(option.length, containerDimensions, 24, 18)
+                            }]}>
+                                {option}
+                            </Text>
                         </Pressable>
                     )
                 })}
@@ -80,11 +88,15 @@ const GlobalMenu: React.FC = ({ }) => {
                         backgroundColor: simpleDisplay == true ? 'white' : 'black'
                     }]}
                 >
-                    <Text style={simpleDisplay === true ? styles.active_button_text : styles.button_text}>
+                    <Text style={[simpleDisplay === true ? styles.active_button_text : styles.button_text ,{
+                        fontSize: containerDimensions && textScaler(14, containerDimensions, 30, 24)
+                    }]}>
                         Simple Display
                     </Text>
                 </Pressable>
-                <Text style={styles.button_text} >Swipe to access this menu. Press/hold icons to interact</Text>
+                <Text style={[styles.button_text,{
+                    fontSize: containerDimensions && textScaler(55/4, containerDimensions, 30, 18)
+                }]} >Swipe to access this menu. Press/hold icons to interact</Text>
             </View>
         </View >
     )
@@ -125,13 +137,11 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontFamily: 'Beleren',
-        fontSize: textScaler(16)
     },
     active_button_text: {
         color: 'black',
         textAlign: 'center',
         fontFamily: 'Beleren',
-        fontSize: textScaler(16),
         backgroundColor: 'white'
     },
 })

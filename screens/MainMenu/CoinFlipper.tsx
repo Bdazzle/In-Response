@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
 import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
 import { AllScreenNavProps } from "../.."
-import { textScaler } from "../../functions/textScaler"
+import { staticTextScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { GameContext } from "../../GameContext"
 
@@ -128,7 +128,6 @@ const CoinFlipper = () => {
                 <View style={styles.input_touch}>
                     <TextInput style={[styles.input_text, styles.all_text]}
                         nativeID="flips input"
-                        // defaultValue={`${quantity}`}
                         keyboardType='numeric'
                         accessibilityLabel="input number of coin flips"
                         accessibilityHint={`Flip ${quantity} coins`}
@@ -196,7 +195,7 @@ const styles = StyleSheet.create({
         minHeight:100
     },
     all_text: {
-        fontSize: textScaler(24),
+        fontSize: staticTextScaler(26),
         textAlign: 'center',
         color: 'white',
         fontFamily: "Beleren"

@@ -123,6 +123,9 @@ const styles = StyleSheet.create({
     fade_container: {
         height: '20%',
         width: '100%',
+
+        borderWidth:1,
+        borderColor:'white'
     },
     selected_option :{
         backgroundColor:'white',

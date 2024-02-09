@@ -11,12 +11,14 @@ import { CounterCardProps } from '..';
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
+import getDimensions from '../functions/getComponentDimensions';
 
 interface CounterRowProps {
     counterType: string
+    changeCounters: (counterType: string, value: number) => void;
 }
 
-const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
+const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) => {
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
@@ -24,29 +26,37 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
             SvgPaths: undefined,
             SvgViewbox: undefined
         })
-    const [displayTotal, setDisplayTotal] = useState<number>(0)
+    const [displayTotal, setDisplayTotal] = useState<number>()
+    const [containerDimensions, setContainerDimensions] = useState<{ width: number, height: number }>();
 
     useEffect(() => {
         dispatchResources(counterType)
+        // if(globalPlayerData[route.params.playerID].counterData![counterType]){
+        //     setDisplayTotal()
+        // }
+        globalPlayerData[route.params.playerID].counterData![counterType] ? setDisplayTotal(globalPlayerData[route.params.playerID].counterData![counterType]) : setDisplayTotal(0)
     }, [counterType])
 
     const changeTotal = (amount: number) => {
-        const total = globalPlayerData[route.params.playerID].counterData![counterType] === undefined ? 0 : globalPlayerData[route.params.playerID].counterData![counterType]
+        // const total = globalPlayerData[route.params.playerID].counterData![counterType] === undefined ? 0 : globalPlayerData[route.params.playerID].counterData![counterType]
+        const total = displayTotal as number
         if (total + amount <= 0) {
-            dispatchGlobalPlayerData({
-                playerID: route.params.playerID,
-                field: 'remove counter',
-                subField: counterType,
-                value: 0
-            })
+            // dispatchGlobalPlayerData({
+            //     playerID: route.params.playerID,
+            //     field: 'remove counter',
+            //     subField: counterType,
+            //     value: 0
+            // })
+            changeCounters(counterType, 0)
             setDisplayTotal(0)
         } else {
-            dispatchGlobalPlayerData({
-                playerID: route.params.playerID,
-                field: 'counters',
-                subField: counterType,
-                value: total + amount
-            })
+            // dispatchGlobalPlayerData({
+            //     playerID: route.params.playerID,
+            //     field: 'counters',
+            //     subField: counterType,
+            //     value: total + amount
+            // })
+            changeCounters(counterType, total + amount)
             setDisplayTotal(total + amount)
         }
     }
@@ -57,6 +67,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
 
     return (
         <View testID='row_container'
+            onLayout={(e) => getDimensions(e, setContainerDimensions)}
             style={styles.row_container}>
 
             {/* Plus */}
@@ -91,7 +102,11 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                     style={[styles.type_text,
                     {
                         height: '30%',
-                        fontSize: counterType === "experience" ? textScaler(21) : textScaler(28),
+                        // fontSize: counterType === "experience" ? staticTextScaler(21) : staticTextScaler(28),
+                        fontSize: containerDimensions && textScaler(counterType.length,
+                            { ...containerDimensions, width: containerDimensions?.width / 3 },
+                            36,
+                            24)
                     }]}>
                     {counterType.charAt(0).toLocaleUpperCase() + counterType.slice(1)}
                 </Text>
@@ -118,12 +133,17 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
                         })
                     }
                 </Svg>
-                <Text 
-                accessibilityLabel={`${displayTotal} ${counterType}`}
-                style={[styles.total_text, {
-                    fontSize: textScaler(24),
-                    height: '35%'
-                }]}>{displayTotal}</Text>
+                <Text
+                    accessibilityLabel={`${displayTotal} ${counterType}`}
+                    style={[styles.total_text, {
+                        // fontSize: staticTextScaler(24),
+                        fontSize: containerDimensions && textScaler(String(displayTotal).length, {...containerDimensions, width: containerDimensions?.width / 3}, 
+                        36, 
+                        16),
+                        height: '35%'
+                    }]}>
+                    {displayTotal}
+                </Text>
             </View>
 
             {/* Minus */}
@@ -155,11 +175,25 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType }) => {
 
 const Counters: React.FC = ({ }) => {
     const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
+    const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
-    const [rotate ] = useScreenRotation(totalPlayers, route.params.playerID)
+    const [rotate] = useScreenRotation(totalPlayers, route.params.playerID)
+    const [stormPressDimensions, setStormPressDimensions] = useState<{ width: number, height: number }>();
+    const [counterTotals, setCounterTotals] = useState<{ [key: string]: number }>({})
+
+    useEffect(() => {
+        setCounterTotals(globalPlayerData[route.params.playerID].counterData ?? {})
+    }, [])
 
     const closeCounters = () => {
+        if (Object.keys(counterTotals).length) {
+            dispatchGlobalPlayerData({
+                playerID: route.params.playerID,
+                field: 'counters',
+                value: counterTotals
+            })
+        }
         navigation.navigate("Game")
     }
 
@@ -171,22 +205,37 @@ const Counters: React.FC = ({ }) => {
         } as CounterCardProps)
     }
 
+    const changeCounters = (counterType: string, value: number) => {
+        const total = !counterTotals[counterType] ? 0 : counterTotals[counterType]
+        if (total + value <= 0 || value === 0) {
+            const countersCopy = counterTotals
+            delete countersCopy[counterType]
+            setCounterTotals(countersCopy)
+        } else {
+            setCounterTotals({ ...counterTotals, [counterType]: value })
+        }
+    }
+
     return (
         <>
             <KeyboardAvoidingView style={[styles.counter_rows_container,
-             rotate && {
+            rotate && {
                 transform: [rotate]
             }
             ]}>
-                {Object.keys(counters).map((counterType: string) => {
-                    return <CounterRow key={counterType} counterType={counterType} />
-                })}
+                {
+                    Object.keys(counters).map((counterType: string) => {
+                        return <CounterRow key={counterType} counterType={counterType} changeCounters={changeCounters} />
+                    })
+                }
                 <Pressable key={"storm"}
                     style={styles.storm_container}
                     onPressIn={() => toStorm()}
+                    onLayout={(e) => getDimensions(e, setStormPressDimensions)}
                 >
                     <Text style={[styles.type_text, {
-                        fontSize: textScaler(24),
+                        // fontSize: textScaler(24),
+                        fontSize: stormPressDimensions && textScaler(5, stormPressDimensions)
                     }]} >Storm</Text>
                     <Svg viewBox='-25 0 600 600' style={styles.storm_icon}>
                         <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />

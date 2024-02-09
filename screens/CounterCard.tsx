@@ -7,7 +7,7 @@ import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
 import { imageReducer, ImageReducerState, manaSymbols } from '../reducers/imageResources';
 import { counters } from '../constants/CounterTypes'
-import { textScaler } from '../functions/textScaler';
+import { staticTextScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
 import FlipCard from '../components/counters/Flipcard';
@@ -148,7 +148,6 @@ const CounterCard: React.FC = ({ }) => {
             style={[styles().container, {
                 width: width,
                 height: height,
-                // transform: rotate && [rotate, { translateY: 70 }],
                 transform: rotate && [rotate],
             }]}>
             {/*The Ring */}
@@ -335,7 +334,7 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
         borderWidth: 0,
         borderBottomWidth: 2,
         fontFamily: 'Beleren',
-        fontSize: cardName === 'storm' ? textScaler(48) : textScaler(56),
+        fontSize: cardName === 'storm' ? staticTextScaler(48) : staticTextScaler(56),
     },
     mana_container: {
         height: '45%',
@@ -356,7 +355,7 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
     mana_total: {
         color: 'white',
         textAlign: 'center',
-        fontSize: deviceType === 'phone' ? textScaler(42) : textScaler(30),
+        fontSize: deviceType === 'phone' ? staticTextScaler(42) : staticTextScaler(30),
         fontFamily: 'Beleren',
         borderBottomColor: 'white',
         borderWidth: 0,

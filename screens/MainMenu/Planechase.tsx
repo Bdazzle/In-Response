@@ -7,7 +7,7 @@ import shuffle from '../../functions/shuffler';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation';
-import { textScaler } from '../../functions/textScaler';
+import { staticTextScaler, textScaler } from '../../functions/textScaler';
 
 /*
 deck + discard will work as history.
@@ -106,7 +106,7 @@ const Planechase = ({ }) => {
             const nextHistory = currentHistory - 1
             setCurrentHistory(nextHistory)
             const lastPlane = discard[discard.length - nextHistory]
-            if(lastPlane !== undefined){
+            if (lastPlane !== undefined) {
                 setCurrentPlane(lastPlane)
             }
         } else {
@@ -151,7 +151,7 @@ const Planechase = ({ }) => {
                     </Pressable>
 
                     <Pressable nativeID='planechase_next'
-                    accessibilityLabel='next plane.'
+                        accessibilityLabel='next plane.'
                         style={[styles().plane_nav_button, styles().plane_nav_next]}
                         onPressOut={() => handleNextPLane()}
                     >
@@ -209,7 +209,13 @@ const Planechase = ({ }) => {
                             height: dieContainerWidth && dieContainerWidth as number / 2,
                         }]}
                     >
-                        <Text style={styles(height, width).text_style}>{rollCost}</Text>
+                        <Text style={[styles(height, width).text_style, {
+                            fontSize: dieContainerWidth && textScaler(String(rollCost).length, { height: dieContainerWidth! / 2, width: dieContainerWidth! / 2}, 
+                            42
+                            )
+                        }]}>
+                            {rollCost}
+                        </Text>
                     </View>
 
                     {/* Reset button */}
@@ -317,7 +323,7 @@ const styles = (windowHeight?: number, windowWidth?: number) => StyleSheet.creat
         color: 'white',
         width: '100%',
         textAlign: 'center',
-        fontSize: textScaler(12)
+        fontSize: staticTextScaler(12)
     },
     mana_cost_container: {
         alignItems: 'center',
@@ -329,7 +335,6 @@ const styles = (windowHeight?: number, windowWidth?: number) => StyleSheet.creat
         textAlign: 'center',
         color: 'black',
         fontFamily: 'Beleren',
-        fontSize: windowWidth && windowWidth < 900 ? textScaler(42) : textScaler(34),//works for tablet
     },
     reset_button: {
         height: windowWidth && windowWidth < 900 ? 30 : 50,

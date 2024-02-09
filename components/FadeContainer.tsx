@@ -12,11 +12,12 @@ const FadeContainer : React.FC<FadeContainerProps> = ({ children }, style ) =>{
     const fadeInStyle = useAnimatedStyle(() => {
         return {
             opacity : withTiming(opacityVal.value, {
-                duration: 300,
+                duration: 200,
                 easing: Easing.bezier(0.25, 0.1, 0.25, 1)
             })
         }
     })
+
     return (
         <Animated.View 
         testID="FadeContainer"

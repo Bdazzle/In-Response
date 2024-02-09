@@ -4,7 +4,7 @@ import React from "react"
 import { Image, Text, StyleSheet, View, Pressable, FlatList, ImageSourcePropType, useWindowDimensions } from "react-native"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { AllScreenNavProps } from "../.."
-import { textScaler } from "../../functions/textScaler"
+import { staticTextScaler } from "../../functions/textScaler"
 import ReactNativeZoomableView from '@openspacelabs/react-native-zoomable-view/src/ReactNativeZoomableView';
 
 type InstructionItem = {
@@ -95,7 +95,7 @@ const Instructions: React.FC = ({ }) => {
             <Text style={{
                 paddingTop: 25,
                 paddingHorizontal: 10,
-                fontSize: textScaler(22),
+                fontSize: staticTextScaler(22),
                 color: 'white',
                 textAlign: 'center',
                 fontFamily: 'Beleren',
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
         height: 80,
     },
     header_text: {
-        fontSize: textScaler(36),
+        fontSize: staticTextScaler(36),
         color: 'white',
         fontFamily: 'Beleren',
     },
     sub_header: {
-        fontSize: textScaler(24),
+        fontSize: staticTextScaler(24),
         color: 'white',
         textAlign: 'center',
         textDecorationLine: 'underline',

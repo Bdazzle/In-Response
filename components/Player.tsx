@@ -9,7 +9,7 @@ import CommanderDamage from "./DamageTracker"
 import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { lifeTotalScaler, textScaler } from '../functions/textScaler';
+import { RFPercentage, textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useLuminance from '../hooks/useLuminance'
 import useContainerDimensions from '../hooks/useContainerDimensions';
@@ -81,7 +81,12 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
-                    style={[styles.commander_damage_tracker, commanderDim]} >
+                    style={[styles.commander_damage_tracker, simpleDisplay ?
+                        {
+                            height: '90%'
+                        }
+                        :
+                        commanderDim]} >
                     <CommanderDamage playerID={playerID}
                         scaleTracker={setScaleTracker}
                         showScale={scaleTracker}
@@ -94,7 +99,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
 
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
-                { !simpleDisplay &&
+                {!simpleDisplay &&
                     <View testID="static_counter_wrapper"
                         style={[styles.static_counter_wrapper, staticCounterDim
                         ]}
@@ -185,7 +190,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.life_total, {
-                                fontSize: lifeTotalScaler(totalPlayers, globalPlayerData[playerID].lifeTotal),
+                                fontSize: textScaler(String(globalPlayerData[playerID].lifeTotal).length, dimensions, dimensions.width * 2, dimensions.width *2),
                                 color: theme.secondary,
                             }]}>
                             {globalPlayerData[playerID].lifeTotal}
@@ -197,7 +202,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     >
                         <Text style={[styles.player_name,
                         {
-                            fontSize: dimensions.height * .13,
+                            fontSize: totalPlayers === 3 && playerID !== 3 ? RFPercentage(3.2) : RFPercentage(4),
                             color: theme.secondary,
                         }]} >
                             {playerName}
@@ -221,7 +226,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         adjustsFontSizeToFit={true}
                         style={[styles.counter_pressable_text, {
                             color: theme.primary,
-                            fontSize: textScaler(14, dimensions.width),
+                            fontSize: textScaler(8, dimensions),
                         }]}>Counters</Text>
                 </Pressable>
                 <View testID='counter_icons_container'
@@ -270,11 +275,12 @@ const styles = StyleSheet.create({
     },
     life_total_text_container: {
         width: '60%',
-        height: '100%',
+        height: '90%',
         justifyContent: 'center',
         alignItems: 'center'
     },
     life_total: {
+        fontFamily: 'Beleren',
         textAlign: 'center',
         width: '100%',
     },

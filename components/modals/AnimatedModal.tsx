@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import getDimensions from "../../functions/getComponentDimensions";
 import { textScaler } from "../../functions/textScaler";
 
 interface ModalProps {
@@ -9,10 +10,12 @@ interface ModalProps {
     close:() => void;
     accept?: () => void;
     decline?: () => void;
+    rotate?: string
 }
 
-const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accept, decline, }) => {
+const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accept, decline, rotate }) => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [pressDimensions, setPressDimensions] = useState<{height: number, width: number}>()
     const modalScaleVal = useRef(new Animated.Value(0)).current;
 
     const modalStyle = {
@@ -57,15 +60,21 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
     return (
         <Modal visible={modalVisible} transparent onRequestClose={() =>{handlePress(close)}}>
             <Pressable nativeID="modalBackdropPress"
-                style={styles.backdrop}
+                style={[styles.backdrop, 
+                    rotate !== undefined && {
+                        transform: [{ rotate: rotate}]
+                    }]}
                 onPress={() => handlePress(close)}
+                onLayout={(e) => getDimensions(e, setPressDimensions)}
             >
                 <Animated.View testID='modalContent'
                     style={[styles.reset_modal, modalStyle]}
                 >
                     <View
                         style={styles.modal} >
-                        <Text style={styles.modal_text}>
+                        <Text style={[styles.modal_text, {
+                            fontSize: pressDimensions && textScaler(modalTitle.length, pressDimensions)
+                        }]}>
                             {modalTitle}
                         </Text>
                         {accept &&
@@ -127,7 +136,6 @@ const styles = StyleSheet.create({
     },
     modal_text: {
         color: "white",
-        fontSize: textScaler(36),
         fontFamily: "Beleren",
         textAlign: 'center',
     },
