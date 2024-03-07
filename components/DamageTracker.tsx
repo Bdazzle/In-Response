@@ -3,9 +3,8 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View, LayoutChangeEvent,
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
 import { cdmgLineHeight, cdmgScaler, cNameScaler, handleTaxSize, taxLineHeight, textScaler } from "../functions/textScaler";
-import { OptionsContext } from "../OptionsContext";
+import { OptionsContext, OptionsContextProps } from "../OptionsContext";
 import getDimensions from "../functions/getComponentDimensions";
-// import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 interface CommanderDamageProps {
     playerID: number,
@@ -28,13 +27,17 @@ interface TrackerProps {
 position is index order(starts @ 0) from top to bottom of individual commander damage trackers, 
 componentHeight is height of element being scaled
 */
-function scaleY(totalPlayers: number, position: number, componentHeight: number): number {
+function scaleY(totalPlayers: number, position: number, componentHeight: number, simpleDisplay: boolean): number {
     switch (totalPlayers) {
         case 2: {
             return -componentHeight
         };
         case 3: {
-            return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
+            if(simpleDisplay){
+                return position === 0 ? -componentHeight * .001 : -componentHeight * 1.4
+            } else {
+                return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
+            }
         }
         case 4: {
             return position === 0 ? componentHeight / 1.5
@@ -55,6 +58,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     showScale,
     componentDimensions }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
+    const { simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
     const [isPressed, setIsPressed] = useState<boolean>(false)
     const [textWrapperDimensions, setTextWrapperDimensions] = useState<{ width: number, height: number }>()
     // const scaleVal = useSharedValue(1)
@@ -86,9 +90,9 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     let translateYVal = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        const scaleTarget = isPressed === false ? 1 : 3.5
+        const scaleTarget = isPressed === false ? 1 : totalPlayers === 3 ? 3 : 3.5
         const targetXVal = isPressed === false ? 0 : componentDimensions!.width * 2.25 
-        const targetYVal = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height)
+        const targetYVal = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height, simpleDisplay)
 
             Animated.parallel([
                 Animated.timing(

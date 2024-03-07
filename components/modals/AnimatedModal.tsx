@@ -58,8 +58,6 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
         }
     }
 
-// console.log(pressDimensions)
-
     return (
         <Modal visible={modalVisible} transparent onRequestClose={() =>{handlePress(close)}}>
             <Pressable nativeID="modalBackdropPress"
@@ -78,9 +76,6 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
                         <Text 
                         numberOfLines={2}
                         style={[styles.modal_text, {
-                            // fontSize: pressDimensions && textScaler(modalTitle.length, pressDimensions)
-                            // fontSize: deviceType === 1 ? 32 : 90
-                            // fontSize: deviceType === 1 ? 32 : pressDimensions && pressDimensions?.width/10
                             fontSize: pressDimensions && pressDimensions.width/9
                         }]}>
                             {modalTitle}
