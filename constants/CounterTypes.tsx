@@ -1,4 +1,5 @@
 export const counters ={
+    "radiation" : 0,
     'acorn' : 0,
     'energy' :0,
     'experience' :0,

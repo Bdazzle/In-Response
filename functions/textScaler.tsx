@@ -1,7 +1,7 @@
 import { deviceType } from 'expo-device';
 import { Dimensions, PixelRatio, Platform, StatusBar } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 //width 600 is largest phone width?
 //900 = test tablet width
@@ -18,7 +18,7 @@ export function staticTextScaler(size: number): number {
 
 
 export function RFPercentage(percent: number) : number {
-  const { height, width } = Dimensions.get("window");
+  // const { height, width } = Dimensions.get("window");
   const standardLength = width > height ? width : height;
   const offset: number = width > height ? 0 : Platform.OS === "ios" ? 78 : StatusBar.currentHeight!; // iPhone X style SafeAreaView size in portrait
 
@@ -90,56 +90,53 @@ export const cNameScaler = (name: string) =>{
   return name.length <= minLength ? startingFont : fontSize
 }
 
-
+/* 
+acts a little off on long phones (width * 2 < height)
+*/
 export const cdmgScaler = (dmgtotal: number, totalPlayers: number, playerID: number, isPressed: boolean) : number =>{
-  /*
-  damage total check order: 0-9 : 10-19 : 20+
-  starting with pressed(zoomed)/single digit font size,
-  enlarge font size if >=10 and not pressed(zoomed) for better visibility when no adjusting
-  */
+
   let fontSize: number;
 
   switch(totalPlayers){
     case 2 :{
-      if(deviceType === 1){
-        fontSize = dmgtotal < 10 ? RFPercentage(9) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(5.2) : RFPercentage(4.8)
+      if(deviceType === 1){//phone
+        fontSize = dmgtotal < 10 ? RFPercentage(9.5) : RFPercentage(8.5)
+        return isPressed && dmgtotal >= 10 ? fontSize * .9 : fontSize
       } 
       else {
-        fontSize = dmgtotal < 10 ? RFPercentage(11) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(7) : RFPercentage(6.4)
+        fontSize = dmgtotal < 10 ? RFPercentage(9.5) : RFPercentage(9)
       }
-      return isPressed || dmgtotal < 10 ? fontSize : fontSize * 1.5
+      return fontSize
     };
 
     case 3 :{
       if(playerID === 3){
-        if(deviceType === 1){
-          fontSize = dmgtotal < 10 ? RFPercentage(9) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(5.5) : RFPercentage(4.8)
+        if(deviceType === 1){//phone
+          fontSize = dmgtotal < 10 ? RFPercentage(9) : RFPercentage(8.5)
         }
         else {
-          fontSize = dmgtotal < 10 ? RFPercentage(9) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(7) : RFPercentage(6.5)
+          fontSize = dmgtotal < 10 ? RFPercentage(9) : RFPercentage(8.5)
         } 
-        return isPressed || dmgtotal < 10 ? fontSize : fontSize * 1.5
       } 
       else {
-        if( deviceType === 1){
-          return RFPercentage(6.2)
+        if( deviceType === 1){//phone
+          fontSize = RFPercentage(6.5)
         }
         else {
-          fontSize = dmgtotal < 10 ? RFPercentage(8.5) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(6.5) : RFPercentage(6)
-          return isPressed || dmgtotal < 10 ? fontSize : fontSize * 1.2
+          fontSize = dmgtotal < 10 ? RFPercentage(8.5) : RFPercentage(8)
         }
       }
+      return fontSize 
     };
 
     case 4 :{
-      if(deviceType === 1) {
-        fontSize = dmgtotal < 10 ? RFPercentage(5.5) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(5) : RFPercentage(4.5)
-        return isPressed || dmgtotal < 10 ? fontSize : fontSize * 1.2
+      if(deviceType === 1) {//phone
+        fontSize = dmgtotal < 10 ? RFPercentage(5.5) : RFPercentage(5.75)
       }
       else {
-        fontSize = dmgtotal < 10 ? RFPercentage(7) : dmgtotal >= 10 && dmgtotal < 20 ? RFPercentage(5) : RFPercentage(4.5)
-        return isPressed || dmgtotal < 10 ? fontSize : fontSize * 1.5
+        fontSize = dmgtotal < 10 ? RFPercentage(7.5) : RFPercentage(7)
       }
+      return fontSize
     }
     
     default:{
@@ -152,15 +149,18 @@ export const cdmgScaler = (dmgtotal: number, totalPlayers: number, playerID: num
 export function cdmgLineHeight(dimension: { width: number, height: number }, totalPlayers: number, damage: number) {
   //tablet
   if (deviceType === 2) {
-    if (damage < 10) {
-      return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.2
-    } 
-    else if (damage >= 10 && damage < 20) {
-      return totalPlayers === 4 ? dimension.height * 1.1 : totalPlayers === 3 ? dimension.height * 1.15 : dimension.height
-    } 
-    else {
-      return totalPlayers === 4 ? dimension.height * 1.1 : totalPlayers === 3 ? dimension.height * 1.15 : dimension.height
-    }
+    return dimension.height * 1.2
+    // if (damage < 10) {
+    //   // return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.2
+    //   return dimension.height * 1.2
+    // } 
+    // // else if (damage >= 10 && damage < 20) {
+    // //   return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.1
+    // // } 
+    // else {
+    //   // return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.1
+    //   return totalPlayers === 2 ? dimension.height * 1.2 : dimension.height * 1.2
+    // }
   }
   if (width >= 600 && width < 900) {
     return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * .8
@@ -168,21 +168,26 @@ export function cdmgLineHeight(dimension: { width: number, height: number }, tot
   //phone
   if (deviceType === 1) {
     if (dimension.height < dimension.width) {
-      /* wide containers*/
+      /* wide containers, which seems to be all containers on my phone, samsung s22*/
       if (damage < 10) {
-        return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.2
-      } else if (damage >= 10 && damage < 20) {
-        return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height
-      } else {
-        return totalPlayers === 4 ? dimension.height * 1.1 : totalPlayers === 3 ? dimension.height * 1.1 : dimension.height
+        // return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.2
+        return dimension.height * 1.2
+      } 
+      // else if (damage >= 10 && damage < 20) {
+      //   return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.05
+      // } 
+      else {
+        return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.05
       }
     } else {
       /* tall containers*/
       if (damage < 10) {
         return totalPlayers === 4 ? dimension.height * 1.3 : totalPlayers === 3 ? dimension.height * 1.2 : dimension.height * 1.1
-      } else if (damage >= 10 && damage < 20) {
-        return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * .9 : dimension.height * .8
-      } else {
+      } 
+      // else if (damage >= 10 && damage < 20) {
+      //   return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * .9 : dimension.height * .8
+      // } 
+      else {
         return totalPlayers === 4 ? dimension.height * 1.2 : totalPlayers === 3 ? dimension.height * .9 : dimension.height * .8
       }
     }
@@ -199,7 +204,13 @@ export const handleTaxSize = (totalPlayers: number, id: number, text: string, ga
       return text.length >= 2 ? RFPercentage(7) : RFPercentage(8.5)
     }
     else {
-      return deviceType === 1 ? RFPercentage(7) : RFPercentage(8.5)
+      /*acts weird on long phones*/
+      if(width * 2 < height){
+        return deviceType === 1 ? RFPercentage(6.5) : RFPercentage(8.5)
+      }
+      else {
+        return deviceType === 1 ? RFPercentage(7) : RFPercentage(8.5)
+      }
     }
   }
   else {

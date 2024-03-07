@@ -1,5 +1,5 @@
-import { CSSProperties } from 'react';
-import Animated, { useAnimatedStyle, withTiming, Easing, useSharedValue } from 'react-native-reanimated';
+import { CSSProperties, useRef } from 'react';
+import { Animated } from 'react-native';
 
 interface FadeContainerProps {
     children: React.ReactNode
@@ -7,22 +7,24 @@ interface FadeContainerProps {
 }
 
 const FadeContainer : React.FC<FadeContainerProps> = ({ children }, style ) =>{
-    const opacityVal = useSharedValue(0)
+    const opacityVal = useRef(new Animated.Value(0)).current
 
-    const fadeInStyle = useAnimatedStyle(() => {
-        return {
-            opacity : withTiming(opacityVal.value, {
-                duration: 200,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1)
-            })
-        }
-    })
+    const fadeInStyle = () =>{
+        Animated.timing(opacityVal, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true
+        }).start()
+    }
 
     return (
         <Animated.View 
         testID="FadeContainer"
-        onLayout={() => opacityVal.value = 1 }
-        style={[style, fadeInStyle]} >
+        onLayout={() => fadeInStyle()}
+        style={[style, {
+            opacity: opacityVal
+        }]} 
+        >
             {children}
         </Animated.View>
     )

@@ -44,6 +44,56 @@ const Dice = () => {
     )
 }
 
+
+interface DieProps {
+    faces: number
+}
+
+const Die : React.FC<DieProps> = ({faces}) =>{
+
+    //z always negative for back
+    const back = [
+        { x: -0.5, y:-0.5, z:-0.5 },
+        { x: 0.5, y:-0.5, z:-0.5 },
+        { x: -0.5, y:0.5, z:-0.5 },
+        { x: 0.5, y:0.5, z:-0.5 },
+    ]
+
+    //z always positive for back
+    const front = [
+        { x: -0.5, y:-0.5, z:0.5 },
+        { x: 0.5, y:-0.5, z:0.5 },
+        { x: -0.5, y:0.5, z:0.5 },
+        { x: 0.5, y:0.5, z:0.5 },
+    ]
+
+    const points = [...front, back]
+
+    const time = 4000
+    /*
+    linear interpolation equation
+    */
+    const mix = (val: number, x: number, y: number) : number =>{
+        return x + (1 - val) + y * val;
+    }
+    const theta : number = mix(time, 0, Math.PI * 2)
+
+    // const animateDice = () => {
+    //     diceScale.value = withSequence(
+    //         withRepeat(
+    //             withTiming(1.1, {
+    //                 duration: 150
+    //             }),
+    //             4),
+    //         withTiming(1)
+    //     )
+    // }
+
+    return (
+        <></>
+    )
+}
+
 const DiceRoller = () => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { globalPlayerData } = useContext(GameContext)

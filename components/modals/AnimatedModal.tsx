@@ -3,6 +3,7 @@ import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing } from "reac
 import Svg, { Path } from "react-native-svg";
 import getDimensions from "../../functions/getComponentDimensions";
 import { textScaler } from "../../functions/textScaler";
+import { deviceType } from 'expo-device';
 
 interface ModalProps {
     visible: boolean;
@@ -57,6 +58,8 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
         }
     }
 
+// console.log(pressDimensions)
+
     return (
         <Modal visible={modalVisible} transparent onRequestClose={() =>{handlePress(close)}}>
             <Pressable nativeID="modalBackdropPress"
@@ -72,8 +75,13 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
                 >
                     <View
                         style={styles.modal} >
-                        <Text style={[styles.modal_text, {
-                            fontSize: pressDimensions && textScaler(modalTitle.length, pressDimensions)
+                        <Text 
+                        numberOfLines={2}
+                        style={[styles.modal_text, {
+                            // fontSize: pressDimensions && textScaler(modalTitle.length, pressDimensions)
+                            // fontSize: deviceType === 1 ? 32 : 90
+                            // fontSize: deviceType === 1 ? 32 : pressDimensions && pressDimensions?.width/10
+                            fontSize: pressDimensions && pressDimensions.width/9
                         }]}>
                             {modalTitle}
                         </Text>
