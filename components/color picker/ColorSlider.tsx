@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { Slider } from '@react-native-assets/slider';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { gradientColors } from '../../constants/Colors';
-import { useDebounce } from '../../hooks/useDebounce';
 
 interface ColorSliderProps {
     initialHue: number,
@@ -15,7 +14,6 @@ Color Slider controls only hue
 */
 const ColorSlider: React.FC<ColorSliderProps> = ({ initialHue, passHue }) => {
     const [hue, setHue] = useState<number>(0);
-    // const debouncedHue = useDebounce<number>(hue, 1);
 
     const handleHueChange = (value: number) => {
         setHue(value);
@@ -24,12 +22,6 @@ const ColorSlider: React.FC<ColorSliderProps> = ({ initialHue, passHue }) => {
     useEffect(() => {
         setHue(initialHue)
     }, [])
-
-    // useEffect(() => {
-    //     if (passHue && debouncedHue) {
-    //         passHue(Math.round(debouncedHue))
-    //     }
-    // }, [debouncedHue])
 
     useEffect(() => {
         if (passHue && hue) {

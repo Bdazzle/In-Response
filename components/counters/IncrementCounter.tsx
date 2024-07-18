@@ -55,10 +55,10 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                 String(total).length,
                 counterDimensions,
                 64, 16
-             )
+                )
             )
         }
-    },[counterDimensions?.height])
+    }, [counterDimensions?.height, total])
 
     return (
         <View
