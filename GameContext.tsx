@@ -28,14 +28,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [planarData, setPlanarData] = useState<PlanarData>({ currentPlane: '', deck: [], discard: [] })
   const [reset, setReset] = useState<boolean>(false)
   
+  /*
+    if any life total is different than starting life total,
+    that means a game is in progress, and life totals should not change for adding an additional player.
+    */
   useEffect(() => {
 
-    dispatchGlobalPlayerData({
-      field: 'init',
-      value: newGameData( totalPlayers, startingLife),
-      playerID: 0
-    })
-  
+    const playerLifeTotals = Object.keys(globalPlayerData).map(player => globalPlayerData[player].lifeTotal)
+
+    if(!playerLifeTotals.every(val => val === startingLife)) {
+      dispatchGlobalPlayerData({
+        field: 'init',
+        value: newGameData(totalPlayers, startingLife, globalPlayerData),
+        playerID: 0
+      }) 
+    } 
+    else {
+      dispatchGlobalPlayerData({
+        field: 'init',
+        value: newGameData(totalPlayers, startingLife),
+        playerID: 0
+      }) 
+    }
+
     const newPlanarDeck = generatePlanarDeck(totalPlayers)
     setPlanarData({
       currentPlane: newPlanarDeck[0],
@@ -44,7 +59,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
   }, [totalPlayers])
-
+  // console.log(globalPlayerData)
   /* reset game when starting life total options change */
   useEffect(() => {
     if (Object.keys(globalPlayerData).length) {
