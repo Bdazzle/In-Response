@@ -4,7 +4,7 @@ import React, { useEffect, useReducer } from "react"
 import { StyleSheet, Pressable, View } from "react-native"
 import Svg, { Circle, Path, Polygon } from "react-native-svg"
 import { RootStackParamList } from "../../navigation"
-import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
+import { imageAction, imageReducer, ImageReducerState } from "../../reducers/imageResources"
 
 interface DayNightProps {
     activeCycle: string,
@@ -46,28 +46,22 @@ const CombinedSvg: React.FC = () => {
 changing cycle has to be done in Game.tsx so it can be changed when reset button is pressed.
 */
 const DayNight: React.FC<DayNightProps> = ({ activeCycle, setActiveCycle }) => {
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
         {
-            SvgPaths: [
-                {
-                    path: 'M18,29c0-7.805,4.48-14.547,11-17.843C26.292,9.788,23.241,9,20,9C8.954,9,0,17.954,0,29  c0,11.046,8.954,20,20,20c3.241,0,6.292-0.788,9-2.157C22.48,43.547,18,36.804,18,29z',
-                    fill: '#BDC3C7'
-                },
-            ],
-            SvgViewbox: "0 0 58 58"
+            Svg: ''
         })
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     useEffect(() => {
-        dispatchResources(activeCycle)
+        dispatchResources({ card: activeCycle })
     }, [activeCycle])
 
     const changeCycle = () => {
         activeCycle === 'day' ? setActiveCycle('night') : setActiveCycle('day')
     }
 
-    const cardLongPress = () =>{
-        if(activeCycle !== "neutral") {
+    const cardLongPress = () => {
+        if (activeCycle !== "neutral") {
             navigation.navigate("Card", {
                 card: `${activeCycle}Card`,
             })
@@ -83,24 +77,9 @@ const DayNight: React.FC<DayNightProps> = ({ activeCycle, setActiveCycle }) => {
             {activeCycle === "neutral" ?
                 <CombinedSvg />
                 :
-                <Svg viewBox={resources.SvgViewbox}
-                accessibilityLabel={activeCycle}
-                >
-                    {resources.SvgPaths &&
-                        resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
-                            return path.path ? <Path key={`${activeCycle} path ${i}`} d={path.path}
-                                fill={path.fill as string} />
-                                : path.polygonPoints ? <Polygon key={`${activeCycle} polygon ${i}`}
-                                    points={path.polygonPoints}
-                                    fill={path.fill as string}
-                                />
-                                    : path.circle ? <Circle key={`${activeCycle} circle ${i}`}
-                                        cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r}
-                                        fill={path.fill as string} />
-                                        : undefined
-                        })
-                    }
-                </Svg>
+                <View>
+                    {resources.Svg}
+                </View>
             }
         </Pressable>
     )

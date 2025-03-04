@@ -2,7 +2,7 @@
   "expo": {
     "name": "In_Response",
     "slug": "In_Response",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
     "userInterfaceStyle": "light",
@@ -36,6 +36,18 @@
             "targetSdkVersion": 34,
             "buildToolsVersion": "34.0.0"
           }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/appIcons/splash/Color_Wheel.png",
+          "dark": {
+            "image": "./assets/appIcons/splash/Color_Wheel.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 300
         }
       ]
     ],

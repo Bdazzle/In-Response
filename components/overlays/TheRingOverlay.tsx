@@ -2,10 +2,123 @@
 import React, { useContext, useEffect, useState } from "react"
 import { Image, View, StyleSheet, Pressable, ImageSourcePropType } from "react-native"
 import FlipCard from "../counters/Flipcard"
-import { GameContext } from "../../GameContext"
+import { GameContext, GameContextProps } from "../../GameContext"
 import { RouteProp, useRoute } from "@react-navigation/native"
 import { RootStackParamList } from "../../navigation"
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
+
+let phoneStyles : any, tabletStyles : any;
+
+const getPhoneStyles = () =>{
+    if(!phoneStyles) {
+        phoneStyles = StyleSheet.create({
+            ring_container: {
+                height: '100%',
+                maxWidth: 690,//the width contained card image on tablet
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+            tablet_ring_container: {
+                aspectRatio: .75
+            },
+            ring_overlay_wrapper: {
+                left: '7.5%',
+                width:'85%',
+                height: '52.5%',
+            },
+            visible_level: {
+                color: 'black',
+                justifyContent: 'center',
+                width: '100%',
+            },
+            hidden_level: {
+                opacity: 0.01,
+                width: '100%',
+            },
+            level1: {
+                height:'17%',
+            },
+            level2: {
+                height:'20%',
+            },
+            level3: {
+                height:'25%',
+            },
+            level4: {
+                height:'23%',
+            },
+            levelImageWrapper: {
+                height: '100%',
+                width: '100%',
+                backfaceVisibility: 'hidden'
+            },
+            levelImage: {
+                height: '100%',
+                width: '100%',
+            }
+        })
+    }
+    return phoneStyles
+}
+
+const getTabletStyles = () =>{
+    if(!tabletStyles){
+        tabletStyles = StyleSheet.create({
+            ring_container: {
+                height: '100%',
+                maxWidth: 690,//the width contained card image on tablet
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+            tablet_ring_container: {
+                aspectRatio: .75
+            },
+            ring_overlay_wrapper: {
+                height: '52.5%',
+                left: '14.5%',
+                width:'71%',
+            },
+            visible_level: {
+                color: 'black',
+                justifyContent: 'center',
+                width: '100%',
+            },
+            hidden_level: {
+                opacity: 0.01,
+                width: '100%',
+            },
+            level1: {
+                height:'15.5%'
+            },
+            level2: {
+                height:'17%'
+            },
+            level3: {
+                height:'21%'
+            },
+            level4: {
+                height:'19%',
+            },
+            levelImageWrapper: {
+                height: '100%',
+                width: '100%',
+                backfaceVisibility: 'hidden'
+            },
+            levelImage: {
+                height: '100%',
+                width: '100%',
+            }
+        })
+    }
+    return tabletStyles
+}
+/*
+instead of having 2 StyleSheet.create() functions execute on any device for tablet/phone styles,
+this should only execute creation of one stylesheet dependent on devicetype
+*/
 
 interface RingProps {
     imageSource: {
@@ -22,12 +135,14 @@ Each time the ring tempts you, you must choose a creature if you control one.
 Each player can have only one emblem named the ring and only one ring-bearer at a time.`
 
 const TheRing: React.FC<RingProps> = ({ imageSource }) => {
-    const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext)
+    const { globalPlayerData, dispatchGlobalPlayerData } = useContext<GameContextProps>(GameContext)
+    const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const [level, setLevel] = useState<number | null>()
     const route = useRoute<RouteProp<RootStackParamList, 'Card'>>()
     const [showLevels, setShowLevels] = useState<boolean>(true)
     const flipVal = useSharedValue(0)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
+    const styles = deviceType === 'phone' ? getPhoneStyles() :  getTabletStyles()
 
     const levelChange = (num: number) => {
         // for clicking on same level to make level go down, deselect level if highlighted
@@ -82,7 +197,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                         height: imageDimensions?.height,
                         position:'absolute',
                         justifyContent:'flex-end',
-
+                        
                     }}>
                     <View testID='ring_overlay_wrapper'
                         style={styles.ring_overlay_wrapper}
@@ -172,56 +287,5 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
         </View>
     )
 }
-
-/*
-bottom of overlay container has to be device height-image dimensions height?
-*/
-const styles = StyleSheet.create({
-    ring_container: {
-        height: '100%',
-        maxWidth: 690,//the width contained card image on tablet
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    tablet_ring_container: {
-        aspectRatio: .75
-    },
-    ring_overlay_wrapper: {
-        left: '7.5%',
-        width:'85%',
-        height: '52.5%',
-    },
-    visible_level: {
-        color: 'black',
-        justifyContent: 'center',
-        width: '100%'
-    },
-    hidden_level: {
-        opacity: 0.01,
-        width: '100%',
-    },
-    level1: {
-        height:'17%'
-    },
-    level2: {
-        height:'20%'
-    },
-    level3: {
-        height:'25%'
-    },
-    level4: {
-        height:'23%'
-    },
-    levelImageWrapper: {
-        height: '100%',
-        width: '100%',
-        backfaceVisibility: 'hidden'
-    },
-    levelImage: {
-        height: '100%',
-        width: '100%',
-    }
-})
 
 export default TheRing

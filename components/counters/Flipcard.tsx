@@ -1,25 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, ImageSourcePropType, Pressable, View, Image, Dimensions, useWindowDimensions, DimensionValue } from "react-native";
+import { StyleSheet, ImageSourcePropType, Pressable, View, Image, Dimensions, DimensionValue } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import Svg, { Path } from "react-native-svg";
-import { iconData } from "../../reducers/imageResources";
-
+import iconData from "../../images/staticResources";
 
 interface FlipCardProps {
     front: ImageSourcePropType,
     back: ImageSourcePropType,
-    // frontUri: string,
-    // backUri: string
     onLayout?: ({ width, height }: { width: number, height: number }) => void,
     onFlip?: () => void,
     altFront?: string,
     altBack?: string,
+    initialFlipVal? : 0 | 1
 }
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altFront, altBack }) => {
+const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altFront, altBack, initialFlipVal }) => {
     const flipVal = useSharedValue(0)
     const imageRef = useRef<Image>(null)
     const backRef = useRef<Image>(null)
@@ -27,6 +24,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
 
     const frontAnimatedStyle = useAnimatedStyle(() => {
         /*Front card spins from 0 - 180 degrees*/
+        
         const frontSpin = interpolate(flipVal.value, [0, 1], [0, 180])
         return {
             transform: [
@@ -53,6 +51,12 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
         flipVal.value = flipVal.value ? 0 : 1
         onFlip && onFlip()
     }
+
+    useEffect(() =>{
+        if(initialFlipVal){
+            flipVal.value = initialFlipVal
+        }
+    },[initialFlipVal])
 
     const handleImageLayout = () => {
         /*
@@ -90,15 +94,13 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
                 {/* Front */}
                 <Animated.View testID='front-wrapper'
                     style={[frontAnimatedStyle, styles.frontWrapper]}
-                // accessibilityLabel={altFront}
                 >
                     <Image testID="front-image"
-                        source={require('../../assets/cards/the_ring.png')}
+                        source={front}
                         ref={imageRef}
                         onLayout={() => handleImageLayout()}
                         style={styles.frontImage}
                         alt={altFront}
-                    // accessibilityLabel={altFront}
                     />
                 </Animated.View>
                 {/* Back */}
@@ -163,9 +165,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         width: 80,
         height: 78,
-        zIndex: 50,
+        zIndex: 10,
         backgroundColor: 'black',
-        bottom: 0,
+        bottom:'5%',
         position: 'absolute'
     }
 })

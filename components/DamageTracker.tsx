@@ -3,7 +3,6 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View, LayoutChangeEvent,
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
 import { cdmgLineHeight, cdmgScaler, cNameScaler, handleTaxSize, taxLineHeight, textScaler } from "../functions/textScaler";
-import { OptionsContext, OptionsContextProps } from "../OptionsContext";
 import getDimensions from "../functions/getComponentDimensions";
 
 interface CommanderDamageProps {
@@ -27,17 +26,13 @@ interface TrackerProps {
 position is index order(starts @ 0) from top to bottom of individual commander damage trackers, 
 componentHeight is height of element being scaled
 */
-function scaleY(totalPlayers: number, position: number, componentHeight: number, simpleDisplay: boolean): number {
+function scaleY(totalPlayers: number, position: number, componentHeight: number): number {
     switch (totalPlayers) {
         case 2: {
             return -componentHeight
         };
         case 3: {
-            if(simpleDisplay){
-                return position === 0 ? -componentHeight * .001 : -componentHeight * 1.4
-            } else {
-                return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
-            }
+            return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
         }
         case 4: {
             return position === 0 ? componentHeight / 1.5
@@ -58,12 +53,8 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     showScale,
     componentDimensions }) => {
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
-    const { simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
     const [isPressed, setIsPressed] = useState<boolean>(false)
-    const [textWrapperDimensions, setTextWrapperDimensions] = useState<{ width: number, height: number }>()
-    // const scaleVal = useSharedValue(1)
-    // const translateXVal = useSharedValue(0)
-    // const translateYVal = useSharedValue(0)
+    const [textWrapperDimensions, setTextWrapperDimensions] = useState<{ width: number, height: number }>({ width: 75, height: 33 })
 
     const totalPlayers = Object.keys(globalPlayerData).length
 
@@ -79,45 +70,39 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
         })
     }
 
-    // useEffect(() => {
-    //     scaleVal.value = isPressed === false ? 1 : 3.5
-    //     translateXVal.value = isPressed === false ? 0 : componentDimensions!.width * 2.25 //totalPlayers === 2 ? componentDimensions!.width * 2 :componentDimensions!.width * 2.75
-    //     translateYVal.value = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height)
-    // }, [isPressed])
-
     let scaleVal = useRef(new Animated.Value(1)).current
     let translateXVal = useRef(new Animated.Value(0)).current
     let translateYVal = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
         const scaleTarget = isPressed === false ? 1 : totalPlayers === 3 ? 3 : 3.5
-        const targetXVal = isPressed === false ? 0 : componentDimensions!.width * 2.25 
-        const targetYVal = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height, simpleDisplay)
+        const targetXVal = isPressed === false ? 0 : componentDimensions!.width * 2.25
+        const targetYVal = isPressed === false ? 0 : scaleY(totalPlayers, position, componentDimensions!.height)
 
-            Animated.parallel([
-                Animated.timing(
-                    translateXVal, {
-                    toValue: targetXVal,
-                    duration: 100,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                    useNativeDriver: true
-                }
-                ),
-                Animated.timing(
-                    translateYVal, {
-                    toValue: targetYVal,
-                    duration: 100,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                    useNativeDriver: true
-                }
-                ),
-                Animated.timing(scaleVal, {
-                    toValue: scaleTarget,
-                    duration: 100,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                    useNativeDriver: true
-                })
-            ]).start()
+        Animated.parallel([
+            Animated.timing(
+                translateXVal, {
+                toValue: targetXVal,
+                duration: 100,
+                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+                useNativeDriver: true
+            }
+            ),
+            Animated.timing(
+                translateYVal, {
+                toValue: targetYVal,
+                duration: 100,
+                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+                useNativeDriver: true
+            }
+            ),
+            Animated.timing(scaleVal, {
+                toValue: scaleTarget,
+                duration: 100,
+                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+                useNativeDriver: true
+            })
+        ]).start()
     }, [isPressed])
 
     const handlePress = () => {
@@ -147,31 +132,6 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
         ],
     }
 
-    // const scaleStyles = useAnimatedStyle(() => {
-    //     return {
-    //         transform: [
-    //             {
-    //                 translateX: withTiming(translateXVal.value, {
-    //                     duration: 100,
-    //                     easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    //                 })
-    //             },
-    //             {
-    //                 translateY: withTiming(translateYVal.value, {
-    //                     duration: 100,
-    //                     easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    //                 })
-    //             },
-    //             {
-    //                 scale: withTiming(scaleVal.value, {
-    //                     duration: 100,
-    //                     easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    //                 })
-    //             },
-    //         ],
-    //     }
-    // })
-
     return (
         <Animated.View testID={`${opponentName}_damage_container`}
             style={
@@ -185,7 +145,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                             totalPlayers === 3 ? `35%` : `33%`,// 100/maximum # of potential players - 1
                         zIndex: isPressed === true ? 10 : 0,
                         borderRadius: 5,
-                        
+
                     }
                 ]} >
             <Pressable testID={`${opponentName}_pressable`}
@@ -202,14 +162,13 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                             style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
                             {
                                 fontSize: totalPlayers === 3 && playerID !== 3 ?
-                                    cNameScaler(opponentName) * .8
+                                    cNameScaler(opponentName) * 1.2
                                     :
                                     totalPlayers === 4 ?
-                                        cNameScaler(opponentName) * .7
+                                        cNameScaler(opponentName)
                                         :
-                                        cNameScaler(opponentName),
-
-                                height: '25%',
+                                        cNameScaler(opponentName) * 1.2,
+                                height: '30%',
                             }
                             ]}
                             accessibilityLabel={`opponent ${opponentName}`}
@@ -256,11 +215,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                 globalPlayerData[playerID!] &&
                                 <View nativeID="cdmgTotalWrapper"
                                     onLayout={(event) => getDimensions(event, setTextWrapperDimensions)}
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        alignItems: 'center',
-                                    }}
+                                    style={styles().cdmgTotalWrapper}
                                 >
                                     <Text
                                         style={[styles(globalPlayerData[oppponentID].colors.secondary).all_text,
@@ -322,7 +277,6 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
 
 const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracker, showScale, gameType }) => {
     const { globalPlayerData, reset } = useContext(GameContext) as GameContextProps
-    const { deviceType } = useContext(OptionsContext)
     const [tax, setTax] = useState<number>(0)
     const [spellTax, setSpellTax] = useState<number>(0)
     const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>()
@@ -358,7 +312,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                                 accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                                 style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                                 {
-                                    fontSize: pressDimensions && textScaler(3, pressDimensions, undefined, 18)
+                                    fontSize: pressDimensions ? textScaler(3, pressDimensions, undefined, 18) : 16
                                 }
                                 ]}>
                                 Tax
@@ -368,18 +322,18 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         <View style={styles().tax_text_wrapper}
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                         >
-                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
-                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 })
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
+                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
                             }]}
                                 accessible={false}
                             >T</Text>
-                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
-                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 })
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
+                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
                             }]}
                                 accessible={false}
                             >a</Text>
-                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType, deviceType).tax_letter, {
-                                fontSize: pressDimensions && textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }),
+                            <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
+                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16,
                                 paddingBottom: 10
                             }]}
                                 accessible={false}
@@ -388,7 +342,6 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                 }
                 {/* Commander Tax  */}
                 <Text
-                    // adjustsFontSizeToFit={true}
                     numberOfLines={1}
                     accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax} commander tax`}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
@@ -426,7 +379,10 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                                 accessibilityLabel={`${globalPlayerData[playerID].screenName} spell tax`}
                                 style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                                 {
-                                    fontSize: pressDimensions && textScaler(9, pressDimensions, 36, 18)
+                                    fontSize: pressDimensions ? textScaler('Spell Tax'.length, 
+                                        pressDimensions, 
+                                        36, 
+                                        totalPlayers === 2 ? pressDimensions.height / "spell".length : (pressDimensions.height / "spell".length + 4)) : 16
                                 }
                                 ]}>
                                 Spell Tax
@@ -434,15 +390,17 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                         </View>
                         <Text
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} ${spellTax} spell tax`}
-                            // adjustsFontSizeToFit={true}
-                            // numberOfLines={1}
+                            adjustsFontSizeToFit={true}
+                            numberOfLines={1}
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             pressDimensions && {
                                 fontSize: handleTaxSize(totalPlayers, playerID, String(spellTax), gameType),
                                 lineHeight: pressDimensions && taxLineHeight(pressDimensions.height, playerID, totalPlayers, gameType),
                                 paddingLeft: totalPlayers === 3 && playerID === 2 ? 4 : 0
                             }]}>
-                            {spellTax}
+                            {
+                                spellTax
+                            }
                         </Text>
                     </Pressable>
             }
@@ -450,7 +408,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
     )
 }
 
-const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceType?: string) => StyleSheet.create({
+const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleSheet.create({
     cdamage_container: {
         height: '100%',
         width: '100%',
@@ -498,15 +456,18 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string, deviceTyp
     },
     damage_row: {
         flexDirection: 'row',
-        // justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-
         height: '75%',
     },
     damage_pressable: {
         justifyContent: 'center',
         width: '25%',
+    },
+    cdmgTotalWrapper: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
     },
     player_pressable: {
         height: '100%',

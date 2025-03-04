@@ -6,7 +6,16 @@ import { useFonts } from "expo-font";
 import React, { useCallback } from 'react';
 // import * as SplashScreen from 'expo-splash-screen';
 
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from 'react-native-reanimated';
 
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 // SplashScreen.preventAutoHideAsync();
 

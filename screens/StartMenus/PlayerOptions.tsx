@@ -80,7 +80,6 @@ maybe move this to a context? somewhere higher up in app hierarchy?
             try {
                 const savedColors = await AsyncStorage.getItem(`${String(playerID)} colors`)
                 if (savedColors) {
-                    // console.log(savedColors)
                     const parsedColors = JSON.parse(savedColors as string)
                     dispatchGlobalPlayerData({
                         field: 'colors',
@@ -91,7 +90,6 @@ maybe move this to a context? somewhere higher up in app hierarchy?
 
                 const sn = await AsyncStorage.getItem(`${String(playerID)} screenName`)
                 if (sn) {
-                    // console.log(sn)
                     dispatchGlobalPlayerData({
                         playerID: playerID,
                         field: 'screenName',

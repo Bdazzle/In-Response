@@ -59,7 +59,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
   }, [totalPlayers])
-  // console.log(globalPlayerData)
+  
   /* reset game when starting life total options change */
   useEffect(() => {
     if (Object.keys(globalPlayerData).length) {

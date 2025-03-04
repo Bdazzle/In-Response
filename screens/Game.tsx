@@ -1,5 +1,5 @@
-import { View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet } from 'react-native';
-import React, { useContext, useRef, useState } from 'react';
+import { View, useWindowDimensions, StyleProp, ViewStyle, Dimensions, Pressable, StyleSheet, LayoutChangeEvent } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player'
 import { GameContext, GameContextProps } from '../GameContext';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
@@ -7,7 +7,8 @@ import Svg, { G, Path } from 'react-native-svg';
 import DayNight from '../components/counters/DayNight';
 import AnimatedModal from '../components/modals/AnimatedModal';
 import GlobalMenu from './GlobalMenu'
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import shuffle from '../functions/shuffler';
 
 const window = Dimensions.get("window")
@@ -16,14 +17,42 @@ const window = Dimensions.get("window")
 PanResponder intercepts onPress and onLongPress events, making them not work in Animated.View children.
 */
 export const Game = () => {
-    const { totalPlayers, startingLife, deviceType, simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, startingLife, deviceType } = useContext(OptionsContext) as OptionsContextProps
     const { globalPlayerData, dispatchGlobalPlayerData, setCurrentMonarch, setCurrentInitiative, setReset } = useContext(GameContext) as GameContextProps
     const [randomPlayer, setRandomPlayer] = useState<string | undefined>()
     const [activeCycle, setActiveCycle] = useState<string>("neutral")
     const [resetModalVis, setResetModalVis] = useState<boolean>(false)
     const [randomPlayerModalVis, setRandomPlayerModalVis] = useState<boolean>(false)
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
-    const swipeRef = useRef<Swipeable>(null)
+    //was type Swipeable, but not anymore and gesture handler docs suck
+    const swipeRef = useRef<any>(null)
+    //98% of windows height, will be set to game_container height because middle buttons on wonky on tablet v. phone
+    const [gameHeight, setGameHeight] = useState<number>(window.height * .98)
+    const [midBtnOffset, setMidBtnOffset] = useState<number>(window.height / 2)
+
+    const getGameHeight = (event: LayoutChangeEvent) => {
+        const { height } = event.nativeEvent.layout
+        if (height !== 0) {
+            setGameHeight(window.height < height ? window.height : height)
+        }
+    }
+
+    /*
+    offset calculated as fraction of 5% (height of mid buttons, aka window.height * .05)
+    for some reason, maybe some artifact or size to 98% height ratio, icons are slightly off center and need fractional adjusting
+    icon sizes are: phone = 38, tablet = 58
+    */
+    useEffect(() => {
+        if (deviceType === 'phone') {
+            const iconSize = 38;
+            const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .65 - (iconSize / 2) : (gameHeight / 2) - (iconSize / 10)
+            setMidBtnOffset(offset)
+        } else {
+            const iconSize = 58;
+            const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .65 : (gameHeight / 2) - (iconSize / 3)
+            setMidBtnOffset(offset)
+        }
+    }, [gameHeight])
 
     /* Random Player Functions */
     const getRandomPlayer = () => {
@@ -33,10 +62,6 @@ export const Game = () => {
         })
         const shuffledPlayers = shuffle(playerNames)
         setRandomPlayer(shuffledPlayers[0])
-
-        /* standard randomized players */
-        // const random = Math.ceil(Math.random() * totalPlayers)
-        // setRandomPlayer(globalPlayerData[random].screenName)
 
         setRandomPlayerModalVis(true)
     }
@@ -49,7 +74,7 @@ export const Game = () => {
     const hideResetModal = () => {
         setResetModalVis(false)
     }
-    
+
     /* 
     reset need to change life totals/commander damage to starting,
     set dungeons and static/incrementing counters to 0,
@@ -72,6 +97,9 @@ export const Game = () => {
             }
             if (newPlayerData[playerID].theRing) {
                 delete newPlayerData[playerID].theRing
+            }
+            if (newPlayerData[playerID].speed) {
+                delete newPlayerData[playerID].speed
             }
         }
 
@@ -116,10 +144,12 @@ export const Game = () => {
                 ref={swipeRef}
                 leftThreshold={80}
                 renderLeftActions={renderLeftActions}
+                renderRightActions={() => null}
             >
                 <View
                     testID='game_container'
                     style={styles.game_container}
+                    onLayout={(e) => { getGameHeight(e) }}
                 >
                     <View testID='middle_buttons'
                         style={{
@@ -130,17 +160,13 @@ export const Game = () => {
                             maxWidth: totalPlayers === 1 ? 350 : '100%',
                             flexDirection: 'row',
                             justifyContent: 'space-between',
-                            top: totalPlayers === 1 ? 0 : totalPlayers === 3 ? (window.height - 38) * .65 : (window.height - 38) / 2,
+                            top: midBtnOffset,
                             transform: totalPlayers === 1 ? [
                                 { rotate: '90deg' },
                                 { translateX: window.width / 5 },
                                 { translateY: window.width / 6 }
                             ]
-                                :
-                                deviceType === 'tablet' ? [
-                                    { translateY: -7 }
-                                ]
-                                    : [],
+                                : [],
                         }}
                     >
                         {/* Reset button */}
@@ -156,7 +182,7 @@ export const Game = () => {
                             >
                                 <Svg viewBox='-3 -4 24 24' >
                                     <G fill="none" fillRule="evenodd" stroke="#000000"
-                                    strokeWidth="1.5"
+                                        strokeWidth="1.5"
                                     >
                                         <Path d='m12.5 1.5c2.4138473 1.37729434 4 4.02194088 4 7 0 4.418278-3.581722 8-8 8s-8-3.581722-8-8 3.581722-8 8-8'>
                                         </Path>
@@ -168,16 +194,14 @@ export const Game = () => {
 
 
                         {/* Day/night Cycle button */}
-                        {!simpleDisplay &&
-                            <View testID='cycle_icon_container'
-                                style={{
-                                    height: deviceType === 'phone' ? 38 : 58,
-                                    width: deviceType === 'phone' ? 38 : 58,
-                                }}
-                            >
-                                <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
-                            </View>
-                        }
+                        <View testID='cycle_icon_container'
+                            style={{
+                                height: deviceType === 'phone' ? 38 : 58,
+                                width: deviceType === 'phone' ? 38 : 58,
+                            }}
+                        >
+                            <DayNight activeCycle={activeCycle} setActiveCycle={setActiveCycle} />
+                        </View>
 
                         {/* Random Player button */}
                         <View testID='random_button'
@@ -203,26 +227,38 @@ export const Game = () => {
                     </View>
 
                     {/* Random Player Modal */}
-                    <AnimatedModal visible={randomPlayerModalVis} 
-                    modalTitle={`${randomPlayer} Selected`} 
-                    close={hideRandomPlayer}
-                    />
+                    <View style={{
+                        position: 'absolute'
+                    }}>
+                        <AnimatedModal visible={randomPlayerModalVis}
+                            modalTitle={`${randomPlayer} Selected`}
+                            close={hideRandomPlayer}
+                        />
+                    </View>
+
 
                     {/* Reset Modal */}
                     {
-                            <AnimatedModal 
-                            close={() => hideResetModal()}
-                            visible={resetModalVis} 
-                            modalTitle={"Reset Game?"}
-                            accept={() => handleReset()} 
-                            decline={() => hideResetModal()} />
+                        <View style={{
+                            position: 'absolute'
+                        }}>
+                            <AnimatedModal
+                                close={() => hideResetModal()}
+                                visible={resetModalVis}
+                                modalTitle={"Reset Game?"}
+                                accept={() => handleReset()}
+                                decline={() => hideResetModal()} />
+                        </View>
+
                     }
                     {
                         totalPlayers === 1 ? <Oneplayer playerIDs={designationMap} />
                             :
                             totalPlayers === 2 ? <TwoPlayerScreen playerIDs={designationMap}
                                 p1style={{
-                                    transform: [{ rotate: "180deg" }],
+                                    transform: [
+                                        { rotate: "180deg" },
+                                    ],
                                 }}
                                 p2style={{}}
                                 containerStyle={{
@@ -380,9 +416,9 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
     return (
         <View
             testID='threeplayer'
-            style={styles.game_container}>
+            style={styles.game_wrapper}>
             {Object.keys(globalPlayerData).length > 0 ?
-                <View style={styles.game_container} >
+                <View style={styles.game_wrapper} >
                     <Twoplayer playerIDs={playerIDs.slice(0, 2)}
                         p1style={{
                             backgroundColor: 'black',
@@ -428,28 +464,38 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
 const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const { height, width } = useWindowDimensions()
+    const [appDimensions, setAppDimensions] = useState<{ width: number, height: number }>({
+        width: width,
+        height: height
+    })
+
+    const getDimensions = (event: LayoutChangeEvent) => {
+        const { height, width } = event.nativeEvent.layout
+        setAppDimensions({ width: width, height: height })
+    }
 
     return (
         <>
             {Object.keys(globalPlayerData).length > 0 ?
                 <View testID='players_container'
-                    style={styles.players_container} >
-
+                    style={styles.players_container}
+                    onLayout={(e) => getDimensions(e)}
+                >
                     <Twoplayer
                         playerIDs={[1, 3]}
                         p1style={{
                             transform: [
                                 { rotate: '90deg' },
                             ],
-                            height: width / 2,
-                            width: height / 2
+                            height: appDimensions.width / 2,
+                            width: appDimensions.height / 2
                         }}
                         p2style={{
                             transform: [
                                 { rotate: '90deg' },
                             ],
-                            height: width / 2,
-                            width: height / 2
+                            height: appDimensions.width / 2,
+                            width: appDimensions.height / 2,
                         }}
                         containerStyle={{
                             width: '50%',
@@ -464,15 +510,15 @@ const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
                             transform: [
                                 { rotate: '270deg' },
                             ],
-                            height: width / 2,
-                            width: height / 2
+                            height: appDimensions.width / 2,
+                            width: appDimensions.height / 2
                         }}
                         p2style={{
                             transform: [
                                 { rotate: '270deg' },
                             ],
-                            height: width / 2,
-                            width: height / 2
+                            height: appDimensions.width / 2,
+                            width: appDimensions.height / 2
                         }}
                         containerStyle={{
                             justifyContent: 'center',
@@ -489,6 +535,12 @@ const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
 
 const styles = StyleSheet.create({
     game_container: {
+        height: '98%',
+        width: '100%',
+        backgroundColor: 'black',
+        paddingTop: '1%',
+    },
+    game_wrapper: {
         height: '100%',
         width: '100%',
         backgroundColor: 'black',

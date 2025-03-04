@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing } from "react-native";
+import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing, LayoutChangeEvent } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import getDimensions from "../../functions/getComponentDimensions";
-import { textScaler } from "../../functions/textScaler";
-import { deviceType } from 'expo-device';
 
 interface ModalProps {
     visible: boolean;
     modalTitle: string
-    close:() => void;
+    close: () => void;
     accept?: () => void;
     decline?: () => void;
     rotate?: string
@@ -16,8 +14,9 @@ interface ModalProps {
 
 const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accept, decline, rotate }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [pressDimensions, setPressDimensions] = useState<{height: number, width: number}>()
+    const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>({ width: 380, height: 750 })
     const modalScaleVal = useRef(new Animated.Value(0)).current;
+    const [fontSize, setFontSize] = useState<number>(16)
 
     const modalStyle = {
         transform: [
@@ -32,7 +31,7 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
             setModalVisible(true)
             handleAnimation()
         }
-    }, [visible])
+    }, [visible, modalVisible])
 
     const handleAnimation = () => {
         Animated.parallel([
@@ -58,13 +57,17 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
         }
     }
 
+    useEffect(() => {
+        setFontSize(pressDimensions.width / 9)
+    }, [pressDimensions])
+
     return (
-        <Modal visible={modalVisible} transparent onRequestClose={() =>{handlePress(close)}}>
+        <Modal visible={modalVisible} transparent onRequestClose={() => { handlePress(close) }}>
             <Pressable nativeID="modalBackdropPress"
-                style={[styles.backdrop, 
-                    rotate !== undefined && {
-                        transform: [{ rotate: rotate}]
-                    }]}
+                style={[styles.backdrop,
+                rotate !== undefined && {
+                    transform: [{ rotate: rotate }]
+                }]}
                 onPress={() => handlePress(close)}
                 onLayout={(e) => getDimensions(e, setPressDimensions)}
             >
@@ -73,11 +76,11 @@ const AnimatedModal: React.FC<ModalProps> = ({ visible, modalTitle, close, accep
                 >
                     <View
                         style={styles.modal} >
-                        <Text 
-                        numberOfLines={2}
-                        style={[styles.modal_text, {
-                            fontSize: pressDimensions && pressDimensions.width/9
-                        }]}>
+                        <Text
+                            numberOfLines={2}
+                            style={[styles.modal_text, {
+                                fontSize:fontSize
+                            }]}>
                             {modalTitle}
                         </Text>
                         {accept &&
@@ -129,13 +132,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         borderWidth: 3,
-        borderColor: 'white'
+        borderColor: 'white',
     },
     modal: {
         height: '100%',
         width: '100%',
-        justifyContent:'center',
-        alignItems:'center'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     modal_text: {
         color: "white",

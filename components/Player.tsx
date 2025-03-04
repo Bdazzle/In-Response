@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View, LayoutChangeEvent, Pressable } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
-import { ColorTheme, CountersProps } from '..';
+import { ColorTheme, CountersProps, Dimensions } from '..';
 import CommanderDamage from "./DamageTracker"
 import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RFPercentage, textScaler } from '../functions/textScaler';
+import { lifeTextScaler, RFPercentage, textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useLuminance from '../hooks/useLuminance'
 import useContainerDimensions from '../hooks/useContainerDimensions';
@@ -20,22 +20,19 @@ interface PlayerProps {
     playerID: number
 }
 
-type Dimensions = {
-    height: number,
-    width: number
-}
-
 /*
 everything not in GameContext gets reset when navigating.
 */
 export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { globalPlayerData, dispatchGlobalPlayerData, } = useContext(GameContext) as GameContextProps
-    const { totalPlayers, gameType, simpleDisplay } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, gameType} = useContext(OptionsContext) as OptionsContextProps
     const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 })
     const [scaleTracker, setScaleTracker] = useState<boolean>(false)
     const luminance = useLuminance(theme.secondary.slice(theme.secondary.indexOf('(') + 1, theme.secondary.lastIndexOf(',')).split(','))
     const [staticCounterDim, commanderDim] = useContainerDimensions(gameType, totalPlayers)
+    const [lifeTextSize, setLifeTextSize] = useState<number>(40)
+    const [counterText, setCounterText] = useState<number>(40)
 
     const handleLifeChange = (val: number): void => {
         dispatchGlobalPlayerData({
@@ -68,6 +65,11 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
         }
     }
 
+    useEffect(()=>{
+        setLifeTextSize(lifeTextScaler(totalPlayers, playerID, globalPlayerData[playerID].lifeTotal, dimensions))
+        setCounterText(textScaler(8, dimensions))
+    }, [dimensions])
+
     return (
         <Pressable testID={`${playerID}-player-container`}
             style={[styles.player_container,
@@ -81,12 +83,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
                 <View testID='commander_damage_tracker'
-                    style={[styles.commander_damage_tracker, simpleDisplay ?
-                        {
-                            height: '90%'
-                        }
-                        :
-                        commanderDim]} >
+                    style={[styles.commander_damage_tracker, commanderDim]} >
                     <CommanderDamage playerID={playerID}
                         scaleTracker={setScaleTracker}
                         showScale={scaleTracker}
@@ -99,7 +96,8 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
 
             <View testID='life_and_static_container'
                 style={styles.life_and_static_container}>
-                {!simpleDisplay &&
+                
+                {/* Static counter/trackers */}
                     <View testID="static_counter_wrapper"
                         style={[styles.static_counter_wrapper, staticCounterDim
                         ]}
@@ -111,7 +109,6 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             dungeonCompleted={globalPlayerData[playerID].dungeonCompleted as boolean}
                         />
                     </View>
-                }
 
                 {/* 
                 Life Total container
@@ -190,7 +187,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.life_total, {
-                                fontSize: textScaler(String(globalPlayerData[playerID].lifeTotal).length, dimensions, dimensions.width * 2, dimensions.width *2),
+                                fontSize: lifeTextSize > 0 ? lifeTextSize : 180,
                                 color: theme.secondary,
                             }]}>
                             {globalPlayerData[playerID].lifeTotal}
@@ -202,7 +199,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     >
                         <Text style={[styles.player_name,
                         {
-                            fontSize: totalPlayers === 3 && playerID !== 3 ? RFPercentage(3.2) : RFPercentage(4),
+                            fontSize: totalPlayers === 3 && playerID !== 3 ? RFPercentage(3.2) : totalPlayers === 2 ? RFPercentage(8)  : RFPercentage(4),
                             color: theme.secondary,
                         }]} >
                             {playerName}
@@ -226,7 +223,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         adjustsFontSizeToFit={true}
                         style={[styles.counter_pressable_text, {
                             color: theme.primary,
-                            fontSize: textScaler(8, dimensions),
+                            fontSize: counterText > 0 ? counterText : 23
                         }]}>Counters</Text>
                 </Pressable>
                 <View testID='counter_icons_container'
@@ -264,7 +261,6 @@ const styles = StyleSheet.create({
     static_counter_wrapper: {
         height: '25%',
         position: 'absolute',
-        zIndex: 50,
     },
     life_total_container: {
         flexDirection: 'row',
@@ -312,7 +308,7 @@ const styles = StyleSheet.create({
         height: '75%',
         position: 'absolute',
         width: '60%',
-        zIndex: 10,
+        zIndex: 5,
         alignItems: 'flex-end',
     },
     background_plus: {

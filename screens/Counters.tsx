@@ -1,13 +1,13 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView } from 'react-native';
-import Svg, { Circle, Path, Polygon } from 'react-native-svg';
+import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, useWindowDimensions } from 'react-native';
+import Svg, { Path, Polygon } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
-import { imageReducer, ImageReducerState, ShapeData } from '../reducers/imageResources';
-import { counters } from '../constants/CounterTypes';
-import { CounterCardProps } from '..';
+import { imageAction, imageReducer, ImageReducerState } from '../reducers/imageResources';
+import { counters, trackers } from '../constants/CounterTypes';
+import { CounterCardProps, DungeonData } from '..';
 import { textScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
@@ -20,42 +20,31 @@ interface CounterRowProps {
 
 const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) => {
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
-    const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
+    const { globalPlayerData } = useContext(GameContext) as GameContextProps
+    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
         {
-            SvgPaths: undefined,
-            SvgViewbox: undefined
+            Svg: undefined
         })
     const [displayTotal, setDisplayTotal] = useState<number>()
-    const [containerDimensions, setContainerDimensions] = useState<{ width: number, height: number }>();
+    const [containerDimensions, setContainerDimensions] = useState<{ width: number, height: number }>({
+        width: 200,
+        height: 100
+    });
+    const [fontSize, setFontSize] = useState<number>(18)
+    const [totalFontSize, setTotalFontsize] = useState<number>(18)
 
     useEffect(() => {
-        dispatchResources(counterType)
-        // if(globalPlayerData[route.params.playerID].counterData![counterType]){
-        //     setDisplayTotal()
-        // }
+        dispatchResources({ card: counterType })
         globalPlayerData[route.params.playerID].counterData![counterType] ? setDisplayTotal(globalPlayerData[route.params.playerID].counterData![counterType]) : setDisplayTotal(0)
     }, [counterType])
 
     const changeTotal = (amount: number) => {
-        // const total = globalPlayerData[route.params.playerID].counterData![counterType] === undefined ? 0 : globalPlayerData[route.params.playerID].counterData![counterType]
         const total = displayTotal as number
+
         if (total + amount <= 0) {
-            // dispatchGlobalPlayerData({
-            //     playerID: route.params.playerID,
-            //     field: 'remove counter',
-            //     subField: counterType,
-            //     value: 0
-            // })
             changeCounters(counterType, 0)
             setDisplayTotal(0)
         } else {
-            // dispatchGlobalPlayerData({
-            //     playerID: route.params.playerID,
-            //     field: 'counters',
-            //     subField: counterType,
-            //     value: total + amount
-            // })
             changeCounters(counterType, total + amount)
             setDisplayTotal(total + amount)
         }
@@ -64,6 +53,18 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
     useEffect(() => {
         globalPlayerData[route.params.playerID].counterData![counterType] && setDisplayTotal(globalPlayerData[route.params.playerID].counterData![counterType])
     }, [])
+
+    useEffect(() => {
+        if (containerDimensions.width !== 0 && containerDimensions.height !== 0) {
+            setFontSize(textScaler(counterType.length,
+                { ...containerDimensions, width: containerDimensions?.width / 3 },
+                36,
+                24));
+            setTotalFontsize(textScaler(String(displayTotal).length, { ...containerDimensions, width: containerDimensions?.width / 3 },
+                36,
+                16))
+        }
+    }, [containerDimensions])
 
     return (
         <View testID='row_container'
@@ -76,7 +77,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                 onPress={() => changeTotal(1)}
                 onLongPress={() => changeTotal(10)}
                 style={{
-                    width: '33%'
+                    width: '20%',
                 }}
                 accessibilityLabel={`add ${counterType} counter`}
             >
@@ -102,47 +103,28 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                     style={[styles.type_text,
                     {
                         height: '30%',
-                        // fontSize: counterType === "experience" ? staticTextScaler(21) : staticTextScaler(28),
-                        fontSize: containerDimensions && textScaler(counterType.length,
-                            { ...containerDimensions, width: containerDimensions?.width / 3 },
-                            36,
-                            24)
+                        fontSize: fontSize
                     }]}>
                     {counterType.charAt(0).toLocaleUpperCase() + counterType.slice(1)}
                 </Text>
-                <Svg viewBox={resources.SvgViewbox}
+                <View
                     style={{
                         height: '30%', width: '100%'
                     }}
                 >
-                    {resources.SvgPaths &&
-                        resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
-                            return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
-                                fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
-                            />
-                                : path.polygonPoints ?
-                                    <Polygon key={`${counterType} polygon ${i}`}
-                                        points={path.polygonPoints}
-                                        fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"}
-                                    />
-                                    : path.circle ?
-                                        <Circle key={`${counterType} circle ${i}`}
-                                            cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r}
-                                            fill={typeof path.fill === "string" ? path.fill : path.fill === true ? "white" : "black"} />
-                                        : undefined
-                        })
+                    {
+                        resources.Svg
                     }
-                </Svg>
+                </View>
                 <Text
                     accessibilityLabel={`${displayTotal} ${counterType}`}
                     style={[styles.total_text, {
-                        // fontSize: staticTextScaler(24),
-                        fontSize: containerDimensions && textScaler(String(displayTotal).length, {...containerDimensions, width: containerDimensions?.width / 3}, 
-                        36, 
-                        16),
+                        fontSize: totalFontSize,
                         height: '35%'
                     }]}>
-                    {displayTotal}
+                    {
+                        displayTotal
+                    }
                 </Text>
             </View>
 
@@ -152,7 +134,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                 onPress={() => changeTotal(-1)}
                 onLongPress={() => changeTotal(-10)}
                 style={{
-                    width: '33%'
+                    width: "20%"
                 }}
                 accessibilityLabel={`minus ${counterType} counter`}
             >
@@ -173,13 +155,187 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
     )
 }
 
+const CountersCol: React.FC<{ changeCounters: (counterType: string, value: number) => void }> = ({ changeCounters }) => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
+    const [stormPressDimensions, setStormPressDimensions] = useState<{ width: number, height: number }>({
+        width: 200,
+        height: 100
+    });
+    const [fontSize, setFontSize] = useState<number>(18)
+
+    const toStorm = () => {
+        navigation.navigate("Card", {
+            card: "storm",
+            currentCounters: 0,
+            playerID: route.params.playerID
+        } as CounterCardProps)
+    }
+
+    useEffect(() => {
+        if (stormPressDimensions.height !== 0 && stormPressDimensions.width !== 0) {
+            setFontSize(textScaler(5, stormPressDimensions))
+        }
+    }, [stormPressDimensions])
+
+    return (
+        <View testID='counters_wrapper'
+            style={styles.counters_wrapper}
+        >
+            {
+                Object.keys(counters).map((counterType: string) => {
+                    return <CounterRow key={counterType} counterType={counterType} changeCounters={changeCounters} />
+                })
+            }
+            <Pressable key={"storm"}
+                style={styles.storm_container}
+                onPressIn={() => toStorm()}
+                onLayout={(e) => getDimensions(e, setStormPressDimensions)}
+            >
+                <Text style={[styles.type_text, {
+                    fontSize: fontSize
+                }]} >Storm</Text>
+                <Svg viewBox='-25 0 600 600' style={styles.storm_icon}>
+                    <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />
+                    <Polygon fill={"white"} points="289.232,280.023 203.678,371.373 279.623,371.373 239.523,443.699 327.887,347.631 251.941,347.631 " />
+                    <Polygon fill={"white"} points="168.739,294.847 116.246,350.895 162.842,350.895 138.239,395.271 192.454,336.326 145.858,336.326   " />
+                </Svg>
+            </Pressable>
+        </View>
+    )
+}
+
+/*
+display icon and name? 
+*/
+interface TrackerProps {
+    icon: string,
+}
+
+const TrackerRow: React.FC<TrackerProps> = ({ icon }) => {
+    const [containerDimensions, setContainerDimensions] = useState<{ width: number, height: number }>({
+        width: 0,
+        height: 0
+    });
+    const [fontSize, setFontSize] = useState<number>(18)
+    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+        {
+            Svg: ''
+        })
+    const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
+    const { globalPlayerData, setCurrentInitiative, setCurrentMonarch } = useContext<GameContextProps>(GameContext)
+    const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const { width } = useWindowDimensions()
+
+    useEffect(() => {
+        const minSize = icon === "the ring" ? containerDimensions.width / "ring".length : containerDimensions.width / icon.length;
+
+        if (containerDimensions.height !== 0 && containerDimensions.width !== 0) {
+            setFontSize(textScaler(icon.length,
+                containerDimensions,
+                undefined,
+                deviceType === 'phone' ? Math.round(minSize) : 32
+            ))
+        }
+    }, [containerDimensions])
+
+    useEffect(() => {
+        const svgSize = {
+            height: deviceType === 'phone' ? 60 : 120,
+        }
+        if (icon === 'initiative') {
+            dispatchResources({ card: icon, fills: ['black', "url(#SVGID_1_)"], svgDimension: svgSize })
+        } else if (icon === 'monarch') {
+            dispatchResources({ card: icon, fills: ['white', "url(#gradient-0)", "url(#gradient-0)"], svgDimension: svgSize })
+        } else {
+            dispatchResources({ card: icon, colorTheme: { primary: 'white', secondary: 'white' }, svgDimension: svgSize })
+        }
+
+    }, [icon])
+
+    const handlePress = () => {
+        if (icon === 'initiative' || icon === 'dungeon') {
+            if (icon === 'initiative') setCurrentInitiative(globalPlayerData[route.params.playerID].screenName);
+
+            navigation.navigate('Dungeon', {
+                playerID: route.params.playerID,
+
+                currentDungeon: (icon === "initiative" && !globalPlayerData[route.params.playerID].dungeonData?.currentDungeon) ? 'Undercity'
+                    : globalPlayerData[route.params.playerID].dungeonData?.currentDungeon,
+
+                dungeonCoords: globalPlayerData[route.params.playerID].dungeonData?.dungeonCoords ?
+                    globalPlayerData[route.params.playerID].dungeonData?.dungeonCoords :
+                    {
+                        x: width / 2,
+                        y: 75
+                    }
+            } as DungeonData)
+        }
+        else if (icon === 'monarch') {
+            setCurrentMonarch(globalPlayerData[route.params.playerID].screenName)
+            navigation.navigate("Game", { menu: false })
+        }
+        else { //for ring and speed
+            navigation.navigate('Card', {
+                playerID: route.params.playerID,
+                card: icon
+            })
+        }
+    }
+
+    return (
+        <View testID='trackers_container'
+            onLayout={(e) => getDimensions(e, setContainerDimensions)}
+            style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+            }}
+        >
+            <Pressable onPress={() => handlePress()}
+                style={{
+                    alignItems: 'center',
+                    width: '60%',
+                }}
+            >
+                <Text style={[styles.total_text, {
+                    fontSize: fontSize
+                }]}>{icon}</Text>
+                <View testID='svg_container'
+                    style={{
+                        height: '10%',
+                        width: '100%'
+                    }}
+                >
+                    {
+                        resources.Svg
+                    }
+                </View>
+            </Pressable>
+        </View>
+    )
+}
+
+const TrackersCol: React.FC = ({ }) => {
+
+    return (
+        <View testID='trackers_wrapper'
+            style={styles.tracker_wrapper}
+        >
+            {trackers.map(trackerType => {
+                return <TrackerRow icon={trackerType} key={trackerType} />
+            })}
+        </View>
+    )
+}
+
 const Counters: React.FC = ({ }) => {
     const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
     const [rotate] = useScreenRotation(totalPlayers, route.params.playerID)
-    const [stormPressDimensions, setStormPressDimensions] = useState<{ width: number, height: number }>();
     const [counterTotals, setCounterTotals] = useState<{ [key: string]: number }>({})
 
     useEffect(() => {
@@ -194,15 +350,7 @@ const Counters: React.FC = ({ }) => {
                 value: counterTotals
             })
         }
-        navigation.navigate("Game")
-    }
-
-    const toStorm = () => {
-        navigation.navigate("Card", {
-            card: "storm",
-            currentCounters: 0,
-            playerID: route.params.playerID
-        } as CounterCardProps)
+        navigation.navigate("Game", { menu: false })
     }
 
     const changeCounters = (counterType: string, value: number) => {
@@ -217,32 +365,14 @@ const Counters: React.FC = ({ }) => {
     }
 
     return (
-        <>
+        <View style={styles.counters_container}>
             <KeyboardAvoidingView style={[styles.counter_rows_container,
             rotate && {
                 transform: [rotate]
             }
             ]}>
-                {
-                    Object.keys(counters).map((counterType: string) => {
-                        return <CounterRow key={counterType} counterType={counterType} changeCounters={changeCounters} />
-                    })
-                }
-                <Pressable key={"storm"}
-                    style={styles.storm_container}
-                    onPressIn={() => toStorm()}
-                    onLayout={(e) => getDimensions(e, setStormPressDimensions)}
-                >
-                    <Text style={[styles.type_text, {
-                        // fontSize: textScaler(24),
-                        fontSize: stormPressDimensions && textScaler(5, stormPressDimensions)
-                    }]} >Storm</Text>
-                    <Svg viewBox='-25 0 600 600' style={styles.storm_icon}>
-                        <Path fill={"white"} d="M375.771,103.226c1.137-5.199,1.736-10.559,1.736-16.04c0-47.913-45.389-86.754-101.377-86.754    c-39.921,0-74.447,19.749-90.979,48.451c-3.419-0.298-6.888-0.451-10.398-0.451c-41.397,0-76.993,21.236-92.738,51.671    C35.289,107.836,0,143.023,0,185.27c0,47.913,45.388,86.754,101.377,86.754h241.377c55.988,0,101.377-38.841,101.377-86.754    C444.131,147.25,415.551,114.945,375.771,103.226z" />
-                        <Polygon fill={"white"} points="289.232,280.023 203.678,371.373 279.623,371.373 239.523,443.699 327.887,347.631 251.941,347.631 " />
-                        <Polygon fill={"white"} points="168.739,294.847 116.246,350.895 162.842,350.895 138.239,395.271 192.454,336.326 145.858,336.326   " />
-                    </Svg>
-                </Pressable>
+                <CountersCol changeCounters={changeCounters} />
+                <TrackersCol />
             </KeyboardAvoidingView>
             <Pressable style={[styles.close_icon,
             (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 2)) ?
@@ -250,8 +380,8 @@ const Counters: React.FC = ({ }) => {
                     top: 0,
                     left: 0
                 } : {
-                    bottom: 60,
-                    right: 60
+                    bottom: 0,
+                    right: 0
                 }
             ]}
                 onPressIn={() => closeCounters()}
@@ -264,16 +394,25 @@ const Counters: React.FC = ({ }) => {
                     />
                 </Svg>
             </Pressable>
-        </>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    counters_container: {
+        height: '95%',
+        width: '100%'
+    },
     counter_rows_container: {
         width: '100%',
         height: '100%',
         backgroundColor: 'black',
-        alignItems: 'center'
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    counters_wrapper: {
+        width: '60%',
     },
     row_container: {
         width: '100%',
@@ -284,8 +423,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         marginTop: 5
     },
+    tracker_wrapper: {
+        width: '30%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'space-evenly',
+    },
     storm_container: {
-        width: '50%',
+        width: '100%',
         height: `${80 / Object.keys(counters).length}%`,
         alignItems: 'center',
     },
@@ -309,6 +454,8 @@ const styles = StyleSheet.create({
     close_icon: {
         position: "absolute",
         zIndex: 1,
+        width: 60,
+        height: 60,
     },
 })
 

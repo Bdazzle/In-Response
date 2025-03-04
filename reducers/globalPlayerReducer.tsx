@@ -120,6 +120,15 @@ const globalPlayerReducer = (state: GlobalPlayerData, action: GlobalPlayerAction
                     theRing: action.value
                 }
             }
+        };
+        case "speed" :{
+            return {
+                ...state,
+                [action.playerID] :{
+                    ...state[action.playerID],
+                    speed: action.value
+                }
+            }
         }
         case 'init': {
             return {

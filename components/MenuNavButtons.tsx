@@ -18,7 +18,7 @@ interface MenuNavProps {
 
 const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, navTo, navToOptions, navBackOptions }) => {
     const navigation = useNavigation<AllScreenNavProps>()
-    const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>();
+    const [pressDimensions, setPressDimensions] = useState<{ width: number, height: number }>({width: 154, height: 104});
 
     const handleNext = () => {
         if (navTo !== undefined) {

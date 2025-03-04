@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { View, StyleSheet, Text, Pressable } from "react-native"
-import { imageReducer, ImageReducerState, ShapeData } from "../../reducers/imageResources"
-import Svg, { Circle, Path, Polygon } from "react-native-svg"
+import { imageAction, imageReducer, ImageReducerState } from "../../reducers/imageResources"
 import { ColorTheme, CounterCardProps, CounterData } from "../.."
 import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../navigation"
-import { textScaler } from "../../functions/textScaler"
+import { counterTextScaler } from "../../functions/textScaler"
 import getDimensions from "../../functions/getComponentDimensions"
 
 interface IncrementCounterProps {
@@ -21,20 +20,19 @@ interface IncrementCounterProps {
 }
 const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions, playerID, colorTheme, counterType }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: string) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
         {
             iconImage: undefined,
             cardImage: undefined,
-            SvgPaths: undefined,
-            SvgViewbox: undefined
+            Svg: undefined
         })
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [counterDimensions, setCounterDimensions] = useState<{ width: number, height: number }>();
+    const [counterDimensions, setCounterDimensions] = useState<{ width: number, height: number }>({width: 78, height: 25});
     const [total, setTotal] = useState<number>()
     const [textSize, setTextSize] = useState<number>()
 
     useEffect(() => {
-        dispatchResources(counterType)
+        dispatchResources({card: counterType, fills:[colorTheme.secondary]})
     }, [parentDimensions])
 
     const handleCounterPress = (counter: string) => {
@@ -51,12 +49,9 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
 
     useEffect(() => {
         if (counterDimensions) {
-            setTextSize(textScaler(
-                String(total).length,
-                counterDimensions,
-                64, 16
-                )
-            )
+            const totalPlayers = Object.keys(globalPlayerData).length
+            
+            setTextSize(counterTextScaler(totalPlayers, playerID, total, counterDimensions))
         }
     }, [counterDimensions?.height, total])
 
@@ -72,38 +67,13 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
                 accessibilityLabel={`${globalPlayerData[playerID].screenName} ${counterType}`}
             >
                 {
-                    resources.SvgPaths &&
+                    resources.Svg &&
                     <View style={styles.counter_icon_container}
                         testID="counter_icon_container"
                     >
-                        <Svg viewBox={resources.SvgViewbox} height={'100%'} width={'100%'}>
                             {
-                                resources.SvgPaths.map((path: ShapeData<boolean | string>, i: number) => {
-                                    return path.path ? <Path key={`${counterType} path ${i}`} d={path.path}
-                                        fill={
-                                            typeof path.fill === "string" ? path.fill :
-                                                path.fill === true ? colorTheme.secondary :
-                                                    colorTheme.primary
-                                        } />
-                                        : path.polygonPoints ? <Polygon key={`${counterType} polygon ${i}`}
-                                            points={path.polygonPoints}
-                                            fill={
-                                                typeof path.fill === "string" ? path.fill :
-                                                    path.fill === true ? colorTheme.secondary :
-                                                        colorTheme.primary
-                                            }
-                                        />
-                                            : path.circle ? <Circle key={`${counterType} circle ${i}`}
-                                                cx={path.circle.cx} cy={path.circle.cy} r={path.circle.r}
-                                                fill={
-                                                    typeof path.fill === "string" ? path.fill :
-                                                        path.fill === true ? colorTheme.secondary :
-                                                            colorTheme.primary
-                                                } />
-                                                : undefined
-                                })
+                                resources.Svg
                             }
-                        </Svg>
                     </View>
                 }
                 <View testID="counter_total_container"
@@ -132,7 +102,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-
+        maxHeight:'50%',
     },
     touchable_wrapper: {
         paddingTop: '2%',

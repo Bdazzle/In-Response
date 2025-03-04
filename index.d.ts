@@ -39,6 +39,10 @@ export type CounterData = {
     [key: string] : number
 }
 
+export type Dimensions = {
+    height: number,
+    width: number
+}
 export interface PlayerData {
     colors: ColorTheme,
     screenName: string,
@@ -47,6 +51,7 @@ export interface PlayerData {
     counterData?: CounterData,
     // citysBlessing?: boolean,
     theRing?: number,
+    speed?: number,
     lifeTotal: number,
     commander_tax: number,
     commander_damage:{

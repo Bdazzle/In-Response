@@ -1,8 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import React, { useContext, useEffect, useState } from "react"
-import { Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
-import Animated, { Easing, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
+import React, { useContext, useEffect, useRef, useState } from "react"
+import { Easing, Animated, Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
 import { AllScreenNavProps } from "../.."
 import { staticTextScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
@@ -17,7 +16,6 @@ const Heads = () => {
 
 const Tails = () => {
     return (
-
         <Image
             style={styles.coin}
             source={require('../../assets/images/tails.png')} />
@@ -29,43 +27,29 @@ const CoinFlipper = () => {
     const { globalPlayerData } = useContext(GameContext)
     const [results, setResults] = useState<string[]>([])
     const [quantity, setQuantity] = useState<number>(1)
-
     const animationTime = 1200
-    const zIndex = useSharedValue(0)
-    const resultSpin = useSharedValue(0)
-    const rotation = useDerivedValue(() => {
-        return interpolate(resultSpin.value,
-            [0, 180],
-            [0, 180]
-        )
-    })
+    const zIndex = useRef<Animated.Value>(new Animated.Value(0)).current
+    const resultSpin = useRef<Animated.Value>(new Animated.Value(0)).current
+    const rotation = resultSpin.interpolate({
+        inputRange: [0, 180],
+        outputRange: ['0deg', '180deg'],
+      });
+    
+      const rotateStyle = {
+        transform: [
+          {
+            rotateX: rotation, // Use the interpolated value directly
+          },
+        ],
+      };
 
-    const rotateStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    rotateX: withTiming(`${rotation.value}deg`, {
-                        duration: animationTime,
-                        easing: Easing.linear
-                    })
-                }
-            ],
-        }
-    })
-
-    const zStyle = useAnimatedStyle(() => {
-        return {
-            zIndex: withTiming(zIndex.value, {
-                duration: animationTime,
-                easing: Easing.linear
-            })
-        }
-    })
-
+    const zStyle = {
+        zIndex: zIndex
+    }
+    
     const handleBack = () => {
         Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
-
 
     const changeQuantity = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
         setQuantity(Number(event.nativeEvent.text))
@@ -75,20 +59,37 @@ const CoinFlipper = () => {
     set a flip start variable, like a Loading variable?
     */
     const handleFlip = () => {
-        zIndex.value = 0
         const result = [...Array(quantity)].map((_, i) => Math.random() < 0.5 ? "Heads" : "Tails")
         setResults(results => [...result])
-        resultSpin.value = 1800
-        if (result[0] === 'Tails') zIndex.value = withDelay(animationTime, withTiming(1))
+        resultSpin.setValue(1800)
+        if(result[0] === 'Tails'){
+            Animated.timing(zIndex, {
+                toValue: 1,
+                duration: animationTime,
+                useNativeDriver: true
+            }).start()
+        } else {
+            Animated.timing(zIndex, {
+                toValue: 0,
+                duration: 100,
+                useNativeDriver: true
+            }).start()
+        }
+        
+        Animated.timing(resultSpin, {
+            toValue: 180, // Animate to 180 degrees
+            duration: animationTime,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }).start();
     }
 
     /*
     reset resultSpin.value
     */
     useEffect(() => {
-        setTimeout(() => resultSpin.value = 0, 1200)
+        setTimeout(() => resultSpin.setValue(0), animationTime)
     }, [results])
-
 
     return (
         <View style={styles.flipper_container}>
@@ -102,7 +103,7 @@ const CoinFlipper = () => {
                     height: '100%',
                     transform: [
                         { rotate: '180deg' }
-                    ]
+                    ],
                 }}>
                     <Path d="M206.78,341.58v-47.04l-81.44,47.04V153.42l81.44,47.04v-47.04l40.72,23.52V0   C110.81,0,0,110.81,0,247.5S110.81,495,247.5,495V318.06L206.78,341.58z"
                         fill={"#6D2C93"}
@@ -138,7 +139,7 @@ const CoinFlipper = () => {
             </KeyboardAvoidingView>
 
             {/* Coins/flip button */}
-            <Animated.View style={styles.coins_container}>
+            <View style={styles.coins_container}>
                 <Pressable style={styles.coin_button}
                     onPressIn={() => handleFlip()}
                     accessibilityLabel="Flip coins"
@@ -147,16 +148,18 @@ const CoinFlipper = () => {
                 >
                     <View style={styles.face_wrapper}>
                         <Animated.View
-                            style={[styles.tails_wrapper, rotateStyle, zStyle]}
+                            style={[styles.tails_wrapper, rotateStyle,
+                                zStyle
+                            ]}
                         >
                             <Tails />
                         </Animated.View>
-                        <Animated.View style={[styles.heads_wrapper, rotateStyle]}>
+                        <Animated.View style={[styles.heads_wrapper, rotateStyle ]}>
                             <Heads />
                         </Animated.View>
                     </View>
                 </Pressable>
-            </Animated.View>
+            </View>
 
             <Text style={styles.all_text}>{results.join(', ')}</Text>
         </View>
@@ -180,19 +183,19 @@ const styles = StyleSheet.create({
     },
     input_wrapper: {
         flexDirection: 'row',
-        minHeight:100,
-        alignItems:'flex-end',
+        minHeight: 100,
+        alignItems: 'flex-end',
         justifyContent: 'center',
         top: 10,
     },
     input_touch: {
         width: '20%',
-        minHeight:100,
+        minHeight: 100,
     },
     input_text: {
         borderBottomColor: 'white',
         borderBottomWidth: 1,
-        minHeight:100
+        minHeight: 100
     },
     all_text: {
         fontSize: staticTextScaler(26),
