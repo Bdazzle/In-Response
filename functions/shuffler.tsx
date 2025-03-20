@@ -1,3 +1,5 @@
+import { ImageSourcePropType } from "react-native";
+
 /*
 Fisher-Yates Shuffle. In-place shuffle O(n).
 stores shuffled elements in back of array.
@@ -6,9 +8,9 @@ the number of shuffled elements (n - m) plus the number of remaining elements (m
 pick a random remaining element (from the front) and place in its new location (in the back). 
 The unshuffled element in the back is swapped to the front, where it waits for subsequent shuffling.
 */
-type Shuffler = (deck: string[], deckSize?: number) => string[]
+type Shuffler<T> = (deck: T[], deckSize?: number) => T[]
 
-const shuffle: Shuffler = (deck, deckSize) => {
+const shuffle: Shuffler<any> = (deck: any[], deckSize: number | undefined) => {
     /* start at back index */
     let currentIndex = deckSize ? deckSize : deck.length;
     let randomIndex: number;

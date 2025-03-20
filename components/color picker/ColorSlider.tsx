@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Slider } from '@react-native-assets/slider';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
@@ -13,21 +13,14 @@ interface ColorSliderProps {
 Color Slider controls only hue
 */
 const ColorSlider: React.FC<ColorSliderProps> = ({ initialHue, passHue }) => {
-    const [hue, setHue] = useState<number>(0);
+    const [hue, setHue] = useState<number>(initialHue);
 
     const handleHueChange = (value: number) => {
         setHue(value);
-    };
-
-    useEffect(() => {
-        setHue(initialHue)
-    }, [])
-
-    useEffect(() => {
-        if (passHue && hue) {
+        if(passHue && value){
             passHue(Math.round(hue))
         }
-    }, [hue])
+    };
 
     return (
         <View style={styles.container}>

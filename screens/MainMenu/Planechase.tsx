@@ -1,38 +1,124 @@
-import { Text, Image, View, useWindowDimensions, StyleSheet, Pressable, LayoutChangeEvent } from 'react-native';
+import { Text, Image, View, StyleSheet, Pressable, LayoutChangeEvent, ActivityIndicator, ImageSourcePropType } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import planechaseImages, { PlaneswalkerSvg } from '../../constants/PlanechaseImages';
 import { GameContext, GameContextProps } from '../../GameContext';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import shuffle from '../../functions/shuffler';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation';
+import { PlaneMenuStackParamList } from '../../navigation';
 import { staticTextScaler, textScaler } from '../../functions/textScaler';
-import { Dimensions } from '../..';
 import { OptionsContext, OptionsContextProps } from '../../OptionsContext';
+import generatePlanarDeck, { collatePlanarData } from '../../functions/planarDeck';
+import { colorLibrary } from '../../constants/Colors';
+import { AllScreenNavProps, PlanarDeck, PlaneCard, PlaneChaseSet } from '../..';
+import { getPlanes } from '../../search/getcards';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /*
+Add caching for plane image uris. Maintain this in AsyncStorage, since the plane sets are complete.
+ * I have Planechase Anthology images in app already, 
+ * so have that option button load from planechaseimages instead of fetching
 deck + discard will work as history.
 new plane handled by handlePlaneswalk, for die result or next button,
 prev button will show last plane in discard (discard.length -1)
 */
 const Planechase: React.FC = ({ }) => {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const { totalPlayers } = useContext<OptionsContextProps>(OptionsContext)
+    const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
+    const route = useRoute<RouteProp<PlaneMenuStackParamList, "Plane Options">>()
     const { setPlanarData, planarData, globalPlayerData } = useContext<GameContextProps>(GameContext)
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const dieFaces = ['planeswalker', null, null, null, null, 'chaos']
-    const [currentPlane, setCurrentPlane] = useState<string>('')
-    const [deck, setDeck] = useState<string[]>([])
-    const [discard, setDiscard] = useState<string[]>([])
+    const [currentPlane, setCurrentPlane] = useState<PlaneCard>(['', '' as ImageSourcePropType])
+    const [deck, setDeck] = useState<PlaneCard[]>([])
+    const [discard, setDiscard] = useState<PlaneCard[]>([])
     const [rollCost, setRollCost] = useState<number>(0)
     const [currentRoll, setCurrentRoll] = useState<string | null>()
     const [dieContainerWidth, setDieContainerWidth] = useState<number>()
     const [currentHistory, setCurrentHistory] = useState<number>(0)
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const loadStoredSet = async (sets: string[]) => {
+        try {
+            const savedSets = await AsyncStorage.multiGet(sets)
+            if (savedSets[0][1] !== null) {
+                const setObj = savedSets.reduce((acc, set) => {
+                    const parsedSetData: PlanarDeck = JSON.parse(set[1] as string)
+                    acc[set[0]] = parsedSetData
+                    return acc
+                }, {} as PlaneChaseSet)
+                // console.log('Successfully loaded planechase data:', savedSets)
+                return setObj
+            } else {
+                return
+            }
+        } catch (error) {
+            // console.error('Error loading planechase sets from async storage: ', error)
+        }
+    }
+
+    const storeSets = async (sets: PlaneChaseSet) => {
+        const stringedSets: [string, string][] = Object.entries(sets).map((set: [string, PlanarDeck]) => [set[0], JSON.stringify(set[1])])
+        await AsyncStorage.multiSet(stringedSets)
+        // console.log('Saved planechase data: ', stringedSets)
+    }
+    /**
+     * call AsyncStorage here to save fetched planechase card data?
+     * @param sets has to be formatted `set:${input}` for uri encoding
+     */
+    const fetchPlanarDecks = async (sets: string[]) => {
+        try {
+            setLoading(true)
+            let planarData = planechaseImages;
+
+            //check for stored planechase sets. AsyncStorage can return empty and valid
+            const storedSets = sets && await loadStoredSet(sets)
+            
+            if (storedSets) {
+                planarData = storedSets
+            }
+            else {
+                /*
+                fetch unstored planechase sets and store them, except for opca (anthologies)
+                */
+                const setOptions = sets.filter(st => st !== 'opca').map(s => `set:${s}`).join(" OR ")
+                const fetchedPlanes = setOptions && await getPlanes(setOptions);
+                if (fetchedPlanes) {
+                    /*
+                    check to see if 'opca' (anthologies) set is selected, if true add to planarData
+                    */
+                    planarData = sets.includes('opca') ? { ...planarData, ...collatePlanarData(fetchedPlanes) } : collatePlanarData(fetchedPlanes)
+                    storeSets(planarData)
+                }
+            }
+            
+            const newPlanarDeck = generatePlanarDeck(totalPlayers === 0 ? 4 : totalPlayers, planarData)
+            setPlanarData({
+                currentPlane: newPlanarDeck[0],
+                deck: newPlanarDeck,
+                discard: []
+            })
+            setCurrentPlane(newPlanarDeck[0])
+            setDeck(newPlanarDeck)
+            setDiscard([])
+
+            setLoading(false)
+
+        } catch (error) {
+            console.error
+        }
+    }
 
     useEffect(() => {
-        setCurrentPlane(planarData.currentPlane)
-        setDeck(planarData.deck)
-        setDiscard(planarData.discard)
+        if (!planarData.deck.length) {
+            fetchPlanarDecks(route.params.options)
+        }
+        else {
+            setCurrentPlane(planarData.currentPlane)
+            setDeck(planarData.deck)
+            setDiscard(planarData.discard)
+        }
     }, [])
 
     const handlePlaneswalk = () => {
@@ -46,7 +132,7 @@ const Planechase: React.FC = ({ }) => {
             setDiscard([])
         } else {
             newDeck = deck.filter(c => c !== currentPlane)
-            setDiscard([...discard as string[], currentPlane])
+            setDiscard([...discard, currentPlane])
         }
         const newPlane = newDeck[0]
         setCurrentPlane(newPlane)
@@ -70,7 +156,7 @@ const Planechase: React.FC = ({ }) => {
     }
 
     const handleNav = () => {
-        Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game', { menu: false }) : navigation.navigate('GlobalMenu')
+        Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game', { menu: false }) : navigation.navigate('MainMenu')
         setPlanarData({
             currentPlane: currentPlane,
             deck: deck,
@@ -119,6 +205,10 @@ const Planechase: React.FC = ({ }) => {
         }
     }
 
+    const handleBack = () => {
+        navigation.navigate("Plane Options")
+    }
+
     return (
         <View style={{
             height: '100%',
@@ -134,40 +224,52 @@ const Planechase: React.FC = ({ }) => {
                     <View nativeID='image_container'
                         style={styles.image_container}
                     >
-                        <Pressable nativeID='planechase_back'
-                            accessibilityLabel='back plane.'
-                            style={[styles.plane_nav_button, styles.plane_nav_back]}
-                            onPressOut={() => handleBackPlane()}
-                        >
-                            <Svg viewBox='0 0 20 20'>
-                                <Path stroke={'black'}
-                                    d='M13 4l-6 6 6 6'
-                                />
-                            </Svg>
-                        </Pressable>
-                        {/* Image button */}
-                        <Pressable testID='plane_image_button'
-                            onPressIn={() => handleNav()}
-                            style={styles.image_button}
-                            accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
-                        >
-                            <Image source={planechaseImages.phenomenon[currentPlane] ? planechaseImages.phenomenon[currentPlane] : planechaseImages.planes[currentPlane]}
-                                style={styles.plane_image}
-                                alt={currentPlane}
-                            />
-                        </Pressable>
+                        {
+                            loading ?
+                                <ActivityIndicator size={'large'} color={colorLibrary.vapePurple} />
+                                :
+                                <>
+                                    <Pressable nativeID='planechase_back'
+                                        accessibilityLabel='back plane.'
+                                        accessibilityRole="button"
+                                        style={[styles.plane_nav_button, styles.plane_nav_back]}
+                                        onPressOut={() => handleBackPlane()}
+                                    >
+                                        <Svg viewBox='0 0 20 20'>
+                                            <Path stroke={'black'}
+                                                d='M13 4l-6 6 6 6'
+                                            />
+                                        </Svg>
+                                    </Pressable>
 
-                        <Pressable nativeID='planechase_next'
-                            accessibilityLabel='next plane.'
-                            style={[styles.plane_nav_button, styles.plane_nav_next]}
-                            onPressOut={() => handleNextPLane()}
-                        >
-                            <Svg viewBox='0 0 20 20'>
-                                <Path stroke={'black'}
-                                    d='M7 16l6-6-6-6'
-                                />
-                            </Svg>
-                        </Pressable>
+                                    {/* Image button */}
+                                    <Pressable testID='plane_image_button'
+                                        accessibilityRole="button"
+                                        onPress={() => handleNav()}
+                                        style={styles.image_button}
+                                        accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
+                                    >
+                                        <Image source={typeof currentPlane[1] === 'number' ? currentPlane[1] : { uri: currentPlane[1] } as ImageSourcePropType}
+                                            style={styles.plane_image}
+                                            alt={currentPlane[0]}
+                                            accessibilityHint='Press to go back to game'
+                                        />
+                                    </Pressable>
+
+                                    <Pressable nativeID='planechase_next'
+                                        accessibilityLabel='next plane.'
+                                        accessibilityRole="button"
+                                        style={[styles.plane_nav_button, styles.plane_nav_next]}
+                                        onPressOut={() => handleNextPLane()}
+                                    >
+                                        <Svg viewBox='0 0 20 20'>
+                                            <Path stroke={'black'}
+                                                d='M7 16l6-6-6-6'
+                                            />
+                                        </Svg>
+                                    </Pressable>
+                                </>
+                        }
                     </View>
 
                     {/* Die Container */}
@@ -183,8 +285,9 @@ const Planechase: React.FC = ({ }) => {
                             </Text>
                             <Pressable style={styles.die}
                                 testID="die"
-                                onPressIn={() => rollDie()}
+                                onPress={() => rollDie()}
                                 accessibilityLabel="planar die roller"
+                                accessibilityRole="button"
                             >
                                 {
                                     currentRoll === 'planeswalker' ?
@@ -199,7 +302,7 @@ const Planechase: React.FC = ({ }) => {
                                                     />
                                                 </G>
                                             </Svg>
-                                            :
+                                            : 
                                             <Svg viewBox='0 0 24 24'>
                                                 <Rect x={4} y={4} width={16} height={16} rx={2} stroke={'white'} strokeWidth={1} strokeLinecap={'round'} ></Rect>
                                             </Svg>
@@ -214,7 +317,10 @@ const Planechase: React.FC = ({ }) => {
                                     { height: dieContainerWidth! / 2, width: dieContainerWidth! / 2 },
                                     deviceType === 'phone' ? 60 : 80,
                                 ) : 18
-                            }]}>
+                            }]}
+                            accessibilityHint='Mana Cost'
+                            accessibilityLiveRegion="polite"
+                            >
                                 {rollCost}
                             </Text>
                         </View>
@@ -222,9 +328,12 @@ const Planechase: React.FC = ({ }) => {
                         {/* Reset button */}
                         <Pressable
                             nativeID='reset_button'
-                            style={styles.reset_button}
+                            style={({ pressed }) => [styles.reset_button, {
+                                opacity: pressed ? .5 : 1,
+                            }]}
                             onPress={() => setRollCost(0)}
                             accessibilityLabel="reset roll mana cost"
+                            accessibilityRole="button"
                         >
                             <Svg viewBox='0 0 25 25'
                                 height={'100%'}
@@ -233,6 +342,14 @@ const Planechase: React.FC = ({ }) => {
                                     stroke={"white"}
                                 ></Path>
                             </Svg>
+                        </Pressable>
+
+                        {/*Back button*/}
+                        <Pressable style={styles.options_button}
+                            accessibilityLabel="Back to Planar Deck options"
+                            accessibilityRole="button"
+                            testID='to_options' onPress={handleBack}>
+                            <Text style={styles.options_text}>Options</Text>
                         </Pressable>
                     </View>
 
@@ -302,7 +419,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-evenly',
         width: '100%',
-        height: '20%',
+        height: '19%',
     },
     die: {
         borderColor: 'white',
@@ -347,6 +464,27 @@ const styles = StyleSheet.create({
     },
     reset_button: {
         width: 90,
+    },
+    options_button: {
+        zIndex:2,
+        borderRadius: 50,
+        backgroundColor: 'white',
+        transform: [
+            { rotate: '90deg' },
+            { translateY: 15 }
+        ],
+        position: 'absolute',
+        left: 0,
+        bottom: 150,
+        width: 80,
+        minHeight:48,
+        justifyContent:'center'
+    },
+    options_text: {
+        fontFamily: "Beleren",
+        color: 'black',
+        textAlign: 'center',
+        fontSize: staticTextScaler(16)
     }
 })
 

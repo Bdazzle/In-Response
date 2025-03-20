@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react"
-import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, View, Pressable, TextInputSubmitEditingEventData } from "react-native"
+import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, View, Pressable, TextInputSubmitEditingEventData, ColorValue } from "react-native"
 import MenuNavButtons from "../../components/MenuNavButtons"
 import { GameContext, GameContextProps } from "../../GameContext"
 import { ColorTheme, StartMenuStackNavProps } from "../.."
@@ -7,6 +7,7 @@ import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
+import Svg, { Path } from "react-native-svg"
 
 interface ColorSquareParams {
     primary: string,
@@ -27,19 +28,20 @@ const ColorSquare: React.FC<ColorSquareParams> = ({ primary, secondary, playerID
     }
 
     return (
-        <Pressable 
-        nativeID={`${playerID}_color_press`}
-        style={styles.color_touch}
-            onPressIn={() => showColorMenu()}
+        <Pressable
+            nativeID={`${playerID}_color_press`}
+            style={styles.color_touch}
+            onPress={() => showColorMenu()}
             accessibilityLabel={`${playerName} color options`}
+            accessibilityRole="button"
         >
-            <View style={[styles.color_square_outter, {
-                backgroundColor: secondary
+            <View style={[styles.color_square_inner, {
+                backgroundColor: primary,
+                borderColor: secondary,
             }]}>
-                <View style={[styles.color_square_inner, {
-                    backgroundColor: primary,
-                }]}>
-                </View>
+                <Svg fill={secondary as ColorValue} height={'100%'} width={'100%'} viewBox="0 0 128 128">
+                    <Path d="M111.84 15.36H16.16c-1.24 0-2.24 1-2.24 2.24v17.99c0 1.24 1 2.24 2.24 2.24h34.65v80.73c0 1.24 1 2.24 2.24 2.24h21.9c1.24 0 2.24-1 2.24-2.24V37.83h34.65c1.24 0 2.24-1 2.24-2.24V17.6c0-1.24-1-2.24-2.24-2.24z"></Path>
+                </Svg>
             </View>
         </Pressable>
     )
@@ -72,9 +74,9 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
         })
     }
 
-/*
-maybe move this to a context? somewhere higher up in app hierarchy?
-*/
+    /*
+    maybe move this to a context? somewhere higher up in app hierarchy?
+    */
     useEffect(() => {
         (async () => {
             try {
@@ -111,8 +113,12 @@ maybe move this to a context? somewhere higher up in app hierarchy?
                 playerID={playerID}
                 playerName={globalPlayerData[playerID].screenName}
             />
-            <Pressable style={styles.name_toucheable}>
+            <Pressable style={styles.name_toucheable}
+                accessibilityRole="button"
+                accessibilityHint={`Change ${globalPlayerData[playerID]} name`}
+            >
                 <TextInput style={styles.player_name}
+                    accessibilityLabel="textbox"
                     defaultValue={globalPlayerData[playerID].screenName}
                     onSubmitEditing={(e) => handleNameChange(e)}
                     onEndEditing={(e) => handleNameChange(e)}
@@ -134,14 +140,14 @@ const PlayerOptions = ({ }) => {
             testID="player_options"
         >
             <Text style={styles.title_text} >Player Names</Text>
-            
+
             {Object.keys(globalPlayerData).map((p: string) => {
                 /*   
                 check to see if playerID <= totalPlayers 
                 so that saved stuff doesn't get set to nonexistent player object.
                 Error caused a player to be created w/only screenName field
                 */
-                return Number(p) <= totalPlayers &&  <PlayerRow playerID={Number(p)} key={`Player ${p}`} />
+                return Number(p) <= totalPlayers && <PlayerRow playerID={Number(p)} key={`Player ${p}`} />
             })}
             <FadeContainer style={styles.fade_container}>
                 <MenuNavButtons navTo="Game" navBack="TotalPlayers" labelBack="Total Players" labelTo="Start Game" />
@@ -189,18 +195,10 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '25%',
     },
-    color_square_outter: {
-        borderColor: 'white',
-        borderWidth: .5,
-        borderRadius: 5,
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
     color_square_inner: {
         borderRadius: 5,
-        height: '75%',
-        width: '75%',
+        borderWidth: 2,
+        height: '100%',
     },
     fade_container: {
         height: '20%',

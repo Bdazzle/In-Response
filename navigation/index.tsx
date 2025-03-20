@@ -17,8 +17,11 @@ import DiceRoller from '../screens/MainMenu/DiceRoller';
 import Planechase from '../screens/MainMenu/Planechase';
 import Instructions from '../screens/MainMenu/Instructions';
 import Counters from '../screens/Counters';
+import SearchCosumer from '../search/SearchConsumer';
+import PlanechaseOptions from '../screens/PlanechaseOptions';
 
 export default function Navigation() {
+
   return (
     <NavigationContainer
     // linking={LinkingConfiguration}
@@ -30,18 +33,10 @@ export default function Navigation() {
   );
 }
 
-/*
-Stack Navigator params are made like
-{
-  Screen name : initialParams | undefined (if no initial params)
-}
-for each screen
-*/
-
 export type RootStackParamList = {
   StartMenu: undefined;
   GlobalMenu: undefined;
-  Game: { menu : boolean };
+  Game: { menu: boolean };
   Dungeon: DungeonData;
   Card: CounterCardProps;
   Counters: CountersProps
@@ -55,13 +50,32 @@ export type StartMenuStackParamList = {
   ColorSelector: ColorSelectorProps;
 }
 
+export type PlaneMenuStackParamList = {
+  "Plane Options" : { options : string[] };
+  PlanarDeck : undefined
+}
+
+const PlaneMenuStack = createNativeStackNavigator<PlaneMenuStackParamList>();
+
+function PlaneMenuNavigator() {
+  return (
+    <PlaneMenuStack.Navigator screenOptions={{
+      headerShown: false,
+      animation: 'none'
+    }}>
+      <PlaneMenuStack.Screen name="Plane Options" component={PlanechaseOptions} />
+      <PlaneMenuStack.Screen name="PlanarDeck" component={Planechase} />
+    </PlaneMenuStack.Navigator>
+  )
+}
+
 const StartMenuStack = createNativeStackNavigator<StartMenuStackParamList>();
 
 function StartMenuNavigator() {
   return (
     <StartMenuStack.Navigator screenOptions={{
       headerShown: false,
-      animation:'none'
+      animation: 'none'
     }}>
       <StartMenuStack.Screen name="Life" component={LifeMenu} />
       <StartMenuStack.Screen name="TotalPlayers" component={TotalPlayers} />
@@ -77,7 +91,8 @@ export type GlobalMenuParamsList = {
   CoinFlipper: undefined,
   DiceRoller: undefined,
   Planechase: undefined,
-  Instructions: undefined
+  Instructions: undefined,
+  Search: undefined
 }
 
 const GlobalMenuStack = createNativeStackNavigator<GlobalMenuParamsList>()
@@ -86,13 +101,14 @@ function GlobalMenuNavigator() {
   return (
     <GlobalMenuStack.Navigator screenOptions={{
       headerShown: false,
-      animation:'none'
+      animation: 'none'
     }}>
       <GlobalMenuStack.Screen name="MainMenu" component={GlobalMenu} />
       <GlobalMenuStack.Screen name="CoinFlipper" component={CoinFlipper} />
       <GlobalMenuStack.Screen name="DiceRoller" component={DiceRoller} />
-      <GlobalMenuStack.Screen name="Planechase" component={Planechase} />
+      <GlobalMenuStack.Screen name="Planechase" component={PlaneMenuNavigator} />
       <GlobalMenuStack.Screen name="Instructions" component={Instructions} />
+      <GlobalMenuStack.Screen name="Search" component={SearchCosumer} />
     </GlobalMenuStack.Navigator>
   )
 }
@@ -103,7 +119,7 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{
       headerShown: false,
-      animation:'none'
+      animation: 'none'
     }}>
       <Stack.Screen name="GlobalMenu" component={GlobalMenuNavigator} />
       <Stack.Screen name="Game" component={Game} initialParams={{}} />

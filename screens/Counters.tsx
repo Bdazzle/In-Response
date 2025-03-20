@@ -80,6 +80,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                     width: '20%',
                 }}
                 accessibilityLabel={`add ${counterType} counter`}
+                accessibilityRole="button"
             >
                 <Svg viewBox='0 0 550 550'
                     style={{
@@ -117,6 +118,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                     }
                 </View>
                 <Text
+                    accessibilityLiveRegion="polite"
                     accessibilityLabel={`${displayTotal} ${counterType}`}
                     style={[styles.total_text, {
                         fontSize: totalFontSize,
@@ -137,6 +139,7 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                     width: "20%"
                 }}
                 accessibilityLabel={`minus ${counterType} counter`}
+                accessibilityRole="button"
             >
                 <Svg viewBox='0 0 360 360'
                     style={{
@@ -189,8 +192,10 @@ const CountersCol: React.FC<{ changeCounters: (counterType: string, value: numbe
             }
             <Pressable key={"storm"}
                 style={styles.storm_container}
-                onPressIn={() => toStorm()}
+                onPress={() => toStorm()}
                 onLayout={(e) => getDimensions(e, setStormPressDimensions)}
+                accessibilityRole="button"
+                accessibilityLabel='Storm and Mana tracker'
             >
                 <Text style={[styles.type_text, {
                     fontSize: fontSize
@@ -298,10 +303,15 @@ const TrackerRow: React.FC<TrackerProps> = ({ icon }) => {
                     alignItems: 'center',
                     width: '60%',
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={`${icon}`}
+                accessibilityHint={icon === 'monarch' || icon === 'initiative' ? `activate ${icon}` : `go to ${icon}`}
             >
                 <Text style={[styles.total_text, {
                     fontSize: fontSize
-                }]}>{icon}</Text>
+                }]}>
+                    {icon}
+                </Text>
                 <View testID='svg_container'
                     style={{
                         height: '10%',
@@ -366,14 +376,15 @@ const Counters: React.FC = ({ }) => {
 
     return (
         <View style={styles.counters_container}>
-            <KeyboardAvoidingView style={[styles.counter_rows_container,
+            <View style={[styles.counter_rows_container,
             rotate && {
                 transform: [rotate]
             }
-            ]}>
+            ]}
+            >
                 <CountersCol changeCounters={changeCounters} />
                 <TrackersCol />
-            </KeyboardAvoidingView>
+            </View>
             <Pressable style={[styles.close_icon,
             (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 2)) ?
                 {
@@ -384,7 +395,8 @@ const Counters: React.FC = ({ }) => {
                     right: 0
                 }
             ]}
-                onPressIn={() => closeCounters()}
+                onPress={() => closeCounters()}
+                accessibilityRole="button"
             >
                 <Svg height="60" width="60" viewBox='0 0 512 512'
                     style={styles.close_icon}

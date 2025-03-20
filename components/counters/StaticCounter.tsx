@@ -58,11 +58,13 @@ const DungeonButton: React.FC<{ playerID: number }> = ({ playerID }) => {
                 onPress={() => showDungeon()}
                 testID="dungeon"
                 accessibilityLabel={dungeonCompleted ? `${playerName} Dungeon Completed` : `${playerName} Venture into the Dungeon`}
+                accessibilityRole="button"
             >
                 {
                     dungeonCompleted &&
                     <Svg viewBox='2 -10 15 30'
                         style={styles.dungeonCheck}
+                        accessibilityLabel="dungeon icon"
                     >
                         <Path d="M16.145,2.571c-0.272-0.273-0.718-0.273-0.99,0L6.92,10.804l-4.241-4.27   c-0.272-0.274-0.715-0.274-0.989,0L0.204,8.019c-0.272,0.271-0.272,0.717,0,0.99l6.217,6.258c0.272,0.271,0.715,0.271,0.99,0   L17.63,5.047c0.276-0.273,0.276-0.72,0-0.994L16.145,2.571z"
                             fill={colorTheme.primary === 'rgba(0,0,0,1)' ? 'white' : 'rgba(0,0,0,1)'} />
@@ -93,6 +95,7 @@ const RingButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) =
                     accessibilityLabel={`The Ring ${playerName}`}
                     onPress={() => cardLongPress('the ring')}
                     style={styles.card_overlay}
+                    accessibilityRole="button"
                 >
                     {resources.Svg}
                 </Pressable>
@@ -144,11 +147,13 @@ const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPres
         <View testID={"initiative"}
             style={styles.card_container}>
             <Pressable
-                accessibilityLabel={currentInitiative === playerName ? `${playerName} has the Initiative` : `activate the initiative for ${playerName}`}
+                accessibilityLabel={currentInitiative === playerName ? `${playerName} has the Initiative` : `initiative to ${playerName}`}
                 style={styles.card_overlay}
                 onPress={() => activeInitiative()}
                 onLongPress={() => cardLongPress("initiative")}
                 testID={"initiative_pressable"}
+                accessibilityRole="button"
+                // accessibilityState={currentInitiative === playerName ? {selected: true} : {disabled: true}}
             />
             {resources.Svg}
         </View>
@@ -199,18 +204,19 @@ const MonarchButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }
         < View testID={"monarch"}
             style={styles.card_container} >
             <Pressable
-                accessibilityLabel={currentMonarch === playerName ? `${playerName} is the Monarch` : `activate the Monarch for ${playerName}`}
+                accessibilityLabel={currentMonarch === playerName ? `${playerName} is the Monarch` : `Monarch to ${playerName}`}
                 style={styles.card_overlay}
                 onPress={() => activateMonarch()}
                 onLongPress={() => cardLongPress("monarch")}
                 testID={"monarch_pressable"}
+                accessibilityRole="button"
             />
             {resources.Svg}
         </View >
     )
 }
 
-const SpeedButton : React.FC<TrackerButtonProps> = ({playerID, cardLongPress}) =>{
+const SpeedButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps;
     const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
         {
@@ -223,21 +229,22 @@ const SpeedButton : React.FC<TrackerButtonProps> = ({playerID, cardLongPress}) =
     }, [])
 
     useEffect(() => {
-        if(globalPlayerData[playerID].speed === 4) {
-            dispatchResources({card : 'speed', colorTheme:{ primary: 'green', secondary: 'green'}})
+        if (globalPlayerData[playerID].speed === 4) {
+            dispatchResources({ card: 'speed', colorTheme: { primary: 'green', secondary: 'green' } })
         }
-    },[globalPlayerData[playerID].speed])
+    }, [globalPlayerData[playerID].speed])
 
     return (
-            <View style={styles.card_container}>
-                <Pressable testID='speed'
-                    accessibilityLabel={`Speed ${playerName}`}
-                    onPress={() => cardLongPress('speed')}
-                    style={styles.card_overlay}
-                >
-                    {resources.Svg}
-                </Pressable>
-            </View>
+        <View style={styles.card_container}>
+            <Pressable testID='speed'
+                accessibilityLabel={`Speed for ${playerName}`}
+                onPress={() => cardLongPress('speed')}
+                style={styles.card_overlay}
+                accessibilityRole="button"
+            >
+                {resources.Svg}
+            </Pressable>
+        </View>
     )
 }
 
@@ -258,7 +265,7 @@ const StaticCounterContainer: React.FC<StaticCounterProps> = ({ dungeonCompleted
     return (
         <View testID='static_counter_container' style={styles.static_counter_container}>
 
-            { (globalPlayerData[playerID].dungeonData?.currentDungeon || globalPlayerData[playerID].dungeonCompleted || currentInitiative)  &&
+            {(globalPlayerData[playerID].dungeonData?.currentDungeon || globalPlayerData[playerID].dungeonCompleted || currentInitiative) &&
                 <DungeonButton playerID={playerID} />
             }
             {globalPlayerData[playerID].theRing !== undefined &&

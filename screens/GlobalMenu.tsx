@@ -8,13 +8,15 @@ import { textScaler } from "../functions/textScaler"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import getComponentDimensions from "../functions/getComponentDimensions"
 import iconData from "../images/staticResources"
+import { GameContext, GameContextProps } from "../GameContext"
 
-const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions"]
+const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions", "Card Search"]
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { setTotalPlayers } = useContext(OptionsContext) as OptionsContextProps
-    const [containerDimensions, setContainerDimensions] = useState<{height: number, width: number}>({height: 666, width: 230});
+    const { setTotalPlayers } = useContext<OptionsContextProps>(OptionsContext)
+    const { planarData } = useContext<GameContextProps>(GameContext)
+    const [containerDimensions, setContainerDimensions] = useState<{ height: number, width: number }>({ height: 666, width: 230 });
 
     const resetGame = () => {
         navigation.navigate('StartMenu', { screen: "Life" })
@@ -34,33 +36,41 @@ const GlobalMenu: React.FC = ({ }) => {
     }
 
     const toPlane = () => {
-        navigation.navigate("Planechase")
+        if(planarData.deck.length > 0){
+            navigation.navigate("Planechase", { screen : "PlanarDeck"})
+        } else {
+            navigation.navigate("Planechase")
+        }
+        
     }
 
     const toInstructions = () => {
         navigation.navigate("Instructions")
     }
 
+    const toSearch = () => {
+        navigation.navigate("Search")
+    }
+
     return (
         <View style={styles.menu_container}>
-            <View style={styles.icons_container}  
-            onLayout={(e) => getComponentDimensions(e, setContainerDimensions)}
+            <View style={styles.icons_container}
+                onLayout={(e) => getComponentDimensions(e, setContainerDimensions)}
             >
                 {options.map(option => {
                     return (
                         <Pressable key={option} style={styles.button_wrapper}
                             testID={`${option}-button`}
-                            accessibilityLabelledBy={option}
-                            aria-labelledby={option}
                             accessibilityRole="button"
-                            onPressIn={() =>
+                            onPress={() =>
                                 option === "New Game" ? resetGame() :
                                     option === 'Players' ? toPlayerOptions() :
                                         option === 'Coin Flip' ? toCoin() :
                                             option === 'Dice' ? toDice() :
                                                 option === "Planechase" ? toPlane() :
                                                     option === "Instructions" ? toInstructions() :
-                                                        ''
+                                                        option === "Card Search" ? toSearch() :
+                                                            ''
                             }
                         >
                             <View style={styles.button_touch} testID="iconWrapper">
@@ -80,8 +90,8 @@ const GlobalMenu: React.FC = ({ }) => {
                         </Pressable>
                     )
                 })}
-                <Text style={[styles.button_text,{
-                    fontSize: containerDimensions ? textScaler(55/4, containerDimensions, 30, 18) : 18
+                <Text style={[styles.button_text, {
+                    fontSize: containerDimensions ? textScaler(55 / 4, containerDimensions, 30, 18) : 18
                 }]} >Swipe to access this menu. Press/hold icons to interact</Text>
             </View>
         </View >
@@ -101,7 +111,7 @@ const styles = StyleSheet.create({
     icons_container: {
         width: '60%',
         height: '80%',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     button_wrapper: {
         height: `${(100 / options.length) - 5}%`,
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     button_touch: {
         alignItems: 'center',

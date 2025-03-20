@@ -107,8 +107,8 @@ export const imageReducer = (state: ImageReducerState, action: imageAction) => {
         case "speed": {
             return {
                 cardImage: {
-                    front: require('../assets/cards/start-speed.png'),
-                    back: require('../assets/cards/max-speed.png')
+                    front: require('../assets/cards/startspeed.jpg'),
+                    back: require('../assets/cards/maxspeed.jpg')
                 },
                 Svg: <Svg 
                 {...action.svgDimension}

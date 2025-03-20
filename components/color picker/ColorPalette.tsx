@@ -171,6 +171,7 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
                     ref={palettePressRef}
                     nativeID="colorPalettePress"
                     accessibilityLabel="Color Gradient"
+                    accessibilityRole="adjustable"
                     onLayout={() => getPaletteMeasurements()}
                     onPressOut={(event) => handlePalettePress(event)}
                     onTouchMove={(e) => markerDrag(e)}

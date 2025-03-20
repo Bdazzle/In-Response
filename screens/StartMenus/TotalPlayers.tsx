@@ -32,8 +32,9 @@ const TotalPlayers = () => {
                         {chunks.map((c: number) => {
                             return <Pressable key={c}
                                 style={totalPlayers === c ? styles.selected_option_touch :styles.option_touch}
-                                onPressIn={() => handleSelectPlayers(c)}
+                                onPress={() => handleSelectPlayers(c)}
                                 testID={`${c}-players`}
+                                accessibilityRole="button"
                             >
                                 <Text key={`${c}_text`} 
                                 style={totalPlayers === c ? styles.selected_option : styles.option_text} 
@@ -123,7 +124,6 @@ const styles = StyleSheet.create({
     fade_container: {
         height: '20%',
         width: '100%',
-
         borderWidth:1,
         borderColor:'white'
     },

@@ -1,22 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
-export function useDebounce<T>(value : T, delay : number) {
-    // State and setters for debounced value
-    const [debouncedValue, setDebouncedValue] = useState<T>(value);
-    useEffect(
-      () => {
-        // Update debounced value after delay
-        const handler = setTimeout(() => {
-          setDebouncedValue(value);
-        }, delay);
-        // Cancel the timeout if value changes (also on delay change or unmount)
-        // This is how we prevent debounced value from updating if value is changed ...
-        // .. within the delay period. Timeout gets cleared and restarted.
-        return () => {
-          clearTimeout(handler);
-        };
-      },
-      [value, delay] // Only re-call effect if value or delay changes
-    );
-    return debouncedValue;
-  }
+const useDebounce = (callback: (text: string) => void, delay: number) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current); // Cleanup on unmount
+      }
+    };
+  }, []);
+
+  const debouncedCallback = (text: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current); // Clear the previous timeout
+    }
+
+    // Set a new timeout
+    timeoutRef.current = setTimeout(() => {
+      callback(text);
+    }, delay);
+  };
+
+  return debouncedCallback;
+};
+
+export default useDebounce;

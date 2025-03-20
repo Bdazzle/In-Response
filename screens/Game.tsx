@@ -179,6 +179,7 @@ export const Game = () => {
                             <Pressable
                                 onPress={() => setResetModalVis(true)}
                                 accessibilityLabel="reset game"
+                                accessibilityRole="button"
                             >
                                 <Svg viewBox='-3 -4 24 24' >
                                     <G fill="none" fillRule="evenodd" stroke="#000000"
@@ -212,6 +213,7 @@ export const Game = () => {
                         >
                             <Pressable onPress={() => getRandomPlayer()}
                                 accessibilityLabel="select random player"
+                                accessibilityRole="button"
                                 style={{
                                     height: '100%',
                                     width: '100%'

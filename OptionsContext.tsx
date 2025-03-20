@@ -17,7 +17,7 @@ export const OptionsContext = createContext({} as OptionsContextProps)
 export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [deviceType, setDeviceType] = useState<string>('')
     const [gameType, setGameType] = useState<string>('normal')
-    const [totalPlayers, setTotalPlayers] = useState<number>(2)
+    const [totalPlayers, setTotalPlayers] = useState<number>(0)
     const [startingLife, setStartingLife] = useState<number>(20)
 
     const resolveDeviceType = async () => {
@@ -50,12 +50,14 @@ export const OptionsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // },[])
 
     return <OptionsContext.Provider value={{
-        deviceType: deviceType,
-        totalPlayers: totalPlayers,
-        setTotalPlayers: setTotalPlayers,
-        startingLife: startingLife,
-        setStartingLife: setStartingLife,
-        gameType: gameType,
-        setGameType: setGameType,
-    }}>{children}</OptionsContext.Provider>
+        deviceType,
+        totalPlayers,
+        setTotalPlayers,
+        startingLife,
+        setStartingLife,
+        gameType,
+        setGameType,
+    }}>
+        {children}
+    </OptionsContext.Provider>
 }

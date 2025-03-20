@@ -15,7 +15,11 @@ export const colorLibrary: { [key: string]: string } = {
     blood: 'rgba(82,0,0,1)',
     pink: 'rgba(250,90,200,1)',
     navy: 'rgba(0,0,80,1)',
-    darkGreen: 'rgba(7,47,27,1)'
+    darkGreen: 'rgba(7,47,27,1)',
+    bluish : `hsla(206, 98%, 36%, 1)`,
+    // offbluish : 'hsl(185, 100%, 32%)',
+    offbluish : 'hsl(206, 98%, 28%)',
+    lightbluish: 'hsla(185, 100%, 43%, 1)'
 }
 
 export const startingColors = [

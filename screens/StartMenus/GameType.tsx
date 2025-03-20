@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, Pressable } from 'react-native';
+import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, Pressable, StatusBar, useWindowDimensions } from 'react-native';
 import MenuNavButtons from "../../components/MenuNavButtons";
 import FadeContainer from "../../components/FadeContainer";
 import { useNavigation } from "@react-navigation/native";
@@ -17,42 +17,49 @@ const LifeMenu = () => {
     const chunk = 2
     const totalChunks = Math.ceil(options.length / chunk)
     const chunkedOptions = [...Array(totalChunks)].map((_) => options.splice(0, chunk))
+    const { height } = useWindowDimensions()
+    const statusBarHeight = StatusBar.currentHeight;
 
     const handleSelectTotal = (val: string | number) => {
         setStartingLife(Number(val))
         navigation.navigate("TotalPlayers")
     }
 
-    const handleOptionDefault  = (val: string) =>{
+    const handleOptionDefault = (val: string) => {
         setGameType(val)
         val === "commander" ? setStartingLife(40) : setStartingLife(20)
         navigation.navigate("TotalPlayers")
     }
 
     return (
-        <View style={styles.container} testID="GameType-screen">
-            <View testID="gametype_container" 
-            style={styles.gametype_container}
+        <View style={[styles.container, {
+            height: height + (statusBarHeight || 0)
+        }]} testID="GameType-screen">
+            <View testID="gametype_container"
+                style={styles.gametype_container}
             >
                 <Text style={styles.title_text}>Game Type</Text>
                 <View style={styles.game_options_wrapper}>
-                    <Pressable 
-                    onPressIn={() => handleOptionDefault('commander')}
-                        style={gameType ==='commander' ? styles.selected_game_option : styles.game_option}
+                    <Pressable
+                        onPress={() => handleOptionDefault('commander')}
+                        accessibilityRole="button"
+                        style={gameType === 'commander' ? styles.selected_game_option : styles.game_option}
                     >
-                        <Text style={ gameType ==='commander' ? styles.selected_option : styles.option_text} >Commander</Text>
+                        <Text style={gameType === 'commander' ? styles.selected_option : styles.option_text} >Commander</Text>
                     </Pressable>
-                    <Pressable 
-                    onPressIn={() => handleOptionDefault('normal')}
-                        style={gameType ==='normal' ? styles.selected_game_option : styles.game_option}
+                    <Pressable
+                        onPress={() => handleOptionDefault('normal')}
+                        accessibilityRole="button"
+                        style={gameType === 'normal' ? styles.selected_game_option : styles.game_option}
                     >
-                        <Text style={ gameType ==='normal' ? styles.selected_option : styles.option_text}>Normal</Text>
+                        <Text style={gameType === 'normal' ? styles.selected_option : styles.option_text}>Normal</Text>
                     </Pressable>
-                    <Pressable 
-                    onPressIn={() => handleOptionDefault('oathbreaker')}
-                        style={gameType ==='oathbreaker' ? styles.selected_game_option : styles.game_option}
+                    <Pressable
+                        onPress={() => handleOptionDefault('oathbreaker')}
+                        accessibilityRole="button"
+                        style={gameType === 'oathbreaker' ? styles.selected_game_option : styles.game_option}
                     >
-                        <Text style={ gameType ==='oathbreaker' ? styles.selected_option : styles.option_text}>Oathbreaker</Text>
+                        <Text style={gameType === 'oathbreaker' ? styles.selected_option : styles.option_text}>Oathbreaker</Text>
                     </Pressable>
                 </View>
             </View>
@@ -64,11 +71,12 @@ const LifeMenu = () => {
                         return index !== chunkedOptions.length - 1 ? <View key={index} style={styles.options_subcontainer}>
                             {chunks.map((c: number) => {
                                 return <Pressable key={c}
+                                    accessibilityRole="button"
                                     style={startingLife === c ? styles.selected_option_touch : styles.option_touch}
-                                    onPressIn={() => handleSelectTotal(c)}
+                                    onPress={() => handleSelectTotal(c)}
                                 >
-                                    <Text key={`${c}_text`} 
-                                    style={startingLife === c ? styles.selected_option : styles.option_text} 
+                                    <Text key={`${c}_text`}
+                                        style={startingLife === c ? styles.selected_option : styles.option_text}
                                     >{c}</Text>
                                 </Pressable>
                             })}
@@ -76,19 +84,20 @@ const LifeMenu = () => {
                             <View key={index} style={styles.options_subcontainer}>
                                 {chunks.map((c: number) => {
                                     return <Pressable key={c}
+                                        accessibilityRole="button"
                                         style={styles.option_touch}
-                                        onPressIn={() => handleSelectTotal(c)}
+                                        onPress={() => handleSelectTotal(c)}
                                     >
-                                        <Text key={`${c}_text`} testID={`${c}_text`} 
-                                        style={startingLife === c ? styles.selected_option : styles.option_text} 
+                                        <Text key={`${c}_text`} testID={`${c}_text`}
+                                            style={startingLife === c ? styles.selected_option : styles.option_text}
                                         >{c}</Text>
                                     </Pressable>
                                 })}
                                 <KeyboardAvoidingView testID="life_input_view" style={styles.input_container}  >
                                     <View testID="life_input_touch" style={styles.input_wrapper}>
                                         <TextInput testID="life_input" style={styles.input_text}
-                                        accessibilityLabel="Input custom starting life total"
-                                        editable={true}
+                                            accessibilityLabel="Input custom starting life total"
+                                            editable={true}
                                             keyboardType='numeric'
                                             onSubmitEditing={(e) => handleSelectTotal(e.nativeEvent.text)}
                                         ></TextInput>
@@ -101,7 +110,7 @@ const LifeMenu = () => {
 
             {startingLife > 0 &&
                 <FadeContainer style={styles.fade_container}>
-                    <MenuNavButtons navTo="TotalPlayers" labelTo="Total Players"/>
+                    <MenuNavButtons navBack="MainMenu" labelBack="Main Menu" navTo="TotalPlayers" labelTo="Total Players" />
                 </FadeContainer>
             }
         </View>
@@ -115,71 +124,72 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         alignItems: 'center',
     },
-    gametype_container:{
-        width:'100%',
-        height:'40%',
+    gametype_container: {
+        marginTop: '2%',
+        width: '100%',
+        height: '40%',
         justifyContent: 'space-evenly'
     },
     title_text: {
         color: 'white',
         textAlign: 'center',
         fontSize: 40,
-        fontFamily:'Beleren'
+        fontFamily: 'Beleren'
     },
-    game_options_wrapper:{
-        width:'100%',
-        height:'80%',
+    game_options_wrapper: {
+        width: '100%',
+        height: '80%',
         justifyContent: 'space-evenly',
-        alignItems:'center'
+        alignItems: 'center'
     },
-    game_option:{
+    game_option: {
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
-        width:'80%',
-        minHeight:60,
-        justifyContent:'center',
+        width: '80%',
+        minHeight: 60,
+        justifyContent: 'center',
     },
-    selected_game_option:{
-        backgroundColor:'white',
+    selected_game_option: {
+        backgroundColor: 'white',
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
-        width:'80%',
-        minHeight:60,
-        justifyContent:'center',
+        width: '80%',
+        minHeight: 60,
+        justifyContent: 'center',
     },
     option_touch: {
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
         width: '30%',
-        alignItems:'center',
-        justifyContent:'center',
-        minHeight:60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 60,
     },
-    selected_option_touch:{
-        backgroundColor:'white',
+    selected_option_touch: {
+        backgroundColor: 'white',
         borderColor: 'white',
         borderRadius: 5,
         borderWidth: 2,
         width: '30%',
-        alignItems:'center',
-        justifyContent:'center',
-        minHeight:60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 60,
     },
     option_text: {
         color: 'white',
         textAlign: 'center',
         fontSize: 36,
-        fontFamily:'Beleren',
+        fontFamily: 'Beleren',
     },
-    selected_option :{
-        backgroundColor:'white',
+    selected_option: {
+        backgroundColor: 'white',
         color: 'black',
         textAlign: 'center',
         fontSize: 36,
-        fontFamily:'Beleren',
+        fontFamily: 'Beleren',
     },
     options_wrapper: {
         alignContent: 'center',
@@ -190,8 +200,8 @@ const styles = StyleSheet.create({
     options_subcontainer: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        minHeight:60,
-        alignItems:'center'
+        minHeight: 60,
+        alignItems: 'center'
     },
     input_wrapper: {
         flex: 1,
@@ -207,19 +217,18 @@ const styles = StyleSheet.create({
         borderBottomColor: 'white',
         borderWidth: 0,
         borderBottomWidth: 2,
-        fontFamily:'Beleren'
+        fontFamily: 'Beleren'
     },
     input_container: {
         flexDirection: 'row',
         justifyContent: 'center',
         width: '33%',
-        minHeight:60
+        minHeight: 60
     },
     fade_container: {
-        height: '20%',
         width: '100%',
     },
-    
+
 })
 
 export default LifeMenu

@@ -94,7 +94,7 @@ const Die : React.FC<DieProps> = ({faces}) =>{
     )
 }
 
-const DiceRoller = () => {
+const DiceRoller : React.FC = ({}) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { globalPlayerData } = useContext(GameContext)
     const [amount, setAmount] = useState<number>(1)
@@ -161,7 +161,8 @@ const DiceRoller = () => {
         <View style={styles.container}>
             {/* Back Button */}
             <Pressable style={styles.back_button}
-                onPressIn={() => handleBack()}
+                onPress={() => handleBack()}
+                accessibilityRole="button"
                 accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
             >
                 <Svg viewBox="0 0 800 800" style={{
@@ -228,8 +229,10 @@ const DiceRoller = () => {
             {/* Dice image/Roller button */}
             <Animated.View style={[styles.dice_container, springStyle]}>
                 <Pressable style={styles.dice_press}
-                    onPressIn={() => handlePressIn()}
+                    onPress={() => handlePressIn()}
                     onPressOut={() => roll()}
+                    accessibilityRole="button"
+                    accessibilityLabel="Roll dice button"
                 >
                     <Dice />
                 </Pressable>

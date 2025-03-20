@@ -3,13 +3,13 @@ import Navigation from './navigation/index';
 import { GameProvider } from './GameContext';
 import { OptionsProvider } from './OptionsContext';
 import { useFonts } from "expo-font";
-import React, { useCallback } from 'react';
+import React from 'react';
 // import * as SplashScreen from 'expo-splash-screen';
-
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from 'react-native-reanimated';
+
 
 // This is the default configuration
 configureReanimatedLogger({
@@ -48,7 +48,7 @@ export default function App() {
         <>
           <OptionsProvider>
             <GameProvider>
-              <Navigation />
+                <Navigation />
             </GameProvider>
           </OptionsProvider>
         </>

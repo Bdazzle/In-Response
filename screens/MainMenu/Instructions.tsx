@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React from "react"
-import { Image, Text, StyleSheet, View, Pressable, FlatList, ImageSourcePropType, useWindowDimensions } from "react-native"
+import { Image, Text, StyleSheet, View, Pressable, ImageSourcePropType, useWindowDimensions, ScrollView } from "react-native"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { AllScreenNavProps } from "../.."
 import { staticTextScaler } from "../../functions/textScaler"
@@ -25,6 +25,41 @@ const instructionalImages = [
     }
 ] as InstructionItem[]
 
+interface PreviewProps {
+    item: InstructionItem,
+    dimensions: {
+        width: number,
+        height: number
+    }
+}
+
+const Preview: React.FC<PreviewProps> = ({ item, dimensions }) => {
+
+    return (
+        <View style={styles.instruction_container}>
+            <Text style={styles.sub_header}>{item.id}</Text>
+            <ReactNativeZoomableView
+                maxZoom={30}
+                contentWidth={dimensions.width * .7}
+                initialZoom={1}
+                doubleTapZoomToCenter={true}
+                bindToBorders={true}
+                pinchToZoomOutSensitivity={0}
+                style={{
+                    width: dimensions.width * .7,
+                    borderColor:'white',borderWidth:1
+                }}
+            >
+                <Image source={item.image} style={{
+                    width: dimensions.width * .7,
+                    height: dimensions.height * .5,
+                    resizeMode: 'contain',
+                }}></Image>
+            </ReactNativeZoomableView>
+        </View>
+    )
+}
+
 const Instructions: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { height, width } = useWindowDimensions();
@@ -33,41 +68,16 @@ const Instructions: React.FC = ({ }) => {
         navigation.navigate('MainMenu')
     }
 
-    const instruction = ({ item }: any) => (
-        /*
-        Less sensitive the larger an image is?
-        */
-        <View style={{
-            paddingTop:10
-        }}>
-            <Text style={styles.sub_header}>{item.id}</Text>
-            <ReactNativeZoomableView
-                maxZoom={30}
-                contentWidth={width}
-                initialZoom={1}
-                doubleTapZoomToCenter={true}
-                bindToBorders={true}
-                pinchToZoomOutSensitivity={0}
-            >
-                <Image source={item.image} style={{
-                    width: width,
-                    height: height * .5,
-                    resizeMode: 'contain',
-                }}></Image>
-            </ReactNativeZoomableView>
-        </View>
-    )
-
     return (
-
         <View style={styles.screen}>
             {/* Back Button */}
             <View testID="header"
                 style={styles.header}
             >
                 <Pressable style={styles.back_button}
-                    onPressIn={() => handleBack()}
+                    onPress={() => handleBack()}
                     accessibilityLabel="back to menu"
+                    accessibilityRole="button"
                 >
                     <Svg viewBox="0 0 800 800" style={{
                         width: 80,
@@ -99,14 +109,16 @@ const Instructions: React.FC = ({ }) => {
                 color: 'white',
                 textAlign: 'center',
                 fontFamily: 'Beleren',
-            }} >Swipe in game screen to go back to main menu. Press/hold icons to interact</Text>
-            <FlatList
-                style={styles.content}
-                data={instructionalImages}
-                renderItem={instruction}
-                keyExtractor={item => item.id}
-            >
-            </FlatList>
+            }} >
+                Swipe in game screen to go back to main menu. Press/hold icons to interact
+            </Text>
+            <ScrollView contentContainerStyle={styles.content}>
+                {instructionalImages.map((item, i) => {
+                    return (
+                        <Preview key={i} item={item} dimensions={{ height: height, width: width }} />
+                    )
+                })}
+            </ScrollView>
         </View>
     )
 }
@@ -115,7 +127,6 @@ const styles = StyleSheet.create({
     screen: {
         backgroundColor: "black",
         height: '100%',
-        overflow: 'scroll'
     },
     header: {
         flexDirection: 'row',
@@ -125,7 +136,12 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     content: {
-        marginTop:'5%'
+        marginTop: '5%',
+        width: '100%',
+        paddingBottom: '40%',
+        display: 'flex',
+        flexGrow: 1,
+        flexDirection: 'column',
     },
     back_button: {
         width: 80,
@@ -135,6 +151,11 @@ const styles = StyleSheet.create({
         fontSize: staticTextScaler(36),
         color: 'white',
         fontFamily: 'Beleren',
+    },
+    instruction_container: {
+        padding: 10,
+        paddingLeft:20,
+        paddingRight:20,
     },
     sub_header: {
         fontSize: staticTextScaler(24),

@@ -69,8 +69,10 @@ return (
             >
                 <Pressable
                     nativeID="save_color"
+                    accessibilityRole="button"
+                    accessibilityLabel="Save Color"
                     style={styles().saveColorPress}
-                    onPressIn={() => handleColorAccept()}
+                    onPress={() => handleColorAccept()}
                 >
                     <Text style={route.params.themePosition === 'secondary' ? 
                     styles(color).saveColorText : 

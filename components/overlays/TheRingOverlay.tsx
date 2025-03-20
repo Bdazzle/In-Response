@@ -1,17 +1,17 @@
 
 import React, { useContext, useEffect, useState } from "react"
 import { Image, View, StyleSheet, Pressable, ImageSourcePropType } from "react-native"
-import FlipCard from "../counters/Flipcard"
+import FlipCard from "../Flipcard"
 import { GameContext, GameContextProps } from "../../GameContext"
 import { RouteProp, useRoute } from "@react-navigation/native"
 import { RootStackParamList } from "../../navigation"
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
-let phoneStyles : any, tabletStyles : any;
+let phoneStyles: any, tabletStyles: any;
 
-const getPhoneStyles = () =>{
-    if(!phoneStyles) {
+const getPhoneStyles = () => {
+    if (!phoneStyles) {
         phoneStyles = StyleSheet.create({
             ring_container: {
                 height: '100%',
@@ -25,7 +25,7 @@ const getPhoneStyles = () =>{
             },
             ring_overlay_wrapper: {
                 left: '7.5%',
-                width:'85%',
+                width: '85%',
                 height: '52.5%',
             },
             visible_level: {
@@ -38,16 +38,16 @@ const getPhoneStyles = () =>{
                 width: '100%',
             },
             level1: {
-                height:'17%',
+                height: '17%',
             },
             level2: {
-                height:'20%',
+                height: '20%',
             },
             level3: {
-                height:'25%',
+                height: '25%',
             },
             level4: {
-                height:'23%',
+                height: '23%',
             },
             levelImageWrapper: {
                 height: '100%',
@@ -63,8 +63,8 @@ const getPhoneStyles = () =>{
     return phoneStyles
 }
 
-const getTabletStyles = () =>{
-    if(!tabletStyles){
+const getTabletStyles = () => {
+    if (!tabletStyles) {
         tabletStyles = StyleSheet.create({
             ring_container: {
                 height: '100%',
@@ -79,7 +79,7 @@ const getTabletStyles = () =>{
             ring_overlay_wrapper: {
                 height: '52.5%',
                 left: '14.5%',
-                width:'71%',
+                width: '71%',
             },
             visible_level: {
                 color: 'black',
@@ -91,16 +91,16 @@ const getTabletStyles = () =>{
                 width: '100%',
             },
             level1: {
-                height:'15.5%'
+                height: '15.5%'
             },
             level2: {
-                height:'17%'
+                height: '17%'
             },
             level3: {
-                height:'21%'
+                height: '21%'
             },
             level4: {
-                height:'19%',
+                height: '19%',
             },
             levelImageWrapper: {
                 height: '100%',
@@ -142,11 +142,11 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
     const [showLevels, setShowLevels] = useState<boolean>(true)
     const flipVal = useSharedValue(0)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
-    const styles = deviceType === 'phone' ? getPhoneStyles() :  getTabletStyles()
+    const styles = deviceType === 'phone' ? getPhoneStyles() : getTabletStyles()
 
     const levelChange = (num: number) => {
         // for clicking on same level to make level go down, deselect level if highlighted
-        const newlevel = level === num ? num - 1 : num 
+        const newlevel = level === num ? num - 1 : num
         setLevel(newlevel)
         dispatchGlobalPlayerData({
             playerID: route.params.playerID as number,
@@ -195,9 +195,9 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                     style={{
                         width: imageDimensions?.width,
                         height: imageDimensions?.height,
-                        position:'absolute',
-                        justifyContent:'flex-end',
-                        
+                        position: 'absolute',
+                        justifyContent: 'flex-end',
+
                     }}>
                     <View testID='ring_overlay_wrapper'
                         style={styles.ring_overlay_wrapper}
@@ -208,6 +208,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             onPress={() => levelChange(1)}
                             style={[level! >= 1 ? styles.visible_level : styles.hidden_level,
                             styles.level1]}
+                            accessibilityState={level! >= 1 ? { checked: true } : { checked: false }}
                             accessibilityLabel={level! >= 1 ? "active level 1" : 'level 1'}
                             accessibilityHint="Your Ring-bearer is legendary and can't be blocked by creatures with greater power"
                         >
@@ -217,7 +218,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                                 <Image
                                     source={require('../../assets/cards/ring_overlay/level1.png')}
                                     style={styles.levelImage}
-                                    alt={"Your Ring-bearer is legendary and can't be blocked by creatures with greater power"}
+                                // alt={"Your Ring-bearer is legendary and can't be blocked by creatures with greater power"}
                                 />
                             </Animated.View>
                         </Pressable>
@@ -228,6 +229,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             onPress={() => levelChange(2)}
                             style={[level! >= 2 ? styles.visible_level : styles.hidden_level,
                             styles.level2]}
+                            accessibilityState={level! >= 2 ? { checked: true } : { checked: false }}
                             accessibilityLabel={level! >= 2 ? 'active level 2' : 'level 2'}
                             accessibilityHint="Whenever your ring-bearer attacks, draw a card, then discard a card."
                         >
@@ -237,7 +239,6 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                                 <Image
                                     source={require('../../assets/cards/ring_overlay/level2.png')}
                                     style={styles.levelImage}
-                                    alt={"Whenever your ring-bearer attacks, draw a card, then discard a card."}
                                 />
                             </Animated.View>
                         </Pressable>
@@ -248,6 +249,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             onPress={() => levelChange(3)}
                             style={[level! >= 3 ? styles.visible_level : styles.hidden_level,
                             styles.level3]}
+                            accessibilityState={level! >= 3 ? { checked: true } : { checked: false }}
                             accessibilityLabel={level! >= 3 ? 'active level 3' : 'level 3'}
                             accessibilityHint="whenever your ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat"
                         >
@@ -257,7 +259,6 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                                 <Image
                                     source={require('../../assets/cards/ring_overlay/level3.png')}
                                     style={styles.levelImage}
-                                    alt={"whenever your ring-bearer becomes blocked by a creature, that creature's controller sacrifices it at end of combat"}
                                 />
                             </Animated.View>
                         </Pressable>
@@ -268,6 +269,7 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                             onPress={() => levelChange(4)}
                             style={[level === 4 ? styles.visible_level : styles.hidden_level,
                             styles.level4]}
+                            accessibilityState={level! >= 4 ? { checked: true } : { checked: false }}
                             accessibilityLabel={level! >= 4 ? 'active level 4' : 'level 4'}
                             accessibilityHint="whenever your ring-bearer deals combat damage to a player, each opponent loses 3 life."
                         >
@@ -277,7 +279,6 @@ const TheRing: React.FC<RingProps> = ({ imageSource }) => {
                                 <Image
                                     source={require('../../assets/cards/ring_overlay/level4.png')}
                                     style={styles.levelImage}
-                                    alt={"whenever your ring-bearer deals combat damage to a player, each opponent loses 3 life."}
                                 />
                             </Animated.View>
                         </Pressable>

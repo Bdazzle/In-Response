@@ -73,6 +73,9 @@ const DayNight: React.FC<DayNightProps> = ({ activeCycle, setActiveCycle }) => {
             onLongPress={() => cardLongPress()}
             style={styles.cycle_pressable}
             accessibilityLabel="Day/Night Cycle"
+            accessibilityRole="button"
+            accessibilityValue={{text: activeCycle}}
+            accessibilityLiveRegion="polite"
         >
             {activeCycle === "neutral" ?
                 <CombinedSvg />

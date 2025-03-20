@@ -13,10 +13,26 @@ import { GlobalMenuParamsList } from "./navigation";
 //       : { screen: K; params: ParamList[K] }
 //   }[keyof ParamList]
 
-export type PlanarData = {
-    currentPlane: string,
-    deck: string[],
-    discard: string[]
+type PlanarData = {
+    currentPlane: PlaneCard,
+    deck: PlaneCard[],
+    discard: PlaneCard[],
+    // images : PlaneProps
+}
+
+type PlaneChaseSet = {
+    [set: string] : PlanarDeck
+}
+
+type PlaneCard = [string, ImageSourcePropType]
+
+type PlaneProps = {
+    [key: string]: ImageSourcePropType
+}
+
+type PlanarDeck = {
+       planes: PlaneProps;
+       phenomenon : PlaneProps
 }
 
 export type StoredData =  [string, string | null][] | readonly KeyValuePair[]
@@ -96,4 +112,68 @@ export type HSLAVals = {
     saturation: number,
     lightness: number,
     alpha? : number
+}
+
+
+// Helper type to extract the `[key: string]: string` part of Card
+/**
+ * 'keyof T' gets all the keys of the type T as a union of string literals (like 'name' of Card)
+ * iterates over the keys of T and includes only those keys where the value is a string.
+ * [K in keyof T as ...] iterates over each key K in keyof T and applies the condition after as.
+ * [... T[K] extends string ? K : never] conditional check :
+ *   If T[K] is a string, it keeps the key K.
+ *   If T[K] is not a string, it replaces the key with never (which effectively removes it)
+ * [...]: T[K] - specifies the value type for each key K, which will always be string 
+ * because non-strings have already been filtered out with "T[K] extends string ? K : never"
+ */
+type StringProperties<T> = {
+    [K in keyof T as T[K] extends string ? K : never]: T[K];
+  };
+
+interface CardData {
+    image_uris? : { [key : string] : string };
+    card_faces? :  {[key: string] : Card};
+    lang:string
+    oracle_text : string;
+    printed_text: string;
+    set: string;
+    oracle_id: string;
+    set_name: string
+}
+interface Card extends CardData {
+    [key: string]:  string | number | boolean | Card;
+    /**
+     * properties explicitly extracted from scryfall data are the following:
+     */
+    set_icon_svg_uri? : string
+    rules?: Rulings;
+}
+
+/**
+ * optional data of ScryFallCard is used, but restructured/reassigned
+ */
+interface ScryFallCard extends CardData {
+    [key: string]:  string | number | boolean | ScryFallCard;
+    name: string;
+    set_uri:string;
+    rulings_uri: string
+}
+
+// [key : string] : Omit<Card, 'name'>[]
+    // [cardName : string] : Card[];
+type CombinedCards  = {
+    [cardName : string] : {
+        versions: Card[];
+        rules: Rulings
+    }
+}
+
+type ScryResultData  = ScryFallCard[]
+
+type Rulings = {
+    [key: number] :{
+        // source: string;
+        // published_at: string;
+        comment: string
+    }
 }

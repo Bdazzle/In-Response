@@ -4,7 +4,7 @@ import { useRoute, RouteProp } from "@react-navigation/native"
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { RootStackParamList } from "../../navigation"
 import { ImageSourcePropType, Pressable, StyleSheet, View, Image } from "react-native"
-import FlipCard from "../counters/Flipcard"
+import FlipCard from "../Flipcard"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 
 let phoneStyles : any, tabletStyles : any;
@@ -15,14 +15,7 @@ this should only execute creation of one stylesheet dependent on devicetype
 */
 const getPhoneStyles = () =>{
     if(!phoneStyles) {
-        phoneStyles = StyleSheet.create({
-            speed_container: {
-                height: '100%',
-                maxWidth: 690,//the width contained card image on tablet
-                width: '100%',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-            },
+        phoneStyles = {
             overlay_container: {
                 position: 'absolute',
                 top: '18%',
@@ -36,24 +29,6 @@ const getPhoneStyles = () =>{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
             },
-            levelImageWrapper: {
-                height: '37%',
-                width: '100%',
-                backfaceVisibility: 'hidden',
-            },
-            visible_level_pressable: {
-                height: '100%',
-                width: '100%',
-            },
-            hidden_level: {
-                opacity: 0.01,
-                height: '100%',
-                width: '100%',
-            },
-            levelImage: {
-                height: '100%',
-                width: '100%',
-            },
             level1: {
                 height: '100%'
             },
@@ -65,21 +40,14 @@ const getPhoneStyles = () =>{
                 height: '100%',
                 top: '-29%',
             },
-        })
+        }
     }
     return phoneStyles
 }
 
 const getTabletStyles = () =>{
     if(!tabletStyles){
-        tabletStyles = StyleSheet.create({
-            speed_container: {
-                height: '100%',
-                maxWidth: 690,//the width contained card image on tablet
-                width: '100%',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-            },
+        tabletStyles = {
             overlay_container: {
                 position: 'absolute',
                 top: '12%',
@@ -92,24 +60,6 @@ const getTabletStyles = () =>{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-            },
-            levelImageWrapper: {
-                height: '37%',
-                width: '100%',
-                backfaceVisibility: 'hidden',
-            },
-            visible_level_pressable: {
-                height: '100%',
-                width: '100%',
-            },
-            hidden_level: {
-                opacity: 0.01,
-                height: '100%',
-                width: '100%',
-            },
-            levelImage: {
-                height: '100%',
-                width: '100%',
             },
             level1: {
                 top:'9%',
@@ -125,9 +75,44 @@ const getTabletStyles = () =>{
                 height: '100%',
                 top: '-28%',
             },
-        })
+        }
     }
     return tabletStyles
+}
+
+const universalStyles = (devicetype : string) =>{
+    const deviceStyles = devicetype === 'phone' ? getPhoneStyles() : getTabletStyles;
+
+    const styles = StyleSheet.create({
+        speed_container: {
+            height: '100%',
+            maxWidth: 690,//the width contained card image on tablet
+            width: '100%',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+        },
+        levelImageWrapper: {
+            height: '37%',
+            width: '100%',
+            backfaceVisibility: 'hidden',
+        },
+        visible_level_pressable: {
+            height: '100%',
+            width: '100%',
+        },
+        hidden_level: {
+            opacity: 0.01,
+            height: '100%',
+            width: '100%',
+        },
+        levelImage: {
+            height: '100%',
+            width: '100%',
+        },
+        ...deviceStyles
+    })
+
+    return styles
 }
 
 interface SpeedProps {
@@ -145,7 +130,7 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
     const [showLevels, setShowLevels] = useState<boolean>(true)
     const flipVal = useSharedValue(0)
     const [imageDimensions, setImageDimensions] = useState<{ width: number, height: number }>()
-    const styles = deviceType === 'phone' ? getPhoneStyles() :  getTabletStyles()
+    const styles = universalStyles(deviceType)
 
     const levelChange = (num: number) => {
         // for clicking on same level to make level go down, deselect level if highlighted
@@ -220,13 +205,12 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
                                     onPress={() => levelChange(1)}
                                     style={[level! >= 1 ? styles.visible_level_pressable : styles.hidden_level,
                                     styles.level1]}
-                                    accessibilityLabel={level! >= 1 ? "active level 1" : 'level 1'}
-                                    accessibilityHint="Speed level 1"
+                                    accessibilityLabel={level! >= 1 ? "active speed level 1" : 'speed level 1'}
+                                    accessibilityState={level! >= 1 ? {checked: true} : {checked: false}}
                                 >
                                     <Image
                                         source={require('../../assets/cards/speed_overlay/lvl_1.png')}
                                         style={styles.levelImage}
-                                        alt={"Speed level 1"}
                                     />
                                 </Pressable>
                             </Animated.View>
@@ -240,13 +224,12 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
                                     onPress={() => levelChange(2)}
                                     style={[level! >= 2 ? styles.visible_level_pressable : styles.hidden_level,
                                     styles.level2]}
-                                    accessibilityLabel={level! >= 2 ? "active level 2" : 'level 2'}
-                                    accessibilityHint="Speed level 2"
+                                    accessibilityLabel={level! >= 2 ? "active speed level 2" : 'speed level 2'}
+                                    accessibilityState={level! >= 2 ? {checked: true} : {checked: false}}
                                 >
                                     <Image
                                         source={require('../../assets/cards/speed_overlay/lvl_2.png')}
                                         style={styles.levelImage}
-                                        alt={"Speed level 2"}
                                     />
                                 </Pressable>
                             </Animated.View>
@@ -260,13 +243,12 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
                                     onPress={() => levelChange(3)}
                                     style={[level! >= 3 ? styles.visible_level_pressable : styles.hidden_level,
                                     styles.level3]}
-                                    accessibilityLabel={level! >= 3 ? "active level 3" : 'level 3'}
-                                    accessibilityHint="Speed level 3"
+                                    accessibilityLabel={level! >= 3 ? "active speed level 3" : 'speed level 3'}
+                                    accessibilityState={level! >= 3 ? {checked: true} : {checked: false}}
                                 >
                                     <Image
                                         source={require('../../assets/cards/speed_overlay/lvl_3.png')}
                                         style={styles.levelImage}
-                                        alt={"Speed level 3"}
                                     />
                                 </Pressable>
                             </Animated.View>

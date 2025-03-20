@@ -6,14 +6,14 @@ import ColorPalette from "./ColorPalette";
 
 export interface ColorPickerProps {
     onColorChange?: (color: HSLAVals) => void;
-    initialColor?: HSLAVals
+    initialColor: HSLAVals
 }
 /* 
 Color Slider will select hue (color).
 Color Palette will select saturation and lightness
 */
 const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColor }) => {
-    const [color, setColor] = useState<HSLAVals>()
+    const [color, setColor] = useState<HSLAVals>(initialColor)
     const [hue, setHue] = useState<number>(Number(initialColor?.hue))
 
     useEffect(() => {
@@ -21,10 +21,6 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onColorChange, initialColor }
             onColorChange(color)
         }
     }, [color])
-
-    useEffect(() => {
-        setColor(initialColor as HSLAVals)
-    }, [])
 
     const getColorFromHue = (hue : number) =>{
         setHue(hue)

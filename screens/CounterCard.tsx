@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, Image, View, StyleSheet, TextInput, TextInputChangeEventData, NativeSyntheticEvent, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions, StatusBar } from 'react-native';
+import { Text, Image, View, StyleSheet, TextInput, TextInputChangeEventData, NativeSyntheticEvent, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
@@ -10,13 +10,12 @@ import { counters } from '../constants/CounterTypes'
 import { staticTextScaler } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
-import FlipCard from '../components/counters/Flipcard';
+import FlipCard from '../components/Flipcard';
 import TheRing from '../components/overlays/TheRingOverlay';
 import { cardRules } from '../constants/cardRules'
 import { DungeonData } from '..';
 import { manaSymbols } from '../images/staticResources';
 import SpeedOverlay from '../components/overlays/SpeedOverlay';
-
 
 interface ManaCounterProps {
     source: ImageSourcePropType,
@@ -30,9 +29,10 @@ const ManaCounter: React.FC<ManaCounterProps> = ({ source, manaColor }) => {
     return (
         <View style={styles().mana_counter} >
             {/*Mana Symbol/Plus*/}
-            <Pressable onPressIn={() => setTotal(total + 1)}
+            <Pressable onPress={() => setTotal(total + 1)}
                 style={styles().mana_pressable}
                 accessibilityLabel={`Add ${manaColor} Mana`}
+                accessibilityRole="button"
             >
                 <Image source={source}
                     resizeMode='contain'
@@ -43,12 +43,14 @@ const ManaCounter: React.FC<ManaCounterProps> = ({ source, manaColor }) => {
             {/* Total */}
             <Text testID='mana_total' style={styles(undefined, deviceType).mana_total}
                 accessibilityRole="none"
+                accessibilityLiveRegion="polite"
                 accessibilityLabel={`${total} ${manaColor} mana`}
             >{total}</Text>
             {/* Minus */}
-            <Pressable onPressIn={() => setTotal(total - 1)}
+            <Pressable onPress={() => setTotal(total - 1)}
                 style={styles().mana_minus}
                 accessibilityLabel={`Minus ${manaColor} Mana`}
+                accessibilityRole="button"
             >
                 <Svg viewBox='0 -100 520 520' height={'100%'} width={'50%'}>
                     <Path d="M281.633,48.328C250.469,17.163,209.034,0,164.961,0C120.888,0,79.453,17.163,48.289,48.328   c-64.333,64.334-64.333,169.011,0,233.345C79.453,312.837,120.888,330,164.962,330c44.073,0,85.507-17.163,116.671-48.328   c31.165-31.164,48.328-72.599,48.328-116.672S312.798,79.492,281.633,48.328z M260.42,260.46   C234.922,285.957,201.021,300,164.962,300c-36.06,0-69.961-14.043-95.46-39.54c-52.636-52.637-52.636-138.282,0-190.919   C95,44.042,128.901,30,164.961,30s69.961,14.042,95.459,39.54c25.498,25.499,39.541,59.4,39.541,95.46   S285.918,234.961,260.42,260.46z"
@@ -143,7 +145,7 @@ const CounterCard: React.FC = ({ }) => {
         <Pressable testID='container'
             focusable={true}
             accessibilityRole="button"
-            onPressIn={() => handleSaveAndClose()}
+            onPress={() => handleSaveAndClose()}
             accessibilityHint='Press background to go back to game'
             style={[styles().container, {
                 width: width,
@@ -160,8 +162,8 @@ const CounterCard: React.FC = ({ }) => {
                     :                    
                     route.params.card === 'speed' ? 
                         <SpeedOverlay imageSource={{
-                            front: require('../assets/cards/start-speed.png'),
-                            back: require('../assets/cards/max-speed.png')
+                            front: require('../assets/cards/startspeed.jpg'),
+                            back: require('../assets/cards/maxspeed.jpg')
                         }} />
                         :
                         <KeyboardAvoidingView testID='card_wrapper'
@@ -172,7 +174,12 @@ const CounterCard: React.FC = ({ }) => {
                                 (typeof cardImageSource.cardImage === 'object' &&
                                     'front' in cardImageSource.cardImage &&
                                     'back' in cardImageSource.cardImage) ?
-                                    <FlipCard front={cardImageSource.cardImage.front} back={cardImageSource.cardImage.back} />
+                                    <FlipCard 
+                                    front={cardImageSource.cardImage.front} 
+                                    back={cardImageSource.cardImage.back} 
+                                    altBack={route.params.card === 'speed' ? 'Max Speed' : 'the Ring Tempts you rules'}
+                                    altFront={route.params.card === 'speed' ? 'Speed levels 1 to 3' :  'the Ring levels 1 to 4'}
+                                    />
                                     :
                                     // Static Card
                                     <View testID='card_pressable'
@@ -185,6 +192,7 @@ const CounterCard: React.FC = ({ }) => {
                                             source={cardImageSource.cardImage!}
                                             resizeMethod='scale'
                                             resizeMode="contain"
+                                            accessibilityRole="image"
                                             alt={route.params.card === 'initiative' ? cardRules['initiative'] :
                                                 route.params.card === 'monarch' ? cardRules['monarch'] :
                                                     `${route.params.card} card`}
@@ -194,8 +202,9 @@ const CounterCard: React.FC = ({ }) => {
                             {
                                 route.params.card === 'initiative' &&
                                 <Pressable style={styles().dungeon_icon}
-                                    onPressIn={() => dungeonNav()}
+                                    onPress={() => dungeonNav()}
                                     accessibilityLabel="to Dungeon"
+                                    accessibilityRole="button"
                                 >
                                     <Svg viewBox='0 0 524 524'>
                                         <Path d="M128.73 195.32l-82.81-51.76c-8.04-5.02-18.99-2.17-22.93 6.45A254.19 254.19 0 0 0 .54 239.28C-.05 248.37 7.59 256 16.69 256h97.13c7.96 0 14.08-6.25 15.01-14.16 1.09-9.33 3.24-18.33 6.24-26.94 2.56-7.34.25-15.46-6.34-19.58zM319.03 8C298.86 2.82 277.77 0 256 0s-42.86 2.82-63.03 8c-9.17 2.35-13.91 12.6-10.39 21.39l37.47 104.03A16.003 16.003 0 0 0 235.1 144h41.8c6.75 0 12.77-4.23 15.05-10.58l37.47-104.03c3.52-8.79-1.22-19.03-10.39-21.39zM112 288H16c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm0 128H16c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm77.31-283.67l-36.32-90.8c-3.53-8.83-14.13-12.99-22.42-8.31a257.308 257.308 0 0 0-71.61 59.89c-6.06 7.32-3.85 18.48 4.22 23.52l82.93 51.83c6.51 4.07 14.66 2.62 20.11-2.79 5.18-5.15 10.79-9.85 16.79-14.05 6.28-4.41 9.15-12.17 6.3-19.29zM398.18 256h97.13c9.1 0 16.74-7.63 16.15-16.72a254.135 254.135 0 0 0-22.45-89.27c-3.94-8.62-14.89-11.47-22.93-6.45l-82.81 51.76c-6.59 4.12-8.9 12.24-6.34 19.58 3.01 8.61 5.15 17.62 6.24 26.94.93 7.91 7.05 14.16 15.01 14.16zm54.85-162.89a257.308 257.308 0 0 0-71.61-59.89c-8.28-4.68-18.88-.52-22.42 8.31l-36.32 90.8c-2.85 7.12.02 14.88 6.3 19.28 6 4.2 11.61 8.9 16.79 14.05 5.44 5.41 13.6 6.86 20.11 2.79l82.93-51.83c8.07-5.03 10.29-16.19 4.22-23.51zM496 288h-96c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zm0 128h-96c-8.84 0-16 7.16-16 16v64c0 8.84 7.16 16 16 16h96c8.84 0 16-7.16 16-16v-64c0-8.84-7.16-16-16-16zM240 177.62V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V177.62c-5.23-.89-10.52-1.62-16-1.62s-10.77.73-16 1.62zm-64 41.51V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V189.36c-12.78 7.45-23.84 17.47-32 29.77zm128-29.77V472c0 4.42 3.58 8 8 8h16c4.42 0 8-3.58 8-8V219.13c-8.16-12.3-19.22-22.32-32-29.77z"
@@ -213,6 +222,7 @@ const CounterCard: React.FC = ({ }) => {
                                         onLongPress={() => setTotal(total + 10)}
                                         style={styles().increment_pressable}
                                         accessibilityLabel={`Plus ${route.params.card}`}
+                                        accessibilityRole="button"
                                     >
                                         <Svg
                                             viewBox={`0 0 650 650`}
@@ -232,13 +242,13 @@ const CounterCard: React.FC = ({ }) => {
                                     >
                                         <TextInput style={styles(route.params.card).total_text}
                                             value={`${total}`}
-                                            accessibilityRole="none"
                                             placeholder={`${total} ${route.params.card} counters`}
                                             testID="counter_total"
                                             keyboardType='numeric'
                                             onChange={(e) => handleInputChange(e)}
                                             editable={true}
                                             accessibilityLabel={`${route.params.card} total input`}
+                                            accessibilityLiveRegion="polite"
                                         ></TextInput>
                                     </View>
 
@@ -248,6 +258,7 @@ const CounterCard: React.FC = ({ }) => {
                                         onLongPress={() => setTotal(total - 10)}
                                         style={styles().increment_pressable}
                                         accessibilityLabel={`Minus ${route.params.card}`}
+                                        accessibilityRole="button"
                                     >
                                         <Svg
                                             viewBox={`-80 0 420 420`}

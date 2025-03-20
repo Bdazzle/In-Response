@@ -2,7 +2,8 @@
   "expo": {
     "name": "In_Response",
     "slug": "In_Response",
-    "version": "3.0.0",
+    "version": "4.1.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
     "userInterfaceStyle": "light",
@@ -32,22 +33,22 @@
           "android": {
             "enableProguardInReleaseBuilds": true,
             "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0"
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
           }
         }
       ],
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#000000",
+          "backgroundColor": "#ffffff",
           "image": "./assets/appIcons/splash/Color_Wheel.png",
           "dark": {
             "image": "./assets/appIcons/splash/Color_Wheel.png",
             "backgroundColor": "#000000"
           },
-          "imageWidth": 300
+          "imageWidth": 400
         }
       ]
     ],

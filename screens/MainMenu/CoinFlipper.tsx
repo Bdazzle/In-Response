@@ -5,7 +5,7 @@ import { Easing, Animated, Image, Text, KeyboardAvoidingView, Platform, StyleShe
 import { AllScreenNavProps } from "../.."
 import { staticTextScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
-import { GameContext } from "../../GameContext"
+import { GameContext, GameContextProps } from "../../GameContext"
 
 const Heads = () => {
     return (
@@ -22,9 +22,9 @@ const Tails = () => {
     )
 }
 
-const CoinFlipper = () => {
+const CoinFlipper : React.FC = ({}) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { globalPlayerData } = useContext(GameContext)
+    const { globalPlayerData } = useContext<GameContextProps>(GameContext)
     const [results, setResults] = useState<string[]>([])
     const [quantity, setQuantity] = useState<number>(1)
     const animationTime = 1200
@@ -95,7 +95,8 @@ const CoinFlipper = () => {
         <View style={styles.flipper_container}>
             {/* Back Button */}
             <Pressable style={styles.back_button}
-                onPressIn={() => handleBack()}
+                onPress={() => handleBack()}
+                accessibilityRole="button"
                 accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
             >
                 <Svg viewBox="0 0 800 800" style={{
@@ -141,9 +142,10 @@ const CoinFlipper = () => {
             {/* Coins/flip button */}
             <View style={styles.coins_container}>
                 <Pressable style={styles.coin_button}
-                    onPressIn={() => handleFlip()}
+                    onPress={() => handleFlip()}
                     accessibilityLabel="Flip coins"
                     accessibilityHint={`Flip ${quantity} coins`}
+                    accessibilityRole="button"
                     nativeID="flips pressable"
                 >
                     <View style={styles.face_wrapper}>

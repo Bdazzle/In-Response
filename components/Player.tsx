@@ -78,7 +78,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
             }
             ]}
             onLayout={(e) => getDimensions(e)}
-            onPressIn={() => handleCDamageModal()}
+            onPress={() => handleCDamageModal()}
         >
             {/* Commander Damage tracker */}
             {gameType === 'oathbreaker' || gameType === 'commander' ?
@@ -121,6 +121,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         testID='background_increment_wrapper'
                         style={styles.background_increment_wrapper}>
                         <Pressable
+                        accessible={false}
                             testID='background_plus'
                             accessibilityLabel={`${playerName} Gain Life`}
                             accessibilityHint='Press to add, hold to add by 10'
@@ -132,13 +133,14 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                                         },
                                         styles.background_plus
                                     ]}
-                            delayLongPress={300}
+                            delayLongPress={200}
                             onPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal + 1)}
                             onLongPress={() => handleLifeChange(globalPlayerData[playerID].lifeTotal + 10)}
                         >
                             <View testID='life_icon_wrapper'
                                 style={styles.life_icon_wrapper}>
                                 <Svg testID='plus_icon'
+                                accessibilityLabel='plus icon'
                                     viewBox='0 0 700 700'
                                     height={'100%'}
                                     width={'100%'}
@@ -169,6 +171,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                                 <Svg viewBox='0 -20 75 75'
                                     height={'100%'}
                                     width={'100%'}
+                                    accessibilityLabel='minus icon'
                                 >
                                     <Path d="M52.161,26.081c0,3.246-2.63,5.875-5.875,5.875H5.875C2.63,31.956,0,29.327,0,26.081l0,0c0-3.245,2.63-5.875,5.875-5.875   h40.411C49.531,20.206,52.161,22.835,52.161,26.081L52.161,26.081z"
                                         fill={theme.secondary}
@@ -184,6 +187,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                     <View testID='life_total_text_container' style={styles.life_total_text_container}>
                         <Text testID='life_total'
                             accessibilityLabel={`${playerName} ${globalPlayerData[playerID].lifeTotal} life`}
+                            accessibilityLiveRegion="polite"
                             adjustsFontSizeToFit={true}
                             numberOfLines={1}
                             style={[styles.life_total, {
@@ -215,10 +219,11 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         styles.counter_pressable,
                         { backgroundColor: pressed ? 'grey' : theme.secondary }
                     ]}
-                    onPressIn={() => toCounters()}
+                    onPress={() => toCounters()}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${playerName} counters`}
                 >
                     <Text testID='counter_pressable_text'
-                        accessibilityLabel={`${playerName} Counters`}
                         numberOfLines={1}
                         adjustsFontSizeToFit={true}
                         style={[styles.counter_pressable_text, {

@@ -1,11 +1,18 @@
 import React from "react"
-import { ImageSourcePropType } from "react-native"
 import Svg, { G, Path } from "react-native-svg"
+import { PlaneChaseSet, PlaneProps } from ".."
 
-type PlaneProps = {
-    [key: string]: ImageSourcePropType
+export const planechaseSets = {
+    'opca': 'Planechase Anthology',
+    'ohop': 'Planechase',
+    'opc2': 'Planechase 2012',
+    'who': 'Doctor Who',
+    "moc": "March of the Machine Commander"
 }
 
+/**
+ * default set is opca
+ */
 const phenomenon: PlaneProps = {
     "chaotic-aether": require('../assets/planechase/phenomenon/chaotic-aether.jpg'),
     "interplanar-tunnel": require('../assets/planechase/phenomenon/interplanar-tunnel.jpg'),
@@ -98,9 +105,11 @@ const planes: PlaneProps = {
     "windriddle-palaces": require('../assets/planechase/planes/windriddle-palaces.jpg'),
 }
 
-const planechaseImages = {
-    phenomenon: phenomenon,
-    planes: planes,
+const planechaseImages : PlaneChaseSet = {
+    'opca': {
+        phenomenon: phenomenon,
+        planes: planes,
+    }
 }
 
 interface PWSvg {
@@ -110,9 +119,7 @@ interface PWSvg {
 
 export const PlaneswalkerSvg: React.FC<PWSvg> = ({ fillColor, viewBox }) => {
     return (
-        <Svg viewBox={viewBox}
-            accessibilityLabel="Planeswalker icon"
-        >
+        <Svg viewBox={viewBox}>
             <G transform={"translate(-128.125,398.84217)"} id="layer1" >
                 <G transform={"matrix(4.0816327,0,0,-4.0816327,128.125,815.48356)"} id="g3777">
                     <G test-id="g3779">

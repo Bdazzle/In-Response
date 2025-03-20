@@ -5,14 +5,14 @@ import Svg, { Path, Polygon } from 'react-native-svg'
 import { AllScreenNavProps } from "..";
 import getDimensions from "../functions/getComponentDimensions";
 import { textScaler } from "../functions/textScaler";
-import { RootStackParamList, StartMenuStackParamList } from "../navigation";
+import { GlobalMenuParamsList, RootStackParamList, StartMenuStackParamList } from "../navigation";
 
 interface MenuNavProps {
     labelTo?: string
     labelBack?: string
-    navTo?: keyof StartMenuStackParamList | keyof RootStackParamList;
+    navTo?: keyof StartMenuStackParamList | keyof RootStackParamList | keyof GlobalMenuParamsList;
     navToOptions?: object;
-    navBack?: keyof StartMenuStackParamList | keyof RootStackParamList;
+    navBack?: keyof StartMenuStackParamList | keyof RootStackParamList | keyof GlobalMenuParamsList;
     navBackOptions?: object
 }
 
@@ -40,10 +40,11 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                 {/* Back */}
                 {navBack !== undefined &&
                     <Pressable style={styles.back_touchable}
-                        onPressIn={() => handleBack()}
+                        onPress={() => handleBack()}
                         onLayout={(e) => getDimensions(e, setPressDimensions)}
                         testID="back_press"
                         accessibilityLabel={`Back to ${labelBack}`}
+                        accessibilityRole="button"
                     >
                         <Svg viewBox="-50 -50 600 600" style={{
                             height: '100%',
@@ -76,9 +77,10 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                 {navTo !== undefined &&
                     <Pressable style={styles.next_touchable}
                         testID="next_press"
-                        onPressIn={() => handleNext()}
+                        onPress={() => handleNext()}
                         onLayout={(e) => getDimensions(e, setPressDimensions)}
                         accessibilityLabel={`Continue to ${labelTo}`}
+                        accessibilityRole="button"
                     >
                         <Svg viewBox="-50 -50 600 600"
                             style={{
