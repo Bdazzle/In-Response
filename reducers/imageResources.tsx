@@ -34,7 +34,7 @@ export type imageAction = {
     colorTheme?: ColorTheme;
     dungeonCompleted?: boolean;
     scale?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
-    svgDimension?: { width?: number, height?: number};
+    svgDimension?: { width?: number | string, height?: number | string};
     fills?: [ColorValue, ...ColorValue[]]//syntax for first item has to be a string (can't be 0) to any amount of strings
 }
 
@@ -124,7 +124,6 @@ export const imageReducer = (state: ImageReducerState, action: imageAction) => {
         case "dungeon":
             return {
                 Svg: <Svg viewBox='0 0 524 524'
-                    // width={"60%"} height={"100%"}
                     {...action.svgDimension}
                     style={{
                         marginLeft: action.dungeonCompleted ? 0 : 10,

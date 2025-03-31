@@ -48,7 +48,8 @@ const DungeonButton: React.FC<{ playerID: number }> = ({ playerID }) => {
         dispatchResources({
             card: 'dungeon',
             dungeonCompleted: dungeonCompleted,
-            colorTheme: colorTheme
+            colorTheme: colorTheme,
+            svgDimension:{ width:'60%', height:'100%'}
         })
     }, [globalPlayerData[playerID].dungeonCompleted])
 
@@ -70,7 +71,7 @@ const DungeonButton: React.FC<{ playerID: number }> = ({ playerID }) => {
                             fill={colorTheme.primary === 'rgba(0,0,0,1)' ? 'white' : 'rgba(0,0,0,1)'} />
                     </Svg>
                 }
-                {resources.Svg}
+                    {resources.Svg}
             </Pressable>
         </>
     )
@@ -153,7 +154,7 @@ const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPres
                 onLongPress={() => cardLongPress("initiative")}
                 testID={"initiative_pressable"}
                 accessibilityRole="button"
-                // accessibilityState={currentInitiative === playerName ? {selected: true} : {disabled: true}}
+            // accessibilityState={currentInitiative === playerName ? {selected: true} : {disabled: true}}
             />
             {resources.Svg}
         </View>

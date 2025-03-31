@@ -75,7 +75,7 @@ in which case, when closed, should save the total to globalPlayerData -> playerI
 which should update corresponding Player component
 */
 const CounterCard: React.FC = ({ }) => {
-    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, deviceType } = useContext(OptionsContext) as OptionsContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Card'>>()
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
@@ -149,7 +149,7 @@ const CounterCard: React.FC = ({ }) => {
             accessibilityHint='Press background to go back to game'
             style={[styles().container, {
                 width: width,
-                height:'95%',
+                height: deviceType === 'phone' ?'95%' : '98%',
                 transform: rotate && [rotate],
             }]}>
             {/*The Ring and Speed*/}

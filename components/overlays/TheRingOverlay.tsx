@@ -77,9 +77,9 @@ const getTabletStyles = () => {
                 aspectRatio: .75
             },
             ring_overlay_wrapper: {
-                height: '52.5%',
-                left: '14.5%',
-                width: '71%',
+                height: '52%',
+                left: '14%',
+                width: '72%',
             },
             visible_level: {
                 color: 'black',
@@ -100,7 +100,7 @@ const getTabletStyles = () => {
                 height: '21%'
             },
             level4: {
-                height: '19%',
+                height: '19.5%',
             },
             levelImageWrapper: {
                 height: '100%',

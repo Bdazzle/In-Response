@@ -223,13 +223,13 @@ export const handleTaxSize = (totalPlayers: number, id: number, text: string, ga
   }
 }
 
-
-export function taxLineHeight(componentHeight: number, playerID: number, totalPlayers: number, gameType: string) {
+/*removed arg playerID: number, */
+export function taxLineHeight(componentHeight: number, totalPlayers: number, gameType: string) {
   if (deviceType === 2) {
     if (totalPlayers === 3) {
       return gameType === 'oathbreaker' ? componentHeight : componentHeight * 1.2
     } else {
-      return gameType === 'oathbreaker' ? componentHeight * .8 : componentHeight * 1.1
+      return gameType === 'oathbreaker' ? componentHeight * .8 : componentHeight * 1.2
     }
   }
   if (width >= 600 && width < 900) {

@@ -18,7 +18,7 @@ export default function useContainerDimensions(gameType: string, totalPlayers: n
                     marginLeft: '15%'
                 })
                 setCommanderDim({
-                    height: '80%'
+                    height: '90%'
                 })
             }
             else if (totalPlayers === 4) {

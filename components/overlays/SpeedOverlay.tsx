@@ -62,18 +62,19 @@ const getTabletStyles = () =>{
                 alignItems: 'flex-start',
             },
             level1: {
-                top:'9%',
+                top:'13%',
                 height: '100%',
+                width: '100%',
             },
             level2: {
-                left:'1%',
+                left:'1.5%',
                 height: '100%',
-                top: '-9%',
+                top: '-6%',
             },
             level3: {
-                left:'1%',
+                left:'1.5%',
                 height: '100%',
-                top: '-28%',
+                top: '-21%',
             },
         }
     }
@@ -81,7 +82,7 @@ const getTabletStyles = () =>{
 }
 
 const universalStyles = (devicetype : string) =>{
-    const deviceStyles = devicetype === 'phone' ? getPhoneStyles() : getTabletStyles;
+    const deviceStyles = devicetype === 'phone' ? getPhoneStyles() : getTabletStyles();
 
     const styles = StyleSheet.create({
         speed_container: {

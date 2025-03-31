@@ -29,17 +29,17 @@ componentHeight is height of element being scaled
 function scaleY(totalPlayers: number, position: number, componentHeight: number): number {
     switch (totalPlayers) {
         case 2: {
-            return -componentHeight
+            return -componentHeight * .2
         };
         case 3: {
-            return position === 0 ? -componentHeight * .2 : -componentHeight * 1.5
+            return position === 0 ? componentHeight/4 : -componentHeight * 1
         }
         case 4: {
             return position === 0 ? componentHeight / 1.5
                 :
                 position === 1 ? -componentHeight / 3
                     :
-                    -componentHeight * 1.4
+                    -componentHeight * 1.6
         }
         default: return componentHeight
     }
@@ -55,7 +55,6 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
     const { globalPlayerData, dispatchGlobalPlayerData } = useContext(GameContext) as GameContextProps
     const [isPressed, setIsPressed] = useState<boolean>(false)
     const [textWrapperDimensions, setTextWrapperDimensions] = useState<{ width: number, height: number }>({ width: 75, height: 33 })
-    
     const totalPlayers = Object.keys(globalPlayerData).length
 
     const handleDamageChange = (val: number) => {
@@ -130,6 +129,10 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
         ],
     }
 
+    const trackerDims = () : number =>{
+        return totalPlayers === 4 ? 100 : totalPlayers == 3 ? 80 : 35
+    }
+
     return (
         <Animated.View testID={`${opponentName}_damage_container`}
             aria-expanded={Number(scaleVal) > 1 ? true : false}
@@ -138,14 +141,9 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                     scaleStyles,
                     {
                         backgroundColor: globalPlayerData[oppponentID].colors.primary,
-                        // height: `${80 / (totalPlayers - 1)}%`,
-                        // height: `${100 / (totalPlayers - 1)}%`,
-                        maxHeight: totalPlayers === 2 ? `25%`
-                            :
-                            totalPlayers === 3 ? `35%` : `33%`,// 100/maximum # of potential players - 1
+                        height: `${trackerDims() / (totalPlayers - 1)}%`,
                         zIndex: isPressed === true ? 10 : 0,
                         borderRadius: 5,
-                        // width: '100%',
                     }
                 ]}
             collapsable={false}
@@ -299,10 +297,18 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
         }
     }
 
+    const taxDimensions = () =>{
+        return totalPlayers === 4 ? '20%' : '25%'
+    }
+
     return (
-        <View style={styles().cdamage_container}
+        <View style={[styles().cdamage_container,{
+            marginTop:totalPlayers === 2 ? 5 : 0,
+        }]}
         >
-            <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
+            <Pressable style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax,{
+                height: gameType === 'oathbreaker' ? '35%' : taxDimensions(),
+            }]}
                 onPress={() => setTax(tax + 1)}
                 onLongPress={() => setTax(tax - 1)}
                 onLayout={(e) => getDimensions(e)}
@@ -350,7 +356,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     pressDimensions && {
                         fontSize: handleTaxSize(totalPlayers, playerID, String(tax), gameType),
-                        lineHeight: taxLineHeight(pressDimensions.height, playerID, totalPlayers, gameType),
+                        lineHeight: taxLineHeight(pressDimensions.height, totalPlayers, gameType),
                         paddingLeft: gameType === 'commander' ? 3 : 0,
                     }]}>
                     {tax}
@@ -359,10 +365,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
             {
                 gameType === 'commander' ?
                     <View testID="trackers_container"
-                        style={{
-                            height: '80%',
-                            width: '100%',
-                        }}
+                        style={styles().tracker_container}
                     >
                         {
                     Object.keys(globalPlayerData).filter((pID: string) => Number(pID) !== playerID)
@@ -381,7 +384,9 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     </View>
                     :
                     /* Spell Tax */
-                    <Pressable style={styles(globalPlayerData[playerID].colors.secondary, gameType).tax}
+                    <Pressable style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax,{
+                        height: '35%'
+                    }]}
                         onPress={() => setSpellTax(spellTax + 1)}
                         onLongPress={() => setSpellTax(spellTax - 1)}
                         onLayout={(e) => getDimensions(e)}
@@ -408,7 +413,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             pressDimensions && {
                                 fontSize: handleTaxSize(totalPlayers, playerID, String(spellTax), gameType),
-                                lineHeight: pressDimensions && taxLineHeight(pressDimensions.height, playerID, totalPlayers, gameType),
+                                lineHeight: pressDimensions && taxLineHeight(pressDimensions.height, totalPlayers, gameType),
                                 paddingLeft: totalPlayers === 3 && playerID === 2 ? 4 : 0
                             }]}>
                             {
@@ -425,13 +430,11 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
     cdamage_container: {
         height: '100%',
         width: '100%',
-        justifyContent: 'center',
         marginLeft: 5,
         paddingBottom: 5,
     },
     tax: {
         paddingLeft: '10%',
-        height: gameType === 'oathbreaker' ? '35%' : '25%',
         width: '90%',
         minHeight: 40,
         flexDirection: gameType === 'commander' ? 'row' : 'column',
@@ -466,6 +469,10 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
         height: '100%',
         width: '100%',
         textAlignVertical: 'top',
+    },
+    tracker_container:{
+        height: '80%',
+        width: '100%',
     },
     damage_row: {
         flexDirection: 'row',

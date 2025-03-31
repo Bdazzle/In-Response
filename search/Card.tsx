@@ -52,6 +52,10 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         translateYVal: langTranslateYVal,
         fadeStyle: langFadeStyle } = useFadeDownAnimation()
 
+        /**
+         * check for new card data when component loads, 
+         * so stale data (from a previoulsy searched card) isn't displayed
+         */
     useEffect(() => {
         setCurrentSet(cardData.versions[0].set_name as keyof StringProperties<Card>)
         setCurrentLang(cardData.versions[0].lang as string)
@@ -68,7 +72,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         }, {} as { [set_name: string]: string })
 
         setSetOptions(sets)
-    }, [])
+    }, [cardData])
 
     /**
      * get language options for a given set
@@ -94,14 +98,14 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         setCurrentLang(newLanguageOptions[0])
         setLangPressed(false)
         setCurrentSet(set as keyof StringProperties<Card>)
-        const currentCard = cardData.versions.filter(card => card.set === set && card.lang === newLanguageOptions[0])
+        const currentCard = cardData.versions.filter(card => card.set_name === set && card.lang === newLanguageOptions[0])
         handlePress(currentCard[0])
     }
 
     const handleLangPress = (lang: string) => {
         setLangPressed(!langPress)
         setCurrentLang(lang)
-        const currentCard = cardData.versions.filter(card => card.lang === lang && card.set === currentSet)
+        const currentCard = cardData.versions.filter(card => card.lang === lang && card.set_name === currentSet)
         handlePress(currentCard[0])
     }
 
@@ -118,9 +122,9 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
             <View testID="set_buttons_container"
             >
                 <Pressable testID="svg_container"
-                accessibilityRole="button"
-                accessibilityLabel="change set"
-                accessibilityHint={`current set ${currentSet}`}
+                    accessibilityRole="button"
+                    accessibilityLabel="change set"
+                    accessibilityHint={`current set ${currentSet}`}
                     style={({ pressed }) => [styles(deviceType).svg_container, {
                         opacity: pressed ? .5 : 1,
                         zIndex: 2
@@ -157,7 +161,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                                         setArr.filter(set => set[0] !== currentSet).map((set, index) => {
                                             return (
                                                 <Pressable key={index}
-                                                accessibilityRole="button"
+                                                    accessibilityRole="button"
                                                     onPress={() => handleSetSelect(set[0])}
                                                     style={({ pressed }) => [styles(deviceType).svg_container,
                                                     {
@@ -165,7 +169,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                                                     },
                                                     ]}
                                                 >
-                                                    <SvgUri uri={set[1] as string} width={40} height={40} accessibilityLabel={set[0]}/>
+                                                    <SvgUri uri={set[1] as string} width={40} height={40} accessibilityLabel={set[0]} />
                                                 </Pressable>
                                             )
                                         })
@@ -180,9 +184,9 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
             <View testID="lang_buttons_container"
             >
                 <Pressable testID="svg_container"
-                accessibilityRole="button"
-                accessibilityLabel="languages"
-                accessibilityHint={`current language ${languageKey[currentLang]}`}
+                    accessibilityRole="button"
+                    accessibilityLabel="languages"
+                    accessibilityHint={`current language ${languageKey[currentLang]}`}
                     style={({ pressed }) => [styles(deviceType).svg_container,
                     {
                         opacity: pressed ? .5 : 1,
@@ -208,8 +212,8 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                             langOptions.filter(l => l !== currentLang).map((abrv, index) => {
                                 return (
                                     <Pressable
-                                    accessibilityRole="button"
-                                    accessibilityLabel={languageKey[abrv]}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={languageKey[abrv]}
                                         style={({ pressed }) => [styles(deviceType).svg_container, {
                                             opacity: pressed ? .5 : 1,
                                         },]} key={index}
@@ -233,33 +237,56 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     const [oracleText, setOracleText] = useState<string>('')
     const [cardFront, setCardFront] = useState<string>()
     const [cardBack, setCardBack] = useState<string>()
-    // const [rules, setRules] = useState<Rulings>()
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
-    // const styles = deviceType === 'phone' ? getPhoneStyles() : getTabletStyles()
+    const [currentVersion, setCurrentVersion] = useState<Card>()
 
+    /**
+     * initialize component with first card in cardData,
+     * or when card data changes, so new searches don't have stale data from previous results
+     */
     useEffect(() => {
-        if (cardData.versions[0].card_faces) {
-            if (showFront) {
-                setOracleText(cardData.versions[0].card_faces?.[0].oracle_text)
-            } else {
-                setOracleText(cardData.versions[0].card_faces?.[1].oracle_text)
-            }
-        }
-        else {
-            setOracleText(cardData.versions[0].oracle_text)
-        }
-    }, [showFront, cardData])
-
-
-    const handleSetChange = (card: Card) => {
+        setCurrentVersion(cardData.versions[0])
+    }, [cardData])
+ 
+    const handleVersionChange = (card: Card) => {
         if (card) {
-            card.card_faces ? (setCardFront(card.card_faces?.[0].image_uris!.normal), setCardBack(card.card_faces?.[1].image_uris!.normal))
-                : setCardFront(card.image_uris?.normal);
-
-            card.printed_text ? setOracleText(card.printed_text as string) : setOracleText(card.oracle_text as string);
-
+            setCurrentVersion(card)
         }
     }
+    /**
+     * when current version changes, we need it's set/language images and text,
+     * check for printed_text if foreign language is selected, otherwise display oracle_text for EN
+     * set images of set/lang version of card.
+     */
+    useEffect(() => {
+        if (currentVersion) {
+            if (currentVersion?.card_faces) {
+                currentVersion.card_faces[0].printed_text
+                setCardFront(currentVersion.card_faces[0].image_uris?.normal)
+                setCardBack(currentVersion.card_faces[1].image_uris?.normal)
+                if (showFront) {
+                    setOracleText(currentVersion.card_faces[0].oracle_text)
+                    currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
+                } else {
+                    setOracleText(currentVersion.card_faces[1].oracle_text)
+                    currentVersion.card_faces[1].printed_text ? setOracleText(currentVersion.card_faces[1].printed_text) : setOracleText(currentVersion.card_faces[1].oracle_text)
+                }
+            } else {
+                setCardFront(currentVersion.image_uris?.normal)
+                currentVersion.printed_text ? setOracleText(currentVersion?.printed_text as string) : setOracleText(currentVersion?.oracle_text as string)
+            }
+        }
+    }, [currentVersion])
+
+    useEffect(() => {
+        if (currentVersion?.card_faces) {
+            if (showFront) {
+                currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
+            } else {
+                currentVersion.card_faces[1].printed_text ? setOracleText(currentVersion.card_faces[1].printed_text) : setOracleText(currentVersion.card_faces[1].oracle_text)
+            }
+        }
+    }, [showFront])
 
     useEffect(() => {
         if (cardData.versions[0].card_faces) {
@@ -298,7 +325,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             }
             <View testID="card_info" style={styles().card_info}>
 
-                <SetRow cardData={cardData} handlePress={handleSetChange} />
+                <SetRow cardData={cardData} handlePress={handleVersionChange} />
 
                 <View style={styles().text_container}>
                     <Text testID="oracle_text" style={styles(deviceType).oracle_text}>
@@ -388,17 +415,17 @@ const styles = (deviceType?: string) => {
             borderTopWidth: 2,
             borderBottomWidth: 2
         },
-        flip_button:{
+        flip_button: {
             borderColor: 'white',
             borderRadius: 50,
             borderWidth: 1,
             maxWidth: 80,
             maxHeight: 78,
-            width:'22%',
-            height:'15%',
+            width: '22%',
+            height: '15%',
             zIndex: 10,
             backgroundColor: 'black',
-            bottom:'-10%',
+            bottom: '-10%',
             position: 'absolute'
         },
         name_text: {

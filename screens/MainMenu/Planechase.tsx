@@ -349,7 +349,9 @@ const Planechase: React.FC = ({ }) => {
                             accessibilityLabel="Back to Planar Deck options"
                             accessibilityRole="button"
                             testID='to_options' onPress={handleBack}>
-                            <Text style={styles.options_text}>Options</Text>
+                            <Text style={[styles.options_text,{
+                                fontSize: deviceType === 'phone' ? 16 : 20
+                            }]}>Options</Text>
                         </Pressable>
                     </View>
 
@@ -484,7 +486,6 @@ const styles = StyleSheet.create({
         fontFamily: "Beleren",
         color: 'black',
         textAlign: 'center',
-        fontSize: staticTextScaler(16)
     }
 })
 

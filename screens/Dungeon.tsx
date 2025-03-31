@@ -27,25 +27,25 @@ const dungeonReducer = (state: dungeonInfo, action: DungeonAction) => {
             return {
                 name: "Undercity",
                 uri: require("../assets/dungeons/Undercity.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .30 : action.imageHeight * .25
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .38 : action.imageHeight * .3
             };
         case "Dungeon of the Mad Mage":
             return {
                 name: "Dungeon of the Mad Mage",
                 uri: require("../assets/dungeons/Dungeon-of-the-Mad-Mage.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .29 : action.imageHeight * .25
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .37 : action.imageHeight * .28
             };
         case "Tomb of Annihilation":
             return {
                 name: "Tomb of Annihilation",
                 uri: require("../assets/dungeons/Tomb-of-Annihilation.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .35 : action.imageHeight * .3
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .42 : action.imageHeight * .35
             };
         case "Lost Mines of Phandelver":
             return {
                 name: "Lost Mines of Phandelver",
                 uri: require("../assets/dungeons/Lost-Mine-of-Phandelver.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .32 : action.imageHeight * .26
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .4 : action.imageHeight * .32
             };
         case "Completed":
             return {
@@ -102,6 +102,7 @@ const DungeonButton: React.FC<DungeonButtonProps> = ({ title, dispatchDungeon, s
 
 /* 
 Dungeon screen rotates to face player, this causes the marker to have inverted/opposite values when rotated 180
+also means marker offset has to be adjusted based on which players and rotation is using it.
 */
 const Dungeon: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -140,8 +141,9 @@ const Dungeon: React.FC = ({ }) => {
     const markerDrag = (event: GestureResponderEvent) => {
         if (rotate) {
             setMarker_coords({
+                // y: height - event.nativeEvent.pageY - marker_radius,
                 x: width - event.nativeEvent.pageX,
-                y: height - event.nativeEvent.pageY - 70,
+                y: height - event.nativeEvent.pageY,
             })
         }
         else {
@@ -151,7 +153,6 @@ const Dungeon: React.FC = ({ }) => {
             })
         }
     }
-
 
     const markerRelease = (event: GestureResponderEvent) => {
         const Ythreshold = height - (currentDungeon.lastroom_height as number)
@@ -322,7 +323,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Beleren',
     },
     dungeon_container: {
-        height: '95%',
+        // height: '95%',
+        height:'100%',
         width: '100%',
     },
     dungeon_wrapper: {
@@ -353,6 +355,7 @@ const styles = StyleSheet.create({
     },
     lastroom: {
         width: '100%',
+        // borderColor:'white', borderWidth:1
     },
     dungeon_image: {
         width: '100%',

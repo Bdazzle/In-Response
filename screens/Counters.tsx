@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, useWindowDimensions } from 'react-native';
+import { Text, View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
@@ -341,7 +341,7 @@ const TrackersCol: React.FC = ({ }) => {
 }
 
 const Counters: React.FC = ({ }) => {
-    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers, deviceType } = useContext(OptionsContext) as OptionsContextProps
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
@@ -375,7 +375,9 @@ const Counters: React.FC = ({ }) => {
     }
 
     return (
-        <View style={styles.counters_container}>
+        <View style={[styles.counters_container,{
+            height: deviceType === 'phone' ? '95%' : '98%'
+        }]}>
             <View style={[styles.counter_rows_container,
             rotate && {
                 transform: [rotate]
@@ -412,7 +414,6 @@ const Counters: React.FC = ({ }) => {
 
 const styles = StyleSheet.create({
     counters_container: {
-        height: '95%',
         width: '100%'
     },
     counter_rows_container: {
