@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
-import { View, StyleSheet, Text, Pressable } from "react-native"
+import { View, StyleSheet, Text, Pressable, ColorValue } from "react-native"
 import { imageAction, imageReducer, ImageReducerState } from "../../reducers/imageResources"
 import { ColorTheme, CounterCardProps, CounterData } from "../.."
 import { GameContext, GameContextProps } from "../../GameContext"
@@ -32,7 +32,8 @@ const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions
     const [textSize, setTextSize] = useState<number>()
 
     useEffect(() => {
-        dispatchResources({card: counterType, fills:[colorTheme.secondary]})
+        const colors :  [ColorValue, ...ColorValue[]] = counterType === 'energy' ? [colorTheme.primary, colorTheme.secondary] : [colorTheme.secondary]
+        dispatchResources({card: counterType, fills:colors})
     }, [parentDimensions])
 
     const handleCounterPress = (counter: string) => {

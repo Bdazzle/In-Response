@@ -24,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.beedazzle.mtg_counter",
-      "versionCode": 26
+      "versionCode": 27
     },
     "plugins": [
       [
@@ -42,6 +42,7 @@
       [
         "expo-splash-screen",
         {
+          "resizeMode" : "contain",
           "backgroundColor": "#ffffff",
           "image": "./assets/appIcons/splash/Color_Wheel.png",
           "dark": {

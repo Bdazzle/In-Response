@@ -447,7 +447,7 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
                         }} />
 
                     <View key="player_3" style={[styles.player_3, {
-                        height: height / 3
+                        height: height * .35,
                     }]}>
                         <Player key="Player 3"
                             playerName={globalPlayerData[playerIDs[2]].screenName}
