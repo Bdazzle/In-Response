@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ImageBackground, GestureResponderEvent, ImageSourcePropType, Dimensions, Pressable, LayoutChangeEvent, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, GestureResponderEvent, ImageSourcePropType, Pressable, LayoutChangeEvent, useWindowDimensions, StatusBar } from 'react-native';
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { textScaler } from '../functions/textScaler';
 import useScreenRotation from '../hooks/useScreenRotation';
 import Marker from '../components/Marker';
 import AnimatedModal from '../components/modals/AnimatedModal';
+import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 
 type dungeonInfo = {
     name: string | undefined,
@@ -107,6 +108,8 @@ also means marker offset has to be adjusted based on which players and rotation 
 const Dungeon: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Dungeon'>>()
+    const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
+    const statusBarHeight = StatusBar.currentHeight;
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const [currentDungeon, dispatchDungeon] = useReducer<(state: dungeonInfo, action: DungeonAction) => dungeonInfo>(dungeonReducer,
         {
@@ -207,7 +210,10 @@ const Dungeon: React.FC = ({ }) => {
     }
 
     return (
-        <View style={[styles.dungeon_container,
+        <View style={[styles.dungeon_container, 
+            {
+                height: height + (deviceType === "phone" && statusBarHeight || 0)
+            },
         rotate && {
             transform: [rotate]
         }
@@ -323,8 +329,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Beleren',
     },
     dungeon_container: {
-        // height: '95%',
-        height:'100%',
         width: '100%',
     },
     dungeon_wrapper: {
@@ -355,7 +359,6 @@ const styles = StyleSheet.create({
     },
     lastroom: {
         width: '100%',
-        // borderColor:'white', borderWidth:1
     },
     dungeon_image: {
         width: '100%',
@@ -369,7 +372,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-
     },
 
 })

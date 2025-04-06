@@ -232,6 +232,16 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
     )
 }
 
+/**
+ * split cards (aftermath, fuse, adventure, etc.) have card_faces[text fields], but no image_uri for those faces.
+ * mdfc's have all data for both card_faces.
+ * add some sort of priorety hierarchy check to load card_face/not card face data first.
+ * if card_data.versions[0]/currentVersion.image_uris -> render image, else render card_faces.image_uris.normal
+ * if card.printed_text => printed_text => oracle_text, else card_faces => card_faces.printed_text => card_faces.oracle_text
+ * text priority printed => oracle, if neither go to card_faces printed => oracle
+ * @param param0 
+ * @returns 
+ */
 const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     const [showFront, setShowFront] = useState<boolean>(true)
     const [oracleText, setOracleText] = useState<string>('')
@@ -253,27 +263,40 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             setCurrentVersion(card)
         }
     }
+
     /**
      * when current version changes, we need it's set/language images and text,
      * check for printed_text if foreign language is selected, otherwise display oracle_text for EN
      * set images of set/lang version of card.
+     *  printed text > oracle text
+        if image_uris and cardfaces, split card, need image, then text from cardfaces
+        if image_uris and !cardfaces, normal cards -> get image and text
+        if no image_uris, flip card, and need image and text from both cardfaces
      */
     useEffect(() => {
         if (currentVersion) {
-            if (currentVersion?.card_faces) {
-                currentVersion.card_faces[0].printed_text
-                setCardFront(currentVersion.card_faces[0].image_uris?.normal)
-                setCardBack(currentVersion.card_faces[1].image_uris?.normal)
-                if (showFront) {
-                    setOracleText(currentVersion.card_faces[0].oracle_text)
-                    currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
-                } else {
-                    setOracleText(currentVersion.card_faces[1].oracle_text)
-                    currentVersion.card_faces[1].printed_text ? setOracleText(currentVersion.card_faces[1].printed_text) : setOracleText(currentVersion.card_faces[1].oracle_text)
+            //check to see if one image, which is split cards and normal cards, both use image_uris
+            if (currentVersion?.image_uris) {
+                setCardFront(currentVersion.image_uris?.normal)
+                if(currentVersion.card_faces){ // check for split card
+                    const cardText = currentVersion.card_faces[0].printed_text ? 
+                    `${currentVersion.card_faces[0].printed_text.split('\n')[0]} // ${'\n'} ${currentVersion.card_faces[1].printed_text}` :
+                    `${currentVersion.card_faces[0].oracle_text.split('\n')[0]} // ${'\n'} ${currentVersion.card_faces[1].oracle_text}`;
+                    setOracleText(cardText)
+                } else { //normal card
+                    currentVersion.printed_text ? setOracleText(currentVersion?.printed_text as string) : setOracleText(currentVersion?.oracle_text as string)    
                 }
             } else {
-                setCardFront(currentVersion.image_uris?.normal)
-                currentVersion.printed_text ? setOracleText(currentVersion?.printed_text as string) : setOracleText(currentVersion?.oracle_text as string)
+                //for double faced cards
+                if(currentVersion.card_faces){
+                    setCardFront(currentVersion.card_faces[0].image_uris?.normal)
+                    setCardBack(currentVersion.card_faces[1].image_uris?.normal)
+                    if (showFront){
+                        currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
+                    } else {
+                        currentVersion.card_faces[1].printed_text ? setOracleText(currentVersion.card_faces[1].printed_text) : setOracleText(currentVersion.card_faces[1].oracle_text)
+                    }
+                }
             }
         }
     }, [currentVersion])
@@ -288,14 +311,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
-    useEffect(() => {
-        if (cardData.versions[0].card_faces) {
-            setCardFront((cardData.versions[0] as Card).card_faces?.[0].image_uris!.normal)
-            setCardBack((cardData.versions[0] as Card).card_faces?.[1].image_uris!.normal)
-        } else {
-            setCardFront((cardData.versions[0].image_uris as Card).normal as string)
-        }
-    }, [cardData])
+    
 
     return (
         <View testID="card_container"
@@ -303,7 +319,8 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         >
             <Text style={styles(deviceType).name_text}>{name}</Text>
             {
-                cardData.versions[0].card_faces ?
+                /*if no image_uris, has to be flip card*/
+                !cardData.versions[0].image_uris ?
                     <View testID="flipcard_container"
                         style={styles(deviceType).flipcard_container}
                     >
