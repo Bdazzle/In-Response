@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing, LayoutChangeEvent } from "react-native";
+import { Text, View, Pressable, StyleSheet, Modal, Animated, Easing } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import getDimensions from "../../functions/getComponentDimensions";
 

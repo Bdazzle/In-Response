@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { GestureResponderEvent, Pressable, StyleSheet, View } from "react-native"
 import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import Svg, {
@@ -30,7 +30,7 @@ interface PaletteMarkerProps {
 }
 
 /* 
-may have to use pageX and pageY for drag events.
+for Pressable coordinate calculations
 take the pageX and Y, subtract palletRef.current.measure() pageX and pageY (the offsets)
 */
 const normalizeCoords = (x: number, y: number, pageOffsetX: number, pageOffsetY: number, maxX: number, maxY: number) => {
@@ -77,15 +77,30 @@ const PaletteMarker: React.FC<PaletteMarkerProps> = ({ x, y, moveDelay }) => {
     )
 }
 
-/*
-#hueGradient is changing lightness and saturation too much.
-Should be static while hue value changes?
-*/
+/**
+ * Pressable > PanHandler since Panhandler keep setting Y value to maximum if dragged x/y locations go out of palette box.
+ * And pressable allows marker to keep moving if someone traces finger on the outside of the palette,
+ * so better visibility for color selection.
+ * @param param0 
+ * @returns 
+ */
 const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, onColorPress }) => {
     const [color, setColor] = useState<HSLAVals>()
-    const [paletteDimensions, setPaletteDimensions] = useState<Measurements>()
     const [markerCoordinate, setMarkerCoordinates] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const palettePressRef = useRef<View>(null)
+    const paletteMeasurementsRef = useRef<Measurements>()
+
+    const getPaletteMeasurements = useCallback(() => {
+        palettePressRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            paletteMeasurementsRef.current = { x, y, width, height, pageX, pageY };
+            const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100,
+                initialColor.lightness / 100,
+                width,
+                height
+            )
+            setMarkerCoordinates(initialMarkerCoords)
+        });
+    }, []);
 
     useEffect(() => {
         if (color) {
@@ -103,57 +118,27 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
         setColor(initialColor)
     }, [])
 
-    const getPaletteMeasurements = async () => {
-        if (palettePressRef.current) {
-            const paletteMeasurements: Measurements = await new Promise((resolve) => {
-                palettePressRef.current!.measure((x, y, width, height, pageX, pageY) => {
-                    resolve({ x, y, width, height, pageX, pageY });
-                });
-            });
-            setPaletteDimensions(paletteMeasurements)
-            /* 
-      convert color values from percents to decimals for maths.
-      */
-            const initialMarkerCoords = convertHSLToCoordinates(initialColor.saturation / 100,
-                initialColor.lightness / 100,
-                paletteMeasurements.width,
-                paletteMeasurements.height
-            )
-            setMarkerCoordinates(initialMarkerCoords)
-        }
-    }
-
     /* 
     having marker View as child of Pressable was setting View "in front" of Pressable,
     preventing onPress or onTouchMove to fire, and reseting locationX and locationY to origin (0,0),
     and screwing up anything that refered to them. See Notes.
     Have to use pageX and Y
     */
-    const handlePalettePress = (event: GestureResponderEvent) => {
-        const { pageX, pageY } = event.nativeEvent;
-        if (paletteDimensions) {
-            const { x, y } = normalizeCoords(pageX, pageY, paletteDimensions.pageX, paletteDimensions.pageY, paletteDimensions.width, paletteDimensions.height)
-            const [saturation, brightness] = convertCoordinatesToHSB(x, y, paletteDimensions!.width, paletteDimensions!.height)
-            const lightness = brightnessToLightness(saturation, brightness)
-            setMarkerCoordinates({ x, y })
-            if (onColorPress) {
-                onColorPress({
-                    saturation: colorValToPercent(saturation),
-                    lightness: colorValToPercent(lightness)
-                })
-            }
-        }
-    }
-
+    /**
+     * Code for Pressable Palette. Keep in case PanGesture is bad. 
+     * @param pageX 
+     * @param pageY 
+     */
     const markerDrag = (event: GestureResponderEvent) => {
         const { pageX, pageY } = event.nativeEvent;
-        if (paletteDimensions) {
-            const { x, y } = normalizeCoords(pageX, pageY, paletteDimensions.pageX, paletteDimensions.pageY, paletteDimensions.width, paletteDimensions.height)
+        if (paletteMeasurementsRef.current) {
+            const { x, y } = normalizeCoords(pageX, pageY, paletteMeasurementsRef.current.pageX, paletteMeasurementsRef.current.pageY, paletteMeasurementsRef.current.width, paletteMeasurementsRef.current.height)
 
-            const [saturation, brightness] = convertCoordinatesToHSB(x, y, paletteDimensions!.width, paletteDimensions!.height)
+            const [saturation, brightness] = convertCoordinatesToHSB(x, y, paletteMeasurementsRef.current!.width, paletteMeasurementsRef.current!.height)
             const lightness = brightnessToLightness(saturation, brightness)
 
             setMarkerCoordinates({ x, y })
+
             if (onColorPress) {
                 onColorPress({
                     saturation: colorValToPercent(saturation),
@@ -164,16 +149,14 @@ const ColorPalette: React.FC<ColorPaletteParams> = ({ initialColor, initialHue, 
     }
 
     return (
-        <View nativeID="color_palette_container" style={styles.container}>
-
+        <View nativeID="color_palette_container" style={styles.container} >
             {color &&
                 <Pressable
                     ref={palettePressRef}
+                    onLayout={() => getPaletteMeasurements()}
                     nativeID="colorPalettePress"
                     accessibilityLabel="Color Gradient"
                     accessibilityRole="adjustable"
-                    onLayout={() => getPaletteMeasurements()}
-                    onPressOut={(event) => handlePalettePress(event)}
                     onTouchMove={(e) => markerDrag(e)}
                 >
                     <Svg style={styles.paletteSVG}

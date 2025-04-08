@@ -25,7 +25,6 @@ export function staticTextScaler(size: number): number {
   }
 }
 
-
 export function RFPercentage(percent: number): number {
   // const { height, width } = Dimensions.get("window");
   const standardLength = width > height ? width : height;

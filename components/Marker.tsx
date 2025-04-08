@@ -1,26 +1,29 @@
 import React, { useEffect } from 'react';
-import { GestureResponderEvent, View, StyleSheet } from 'react-native';
+import { GestureResponderEvent, View, StyleSheet, } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
-
 interface MarkerProps {
     x: number,
     y: number,
     radius: number,
     moveDelay: number,
-    touchResponse: (event: GestureResponderEvent) => void
+    touchResponse?: (event: GestureResponderEvent) => void
 }
 
+/*
+Can't migrate to Animated API because it runs on JS thread and drops frames,
+reanimated is potential bloat, but useDerivedValue causes smooth animations along x/y change.
+*/
 const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay, touchResponse }) => {
+    const endScale = useSharedValue(0)
     const translateX = useDerivedValue<number>(() => { return x })
     const translateY = useDerivedValue<number>(() => { return y })
-    const endScale = useSharedValue(0)
 
     useEffect(() => {
         endScale.value = withRepeat(withTiming(1, {
             duration: 500,
         }), -1, true)
     }, [])
-
+    
     const containerMoveStyle = useAnimatedStyle(() => {
         return {
             transform: [
@@ -54,15 +57,16 @@ const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay, touchResponse 
     })
 
     return (
-        <Animated.View key="pulse_container" 
-        accessibilityLabel="Room Marker"
-        onTouchEnd={(e) => touchResponse(e)} 
-        style={[styles.pulse_container, containerMoveStyle,
-        {
-            height: radius * 2,
-            width: radius * 2,
-        },
-        ]}>
+        <Animated.View key="pulse_container"
+            accessibilityLabel="Room Marker"
+            onTouchEnd={(e) => touchResponse && touchResponse(e)}
+            style={[styles.pulse_container, containerMoveStyle,
+            {
+                height: radius * 2,
+                width: radius * 2,
+                pointerEvents: touchResponse ? 'auto' : "none"//allow touches to pass through to the PanResponder in Dungeon.tsx
+            },
+            ]}>
             <Animated.View key="pulse_outter" style={[styles.pulse_outter, pulseStyle]}>
                 <View key="pulse_inner" style={styles.pulse_inner}></View>
             </Animated.View>
@@ -77,6 +81,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        zIndex: 1,
     },
     pulse_inner: {
         borderRadius: 50,
@@ -86,6 +91,7 @@ const styles = StyleSheet.create({
         borderColor: "rgba(262, 182, 247,0.5)",
         shadowColor: 'rgba(62, 182, 247,0.5)',
         shadowRadius: 20,
+        zIndex: 1
     },
     pulse_outter: {
         width: "70%",
@@ -96,6 +102,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         shadowRadius: 20,
         shadowOpacity: 1,
+        zIndex: 1
     }
 })
 

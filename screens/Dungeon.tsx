@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, ImageBackground, GestureResponderEvent, ImageSourcePropType, Pressable, LayoutChangeEvent, useWindowDimensions, StatusBar } from 'react-native';
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import { StyleSheet, Text, View, ImageBackground, GestureResponderEvent, ImageSourcePropType, Pressable, LayoutChangeEvent, useWindowDimensions, StatusBar, PanResponder, PanResponderInstance } from 'react-native';
+import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -28,25 +28,25 @@ const dungeonReducer = (state: dungeonInfo, action: DungeonAction) => {
             return {
                 name: "Undercity",
                 uri: require("../assets/dungeons/Undercity.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .38 : action.imageHeight * .3
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .35 : action.imageHeight * .3
             };
         case "Dungeon of the Mad Mage":
             return {
                 name: "Dungeon of the Mad Mage",
                 uri: require("../assets/dungeons/Dungeon-of-the-Mad-Mage.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .37 : action.imageHeight * .28
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .33 : action.imageHeight * .28
             };
         case "Tomb of Annihilation":
             return {
                 name: "Tomb of Annihilation",
                 uri: require("../assets/dungeons/Tomb-of-Annihilation.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .42 : action.imageHeight * .35
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .39 : action.imageHeight * .35
             };
         case "Lost Mines of Phandelver":
             return {
                 name: "Lost Mines of Phandelver",
                 uri: require("../assets/dungeons/Lost-Mine-of-Phandelver.jpg"),
-                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .4 : action.imageHeight * .32
+                lastroom_height: action.imageHeight < 900 ? action.imageHeight * .36 : action.imageHeight * .32
             };
         case "Completed":
             return {
@@ -118,12 +118,16 @@ const Dungeon: React.FC = ({ }) => {
             lastroom_height: undefined
         }
     )
-    const [promptComplete, setPromptComplete] = useState<boolean>(false)
     const [rotate] = useScreenRotation(Object.keys(globalPlayerData).length, route.params.playerID)
     const marker_radius = 75
     const { width, height } = useWindowDimensions()
-    const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: width/2, y: 75 })
-
+    const [marker_coords, setMarker_coords] = useState<{ x: number, y: number }>({ x: width / 2, y: 75 })
+    // need 2 seperate modal trackers, state to pass to AnimatedModal, ref to pass to PanResponder
+    const [promptModal, setPromptModal] = useState<boolean>(false)
+    //ref for PanResponder
+    const promptComplete = useRef<boolean>(false)
+    const dungeonDataRef = useRef<dungeonInfo>()
+    const rotateRef = useRef<{ rotate: string; } | undefined>()
     /* set saved coordinates, else center marker to top */
     useEffect(() => {
         if (route.params.currentDungeon) {
@@ -139,30 +143,35 @@ const Dungeon: React.FC = ({ }) => {
                 y: marker_radius
             })
         }
+
     }, [])
 
-    const markerDrag = (event: GestureResponderEvent) => {
+
+    useEffect(() => {
+        promptComplete.current = promptModal
+    }, [promptModal])
+
+    useEffect(() => {
+        dungeonDataRef.current = currentDungeon
+        rotateRef.current = rotate
+    }, [currentDungeon])
+
+    const markerDrag = ({ x, y }: { x: number, y: number }) => {
         if (rotate) {
             setMarker_coords({
                 // y: height - event.nativeEvent.pageY - marker_radius,
-                x: width - event.nativeEvent.pageX,
-                y: height - event.nativeEvent.pageY,
+                x: width - x,
+                y: height - y,
             })
         }
         else {
             setMarker_coords({
-                x: event.nativeEvent.pageX,
-                y: event.nativeEvent.pageY
+                x: x,
+                y: y
             })
         }
     }
 
-    const markerRelease = (event: GestureResponderEvent) => {
-        const Ythreshold = height - (currentDungeon.lastroom_height as number)
-        if (event.nativeEvent.pageY >= Ythreshold) {
-            setPromptComplete(true)
-        }
-    }
     /*
     on dungeon complete, have to reset dungeon data, and set dungeonComplete to true  
     in globalPlayerData for active player.
@@ -175,7 +184,7 @@ const Dungeon: React.FC = ({ }) => {
             playerID: route.params.playerID,
             value: true
         })
-        setPromptComplete(false)
+        setPromptModal(false)
         setMarker_coords({
             x: width / 2,
             y: marker_radius
@@ -183,7 +192,7 @@ const Dungeon: React.FC = ({ }) => {
     }
 
     const cancelCompleteModal = () => {
-        setPromptComplete(false)
+        setPromptModal(false)
     }
 
     /*
@@ -201,19 +210,85 @@ const Dungeon: React.FC = ({ }) => {
                 }
             }
         })
-        navigation.navigate('Game', {menu: false})
+        navigation.navigate('Game', { menu: false })
     }
 
     const cancelDungeon = () => {
         dispatchDungeon({ dungeon: "Completed", imageHeight: 0 })
-        setPromptComplete(false)
+        setPromptModal(false)
     }
 
-    return (
-        <View style={[styles.dungeon_container, 
-            {
-                height: height + (deviceType === "phone" && statusBarHeight || 0)
+    /**
+     * PanResponders will track touches outside of component area, for swipes or velocity based movements.
+     * have to forceably turn them off through onMoveShouldSetPanResponder => false if out of component area
+        Marker being in fron of PanResponder was intercepting gesture and sending marker to origin (0,0) the starting gesture.
+        causing Marker to fly around. Happened with ColorPalette also. 
+    */
+    const panResponder = useRef<PanResponderInstance>(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => !promptComplete.current, //true,
+            onMoveShouldSetPanResponder: () => !promptComplete.current, // Block moves if out of bounds
+            onPanResponderGrant: (e: GestureResponderEvent, gestureState) => {
+                //handle initial press/touch
+                const { locationX, pageX: x, pageY: y, locationY } = e.nativeEvent;
+
+                rotateRef.current ? markerDrag({ x: locationX, y: locationY }) : markerDrag({ x, y })
+
+                promptComplete.current = false
             },
+            onPanResponderMove: (e, gestureState) => {
+                const { locationX, pageX: x, pageY: y, locationY } = e.nativeEvent;
+                /**
+                 * measures from top down
+                 * if rotated, last room is at top, so calculate it's height from top down
+                 * pageX/pageY are more accurate for non rotated, 
+                 * but locationX/Y interpolate correctly when rotated 
+                 * (otherwise pageX/Y would be inverted)
+                 */
+                const lastroomArea = height - dungeonDataRef.current?.lastroom_height!
+                /**
+                 * separate markerDrag and promptComplete, otherwise promptComplete stays true after triggered
+                 */
+                rotateRef.current ? markerDrag({ x: locationX, y: locationY }) : markerDrag({ x, y })
+
+                if (promptComplete.current) {
+                    return
+                }
+                else {
+                    /**
+                     * must set modal ref (for PanResponder to read) 
+                     * and modal state (for Modal visibility property)
+                     * Otherwise can get stuck in a loop of 'promptComplete.current = true',
+                     * causing modal to continuously reopen.
+                     */
+                    if (rotateRef.current) {
+                        if (locationY > lastroomArea) {
+                            promptComplete.current = true
+                            setPromptModal(true)
+                        } 
+                    }
+                    else {
+                        if (y > lastroomArea) {
+                            promptComplete.current = true
+                            setPromptModal(true)
+                        }
+                    }
+                }
+            },
+            onPanResponderRelease: (e: GestureResponderEvent) => {
+                promptComplete.current = false
+            },
+            onPanResponderTerminate: () => {
+                promptComplete.current = false
+            }
+        })
+    )
+
+    return (
+        <View style={[styles.dungeon_container,
+        {
+            height: height + (deviceType === "phone" && statusBarHeight || 0)
+        },
         rotate && {
             transform: [rotate]
         }
@@ -263,11 +338,12 @@ const Dungeon: React.FC = ({ }) => {
                                 />
                             </Svg>
                         </Pressable>
+
                         <View style={{
-                            position:'absolute',
+                            position: 'absolute',
                         }}>
                             <AnimatedModal
-                                visible={promptComplete}
+                                visible={promptModal}
                                 modalTitle={'Complete Dungeon?'}
                                 close={cancelCompleteModal}
                                 accept={completeDungeon}
@@ -275,7 +351,6 @@ const Dungeon: React.FC = ({ }) => {
                                 rotate={rotate?.rotate}
                             />
                         </View>
-
 
                         {/* Cancel Dungeon */}
                         <Pressable style={styles.cancel_icon}
@@ -293,12 +368,13 @@ const Dungeon: React.FC = ({ }) => {
 
                         {/* Dungeon Image/pointer */}
                         <View style={styles.dungeon_wrapper}
-                            onTouchMove={(e) => markerDrag(e)}
                         >
-                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius} moveDelay={200} />
-                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={500} />
-                            <Marker touchResponse={markerRelease} x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={350} />
-                            <View style={styles.image_container}>
+                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius} moveDelay={200} />
+                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .33} moveDelay={500} />
+                            <Marker x={marker_coords.x} y={marker_coords.y} radius={marker_radius * .66} moveDelay={350} />
+                            <View style={styles.image_container}
+                                {...panResponder.current.panHandlers}
+                            >
                                 <ImageBackground
                                     testID='dungeon_image'
                                     source={currentDungeon.uri as ImageSourcePropType}
@@ -306,15 +382,16 @@ const Dungeon: React.FC = ({ }) => {
                                     resizeMethod='scale'
                                     style={styles.dungeon_image}
                                 >
-                                    <Pressable key="lastroom"
-                                        onPressOut={() => setPromptComplete(true)}
+                                    {/* <Pressable key="lastroom"
+                                        // onPressOut={() => setPromptModal(true)}
                                         accessibilityLabel="Last Room"
                                         accessibilityRole="button"
                                         style={[styles.lastroom, {
                                             //height needs to change depending on aspect ratio for phone() vs tablet
-                                            height: currentDungeon.lastroom_height as number
+                                            // height: currentDungeon.lastroom_height as number
+                                            height : rotate ? currentDungeon.lastroom_height : height - (height -currentDungeon.lastroom_height!)
                                         }]}>
-                                    </Pressable>
+                                    </Pressable> */}
                                 </ImageBackground>
                             </View>
                         </View>
@@ -334,7 +411,8 @@ const styles = StyleSheet.create({
     dungeon_wrapper: {
         backgroundColor: "black",
         width: '100%',
-        height: '100%'
+        height: '100%',
+
     },
     close_icon: {
         position: "absolute",
@@ -355,11 +433,10 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: "center",
         alignItems: "center",
-        zIndex: -1,
     },
-    lastroom: {
-        width: '100%',
-    },
+    // lastroom: {
+    //     width: '100%',
+    // },
     dungeon_image: {
         width: '100%',
         flex: 1,

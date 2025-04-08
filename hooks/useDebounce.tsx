@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const useDebounce = (callback: (text: string) => void, delay: number) => {
+const useDebounce = (callback: (args: any) => void, delay: number) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -11,14 +11,14 @@ const useDebounce = (callback: (text: string) => void, delay: number) => {
     };
   }, []);
 
-  const debouncedCallback = (text: string) => {
+  const debouncedCallback = (args: any) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current); // Clear the previous timeout
     }
 
     // Set a new timeout
     timeoutRef.current = setTimeout(() => {
-      callback(text);
+      callback(args);
     }, delay);
   };
 

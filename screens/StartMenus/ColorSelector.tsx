@@ -60,12 +60,12 @@ const ColorSelector: React.FC = ({ }) => {
         setColorString(`hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`)
     }
 
-return (
+    return (
         <View style={styles().container}>
             <View nativeID="saveColorWrapper"
-                style={route.params.themePosition === 'primary' ? 
-                styles(color).saveColorWrapper : 
-                styles(deriveHSLAValues(globalPlayerData[route.params.playerID].colors.primary) as HSLAVals).saveColorWrapper}
+                style={route.params.themePosition === 'primary' ?
+                    styles(color).saveColorWrapper :
+                    styles(deriveHSLAValues(globalPlayerData[route.params.playerID].colors.primary) as HSLAVals).saveColorWrapper}
             >
                 <Pressable
                     nativeID="save_color"
@@ -74,9 +74,9 @@ return (
                     style={styles().saveColorPress}
                     onPress={() => handleColorAccept()}
                 >
-                    <Text style={route.params.themePosition === 'secondary' ? 
-                    styles(color).saveColorText : 
-                    styles(deriveHSLAValues(globalPlayerData[route.params.playerID].colors.secondary) as HSLAVals).saveColorText}>
+                    <Text style={route.params.themePosition === 'secondary' ?
+                        styles(color).saveColorText :
+                        styles(deriveHSLAValues(globalPlayerData[route.params.playerID].colors.secondary) as HSLAVals).saveColorText}>
                         Save Color
                     </Text>
                 </Pressable>
@@ -104,11 +104,11 @@ const styles = (color?: HSLAVals) => StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: color && `hsla(${color.hue},${color.saturation}%, ${color.lightness}%, ${color.alpha})`,
     },
-    saveColorPress:{
-        width:'100%',
-        height:'100%',
-        justifyContent:'center',
-        alignItems:'center',
+    saveColorPress: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
         borderRadius: 50,
     },
     saveColorText: {
