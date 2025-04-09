@@ -50,6 +50,7 @@ const Preview: React.FC<PreviewProps> = ({ item, dimensions }) => {
                 pinchToZoomOutSensitivity={0}
                 style={{
                     width: dimensions.width * .7,
+                    borderWidth:1, borderColor:'white'
                 }}
             >
                 <Image source={item.image} style={{

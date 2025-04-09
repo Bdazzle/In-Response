@@ -52,10 +52,10 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         translateYVal: langTranslateYVal,
         fadeStyle: langFadeStyle } = useFadeDownAnimation()
 
-        /**
-         * check for new card data when component loads, 
-         * so stale data (from a previoulsy searched card) isn't displayed
-         */
+    /**
+     * check for new card data when component loads, 
+     * so stale data (from a previoulsy searched card) isn't displayed
+     */
     useEffect(() => {
         setCurrentSet(cardData.versions[0].set_name as keyof StringProperties<Card>)
         setCurrentLang(cardData.versions[0].lang as string)
@@ -257,13 +257,20 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     useEffect(() => {
         setCurrentVersion(cardData.versions[0])
     }, [cardData])
- 
+
     const handleVersionChange = (card: Card) => {
         if (card) {
             setCurrentVersion(card)
         }
     }
 
+    const checkForFuse = (face1: string, face2: string) => {
+        if (face1.slice(face1.lastIndexOf('\n'), face1.length) === face2.slice(face2.lastIndexOf('\n'), face2.length)) {
+            return `${face1.slice(0, face1.lastIndexOf('\n'))} // ${'\n'} ${face2}`
+        } else {
+            return `${face1} // ${'\n'} ${face2}`
+        }
+    }
     /**
      * when current version changes, we need it's set/language images and text,
      * check for printed_text if foreign language is selected, otherwise display oracle_text for EN
@@ -278,20 +285,20 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             //check to see if one image, which is split cards and normal cards, both use image_uris
             if (currentVersion?.image_uris) {
                 setCardFront(currentVersion.image_uris?.normal)
-                if(currentVersion.card_faces){ // check for split card
-                    const cardText = currentVersion.card_faces[0].printed_text ? 
-                    `${currentVersion.card_faces[0].printed_text.split('\n')[0]} // ${'\n'} ${currentVersion.card_faces[1].printed_text}` :
-                    `${currentVersion.card_faces[0].oracle_text.split('\n')[0]} // ${'\n'} ${currentVersion.card_faces[1].oracle_text}`;
+                if (currentVersion.card_faces) { // check for split card
+                    const cardText = currentVersion.card_faces[0].printed_text ?
+                        checkForFuse(currentVersion.card_faces[0].printed_text, currentVersion.card_faces[1].printed_text) :
+                        checkForFuse(currentVersion.card_faces[0].oracle_text, currentVersion.card_faces[1].oracle_text)
                     setOracleText(cardText)
                 } else { //normal card
-                    currentVersion.printed_text ? setOracleText(currentVersion?.printed_text as string) : setOracleText(currentVersion?.oracle_text as string)    
+                    currentVersion.printed_text ? setOracleText(currentVersion?.printed_text as string) : setOracleText(currentVersion?.oracle_text as string)
                 }
             } else {
                 //for double faced cards
-                if(currentVersion.card_faces){
+                if (currentVersion.card_faces) {
                     setCardFront(currentVersion.card_faces[0].image_uris?.normal)
                     setCardBack(currentVersion.card_faces[1].image_uris?.normal)
-                    if (showFront){
+                    if (showFront) {
                         currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
                     } else {
                         currentVersion.card_faces[1].printed_text ? setOracleText(currentVersion.card_faces[1].printed_text) : setOracleText(currentVersion.card_faces[1].oracle_text)
@@ -311,7 +318,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
-    
+
 
     return (
         <View testID="card_container"
