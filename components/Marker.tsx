@@ -15,6 +15,7 @@ reanimated is potential bloat, but useDerivedValue causes smooth animations alon
 */
 const Marker: React.FC<MarkerProps> = ({ x, y, radius, moveDelay, touchResponse }) => {
     const endScale = useSharedValue(0)
+    //interpolates values?
     const translateX = useDerivedValue<number>(() => { return x })
     const translateY = useDerivedValue<number>(() => { return y })
 

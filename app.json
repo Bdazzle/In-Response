@@ -6,11 +6,11 @@
     "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/appIcons/splash/Color_Wheel.png",
+      "image": "./assets/appIcons/splash/transparent.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -37,19 +37,6 @@
             "targetSdkVersion": 35,
             "buildToolsVersion": "35.0.0"
           }
-        }
-      ],
-      [
-        "expo-splash-screen",
-        {
-          "resizeMode" : "contain",
-          "backgroundColor": "#ffffff",
-          "image": "./assets/appIcons/splash/Color_Wheel.png",
-          "dark": {
-            "image": "./assets/appIcons/splash/Color_Wheel.png",
-            "backgroundColor": "#000000"
-          },
-          "imageWidth": 400
         }
       ]
     ],

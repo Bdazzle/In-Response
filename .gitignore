@@ -76,6 +76,7 @@ web-build/
 *.aab
 assets/
 screen_shots/
+.vscode
 *.doc
 hooks/useSwipe.tsx
 hooks/useDebouncedDrag.ts
