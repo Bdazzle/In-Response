@@ -22,6 +22,9 @@ const instructionalImages = [
     }, {
         id: 'Card Screens',
         image: require("../../assets/instructions/card-example.png")
+    }, {
+        id: 'Counter Options',
+        image: require("../../assets/instructions/counter-options.png")
     }
 ] as InstructionItem[]
 
@@ -47,7 +50,6 @@ const Preview: React.FC<PreviewProps> = ({ item, dimensions }) => {
                 pinchToZoomOutSensitivity={0}
                 style={{
                     width: dimensions.width * .7,
-                    borderColor:'white',borderWidth:1
                 }}
             >
                 <Image source={item.image} style={{

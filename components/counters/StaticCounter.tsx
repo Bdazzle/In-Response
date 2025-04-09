@@ -114,6 +114,7 @@ const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPres
     const playerName = globalPlayerData[playerID].screenName;
 
     const activeInitiative = () => {
+        //set current initiative to player or string instead of undefined to be identified as !undefined in other components
         currentInitiative !== playerName ? setCurrentInitiative(playerName) : setCurrentInitiative('')
     }
 
@@ -154,7 +155,6 @@ const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPres
                 onLongPress={() => cardLongPress("initiative")}
                 testID={"initiative_pressable"}
                 accessibilityRole="button"
-            // accessibilityState={currentInitiative === playerName ? {selected: true} : {disabled: true}}
             />
             {resources.Svg}
         </View>

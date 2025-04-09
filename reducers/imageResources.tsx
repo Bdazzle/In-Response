@@ -146,7 +146,7 @@ export const imageReducer = (state: ImageReducerState, action: imageAction) => {
             return {
                 cardImage: require('../assets/cards/initiative.jpg'),
                 Svg: <AnimatedSvg viewBox="0 0 375 500"
-                    // style={action.scale}
+                    style={action.scale}
                     {...action.svgDimension}
                 >
                     <Path
