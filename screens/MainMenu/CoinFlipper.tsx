@@ -22,31 +22,41 @@ const Tails = () => {
     )
 }
 
-const CoinFlipper : React.FC = ({}) => {
+const CoinFlipper: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
     const { globalPlayerData } = useContext<GameContextProps>(GameContext)
     const [results, setResults] = useState<string[]>([])
     const [quantity, setQuantity] = useState<number>(1)
-    const animationTime = 1200
-    const zIndex = useRef<Animated.Value>(new Animated.Value(0)).current
+    const animationTime = 180//1200
+    const tailsZIndex = useRef<Animated.Value>(new Animated.Value(0)).current
+    const headsZIndex = useRef<Animated.Value>(new Animated.Value(1)).current
     const resultSpin = useRef<Animated.Value>(new Animated.Value(0)).current
+    /**
+     * have to set max output range to 360. at 180 wrong side could show or be upside down
+     */
     const rotation = resultSpin.interpolate({
-        inputRange: [0, 180],
-        outputRange: ['0deg', '180deg'],
-      });
-    
-      const rotateStyle = {
-        transform: [
-          {
-            rotateX: rotation, // Use the interpolated value directly
-          },
-        ],
-      };
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
+        extrapolate: 'clamp'
+    });
 
-    const zStyle = {
-        zIndex: zIndex
+    const rotateStyle = {
+        transform: [
+            {
+                rotateX: rotation, // Use the interpolated value directly
+            },
+        ],
+    };
+
+    const tailsZStyle = {
+        zIndex: tailsZIndex
     }
-    
+
+    const headsZStyles = {
+        zIndex: headsZIndex
+    }
+
+
     const handleBack = () => {
         Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
@@ -60,37 +70,30 @@ const CoinFlipper : React.FC = ({}) => {
     */
     const handleFlip = () => {
         const result = [...Array(quantity)].map((_, i) => Math.random() < 0.5 ? "Heads" : "Tails")
-        setResults(results => [...result])
-        resultSpin.setValue(1800)
-        if(result[0] === 'Tails'){
-            Animated.timing(zIndex, {
-                toValue: 1,
-                duration: animationTime,
-                useNativeDriver: true
-            }).start()
-        } else {
-            Animated.timing(zIndex, {
-                toValue: 0,
-                duration: 100,
-                useNativeDriver: true
-            }).start()
-        }
-        
-        Animated.timing(resultSpin, {
-            toValue: 180, // Animate to 180 degrees
-            duration: animationTime,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }).start();
+        setResults(result)
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(resultSpin, {
+                    toValue: 1,
+                    duration: animationTime,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+            ]),
+            { iterations: 5 }
+        ).start(() => {
+            //After animation, set zIndex of result face
+            if (result[0] === 'Tails') {
+                tailsZIndex.setValue(1)
+                headsZIndex.setValue(0)
+            } else {
+                tailsZIndex.setValue(0)
+                headsZIndex.setValue(1)
+            }
+            resultSpin.setValue(0) //reset resultSpin.value for to new flip
+        })
     }
-
-    /*
-    reset resultSpin.value
-    */
-    useEffect(() => {
-        setTimeout(() => resultSpin.setValue(0), animationTime)
-    }, [results])
-
+    
     return (
         <View style={styles.flipper_container}>
             {/* Back Button */}
@@ -151,12 +154,15 @@ const CoinFlipper : React.FC = ({}) => {
                     <View style={styles.face_wrapper}>
                         <Animated.View
                             style={[styles.tails_wrapper, rotateStyle,
-                                zStyle
+                                tailsZStyle
                             ]}
                         >
                             <Tails />
                         </Animated.View>
-                        <Animated.View style={[styles.heads_wrapper, rotateStyle ]}>
+                        <Animated.View style={[styles.heads_wrapper, rotateStyle, 
+                            headsZStyles
+                            // {zIndex:}
+                            ]}>
                             <Heads />
                         </Animated.View>
                     </View>
@@ -212,8 +218,21 @@ const styles = StyleSheet.create({
         top: '5%',
     },
     coin_button: {
-        height: '10%',
-        minHeight: 100
+        height:250,
+        minHeight: 100,
+        borderRadius:'50%',
+    },
+    heads_wrapper: {
+        position: 'absolute',
+        height: 250,
+        width: '100%',
+        // backfaceVisibility: 'hidden',
+        right: 3,
+    },
+    tails_wrapper: {
+        position: 'absolute',
+        height: 250,
+        width: '100%',
     },
     face_wrapper: {
         height: '100%',
@@ -222,17 +241,6 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         width: '100%',
         height: '100%',
-    },
-    heads_wrapper: {
-        position: 'absolute',
-        height: 257,
-        width: '100%',
-        backfaceVisibility: 'hidden',
-    },
-    tails_wrapper: {
-        position: 'absolute',
-        height: 250,
-        width: '100%',
     },
     heads: {
         backgroundColor: "#EFC75E",
