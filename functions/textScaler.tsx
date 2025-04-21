@@ -81,7 +81,7 @@ export const lifeTextScaler = (totalPlayers: number, playerID: number, lifeTotal
       }
     }
     if (totalPlayers === 4) {
-      textSize = textScaler(lifeTotal, dimensions, dimensions.width / 2.75, dimensions.width / 2)
+      textSize = textScaler(lifeTotal, dimensions, dimensions.width / 3, dimensions.width / 2)
     }
   } else {//all others
     if (totalPlayers === 2) {
@@ -218,7 +218,7 @@ export const handleTaxSize = (totalPlayers: number, id: number, text: string, ga
     }
   }
   else {
-    return text.length >= 2 ? RFPercentage(6) : RFPercentage(7)
+    return text.length >= 2 ? RFPercentage(6) : RFPercentage(6)
   }
 }
 
