@@ -31,8 +31,8 @@ const generatePlanarDeck = (totalPlayers : number, planarData: PlaneChaseSet) =>
         return acc
     }, { planes: {}, phenomenon: {} } as PlanarDeck)
     const shuffledPlanes = shuffle(Object.entries(totalCards.planes))
-    const shuffledPhenom = shuffle(Object.entries(totalCards.phenomenon), totalPlayers * 2)
-    const randomizedCards = shuffle([...shuffledPlanes, ...shuffledPhenom])
+    const shuffledPhenom = Object.keys(totalCards.phenomenon).length && shuffle(Object.entries(totalCards.phenomenon), totalPlayers * 2)
+    const randomizedCards = shuffledPhenom ? shuffle([...shuffledPlanes, ...shuffledPhenom]) : shuffledPlanes
     const newDeck = randomizedCards.slice(0, totalPlayers * 10)
     return newDeck
 }
