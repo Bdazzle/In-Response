@@ -3,7 +3,6 @@
     "name": "In_Response",
     "slug": "In_Response",
     "version": "4.1.3",
-    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/appIcons/mtg_counter_icon_1024.png",
     "userInterfaceStyle": "dark",
@@ -24,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.beedazzle.mtg_counter",
-      "versionCode": 27
+      "versionCode": 32
     },
     "plugins": [
       [
@@ -33,11 +32,11 @@
           "android": {
             "enableProguardInReleaseBuilds": true,
             "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0"
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
           }
-        }
+        }        
       ]
     ],
     "extra": {

@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { CombinedCards } from ".";
+import { CombinedCards } from "./index";
 
 
 export interface SearchContextProps {

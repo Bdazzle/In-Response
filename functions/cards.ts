@@ -1,5 +1,5 @@
-import { CombinedCards, ScryFallCard, ScryResultData } from "..";
-import getRules from "../search/getRules";
+import { CombinedCards, ScryFallCard, ScryResultData } from "../index";
+import getRules, { getRulesScryfall } from "../search/getRules";
 
 /* 
 return object like 
@@ -9,6 +9,48 @@ cardname:{[cardsVersion1..., cardVersion2] rules:'...'},
 since traversing an object to render components has to be an array anyway
 }
 */
+// const processCardData = async (cardData: UsedCard[]) =>{
+//     try {
+//         if (cardData){
+//             const oracle_ids = [...new Set(cardData.map(card => card.oracle_id))];
+//             const rules_data = getRules(oracle_ids)
+//             const rulesMap = new Map
+//             Object.entries(rules_data).map(([key, val]) =>{
+//                 rulesMap.set(key, val)
+//             })
+            
+//             const collated = cardData.reduce((res: CombinedCards, item) =>{
+//                 const { 
+//                     id, 
+//                     name,
+//                     oracle_id,
+//                     printed_name,
+//                     set_code,
+//                     lang,
+//                     oracle_text,
+//                     printed_text,
+//                     image_uri,
+//                     set_name } = item;
+
+//                     const { card_faces } = item
+
+//                     if (!res[name as string]) {
+//                         res[name as string] = {
+//                             versions: [],
+//                             rules: rulesMap.get(oracle_id)
+//                         }
+//                     }
+//                     res[name as string].versions.push(item as UsedCard)
+
+//                     return res
+//             },{})
+//         }
+//     } catch (error){
+//         console.log('Error processing cards', error)
+//     }
+    
+// }
+
 const collateCardData = async (cardData: ScryResultData): Promise<CombinedCards | undefined> => {
     try {
         if (cardData) {
@@ -25,14 +67,15 @@ const collateCardData = async (cardData: ScryResultData): Promise<CombinedCards 
 
             await Promise.all(
                 uniqueRulesUris.map(async (uri) => {
-                    const ruling = await getRules(uri as string);
+                    const ruling = await getRulesScryfall(uri as string);
                     rulesMap.set(uri, ruling)
                 })
             )
 
             const collated = cardData.reduce((res: CombinedCards, item) => {
 
-                const { name, set_uri,
+                const { name, 
+                    set_uri,
                     rulings_uri,
                     image_uris,
                     lang,
@@ -78,7 +121,6 @@ const collateCardData = async (cardData: ScryResultData): Promise<CombinedCards 
     catch (error) {
         console.error('Error fetching card rules!', error)
     }
-
 }
 
 export default collateCardData

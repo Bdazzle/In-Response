@@ -4,12 +4,12 @@ import Svg, { Path } from 'react-native-svg'
 import { GameContext, GameContextProps } from '../GameContext'
 import IncrementingCounter from './counters/IncrementCounter'
 import StaticCounterContainer from './counters/StaticCounter';
-import { ColorTheme, CountersProps, Dimensions } from '..';
+import { ColorTheme, CountersProps, Dimensions } from '../index';
 import CommanderDamage from "./DamageTracker"
 import { RootStackParamList } from '../navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { lifeTextScaler, RFPercentage, textScaler } from '../functions/textScaler';
+import { fitFontToContainer, lifeTextScaler, RFPercentage } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useLuminance from '../hooks/useLuminance'
 import useContainerDimensions from '../hooks/useContainerDimensions';
@@ -67,7 +67,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
 
     useEffect(()=>{
         setLifeTextSize(lifeTextScaler(totalPlayers, playerID, globalPlayerData[playerID].lifeTotal, dimensions))
-        setCounterText(textScaler(8, dimensions))
+        setCounterText(fitFontToContainer(8, dimensions))
     }, [dimensions])
 
     return (
@@ -204,6 +204,7 @@ export const Player: React.FC<PlayerProps> = ({ playerName, theme, playerID }) =
                         <Text style={[styles.player_name,
                         {
                             fontSize: totalPlayers === 3 && playerID !== 3 ? RFPercentage(3.2) : totalPlayers === 2 ? RFPercentage(8)  : RFPercentage(4),
+                            // lineHeight: 5,
                             color: theme.secondary,
                         }]} >
                             {playerName}
@@ -290,8 +291,11 @@ const styles = StyleSheet.create({
         width: '100%',
         position: 'absolute',
         alignItems: 'center',
+        // paddingBottom:2,
+        marginBottom: 3,
     },
     player_name: {
+        // lineHeight:30,
         fontFamily: 'Beleren',
         height: '100%',
         textAlign: 'center',

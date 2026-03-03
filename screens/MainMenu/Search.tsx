@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
-import { KeyboardAvoidingView, StyleSheet, View, Pressable, Text, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData, FlatList, ScrollView, ActivityIndicator } from "react-native"
+import { KeyboardAvoidingView, StyleSheet, View, Pressable, Text, TextInput, FlatList, ScrollView, ActivityIndicator, TextInputSubmitEditingEvent } from "react-native"
 import { colorLibrary } from "../../constants/Colors"
-import getScryfallData, { getAllCardVersion, getExactCard, getSuggestedCards } from "../../search/getcards"
-import { AllScreenNavProps,CombinedCards, ScryResultData } from "../.."
+import getCardData, { getAllCardVersion, getExactCard, getSuggestedCards } from "../../search/getcards"
+import { AllScreenNavProps,CombinedCards, ScryResultData } from "../../index"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
@@ -14,6 +14,7 @@ import sleep from "../../functions/sleep"
 import getSets, { addSetSymbolstoCards } from "../../search/getSetIcons"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import { SearchContext, SearchContextProps } from "../../SearchContext"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 /* 
 fetch order :
@@ -93,7 +94,7 @@ const SearchScreen: React.FC = ({ }) => {
             a statement about "all elements" is vacuously true if there are no elements to test.
             */
             if (Object.keys(cachedCardData).length === 0 || (Object.keys(cachedCardData).length > 0 && suggestions.every(c => !Object.keys(cachedCardData).includes(c)))) {
-                const cardRes = await getScryfallData(searchTerm)
+                const cardRes = await getCardData(searchTerm)
                 const filteredCards = cardRes && filterBySuggestions(cardRes, suggestions)
                 const combined = await collateCardData(filteredCards || [])
                 if (combined) {
@@ -102,6 +103,7 @@ const SearchScreen: React.FC = ({ }) => {
                 }
                 setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
                 setCardData(combined)
+                
             } 
             else {
                 const cachedCards = checkCache(suggestions, cachedCardData)
@@ -136,6 +138,7 @@ const SearchScreen: React.FC = ({ }) => {
                 /* 
                 to get all versions/languages of a card, we have to get oracle_id of the card,
                 then fetch variants of that card and it's set symbols
+                SCRYFALL CODE
                 */
                 const versionsRes = cardRes && await getAllCardVersion(cardRes.oracle_id as string)
                 const combined = await collateCardData(versionsRes || []);
@@ -144,7 +147,7 @@ const SearchScreen: React.FC = ({ }) => {
                     addSetSymbolstoCards(combined, sets)
                 }
                 setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
-                setCardData(combined)
+                setCardData(combined)     
             }
             setLoading(false)
         }
@@ -156,10 +159,15 @@ const SearchScreen: React.FC = ({ }) => {
 
     const debounceExactFetch = useDebounce(fetchExact, 50)
 
-    const handleSubmit = (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
-        const text = event.nativeEvent.text
-        if (text && text.length >= 3) {
-            debouncedFetchCards(text)
+    /*
+    handles keyboard submit. Make sure it tries to fetch exact card match before ambiguous cards that may have search text in name,
+    lik "Shock", which is a card, but shows up in a shit load of other card names.
+    */
+    const handleSubmit = (event: TextInputSubmitEditingEvent) => {
+        const text = event.nativeEvent.text || '';
+        const trimmed = text.trim();
+        if (trimmed.length >= 3) {
+            debouncedFetchCards(trimmed);
         }
         setInputVal(text)
         setShowSuggestions(false)
@@ -195,7 +203,7 @@ const SearchScreen: React.FC = ({ }) => {
     }
 
     return (
-        <View style={styles().search_container}>
+        <SafeAreaView style={styles().search_container}>
             {/* Back Button */}
             <Pressable style={styles().back_button}
                 onPress={() => handleBack()}
@@ -278,7 +286,7 @@ const SearchScreen: React.FC = ({ }) => {
                 </ScrollView>
             }
 
-        </View>
+        </SafeAreaView>
     )
 }
 

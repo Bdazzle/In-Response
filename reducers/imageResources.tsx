@@ -2,7 +2,7 @@
 import { ColorValue, ImageSourcePropType, StyleProp, ViewStyle } from "react-native"
 import Svg, { Circle, Defs, LinearGradient, Path, Polygon, RadialGradient, Rect, Stop } from "react-native-svg";
 import { ReactNode } from "react";
-import { ColorTheme } from "..";
+import { ColorTheme } from "../index";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
 type SvgCircleProps = {
@@ -43,7 +43,7 @@ const AnimatedSvg = Animated.createAnimatedComponent(Svg)
 fill boolean refers to theme reducer choices in App.
 get device dimensions and change viewboxes depending on device width? (phone v. tablet)?
 */
-export const imageReducer = (state: ImageReducerState, action: imageAction) => {
+export const imageReducer = (state: ImageReducerState, action: imageAction) : ImageReducerState => {
     switch (action.card) {
         case "the ring": {
             return {

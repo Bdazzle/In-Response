@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
-import { GlobalPlayerData, PlanarData } from "."
+import React, { createContext, Dispatch, useContext, useEffect, useReducer, useState } from "react"
+import { GlobalPlayerData, PlanarData } from "./index"
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";
 import newGameData from "./functions/newGame";
@@ -24,7 +24,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { totalPlayers, startingLife } = useContext<OptionsContextProps>(OptionsContext)
   const [currentMonarch, setCurrentMonarch] = useState<string>()
   const [currentInitiative, setCurrentInitiative] = useState<string>()
-  const [globalPlayerData, dispatchGlobalPlayerData] = useReducer<(state: GlobalPlayerData, action: GlobalPlayerAction) => any>(globalPlayerReducer, {})
+  const [globalPlayerData, dispatchGlobalPlayerData] = useReducer(globalPlayerReducer, {})
   const [planarData, setPlanarData] = useState<PlanarData>({ 
     currentPlane: ['', '' as ImageSourcePropType], 
     deck: [], 

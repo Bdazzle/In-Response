@@ -1,21 +1,27 @@
 import { Animated, StatusBar, StyleSheet, useWindowDimensions } from 'react-native';//device's stop status bar
 import Navigation from './navigation/index';
+// gesture-handler root view must wrap any component tree that uses
+// gesture-handler primitives (RectButton, Swipeable, etc.).  Without this
+// the library will throw the runtime error seen when GlobalMenu renders on
+// app start.
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GameProvider } from './GameContext';
 import { OptionsProvider } from './OptionsContext';
 import { useFonts } from "expo-font";
 import React, { useEffect, useRef, useState } from 'react';
+// import * as NavigationBar from 'expo-navigation-bar'
 // import * as SplashScreen from 'expo-splash-screen';
-import {
-  configureReanimatedLogger,
-  ReanimatedLogLevel,
-} from 'react-native-reanimated';
+// import {
+//   configureReanimatedLogger,
+//   ReanimatedLogLevel,
+// } from 'react-native-reanimated';
 
 
 // This is the default configuration
-configureReanimatedLogger({
-  level: ReanimatedLogLevel.warn,
-  strict: false, // Reanimated runs in strict mode by default
-});
+// configureReanimatedLogger({
+//   level: ReanimatedLogLevel.warn,
+//   strict: false, // Reanimated runs in strict mode by default
+// });
 
 /** app.json "plugins" splash screen config:
    [
@@ -109,7 +115,7 @@ export default function App() {
   return (
     <>
 
-      <StatusBar hidden={true} />
+      {/* <StatusBar hidden={true} /> */}
       {fontsLoaded ?
         <>
           {
@@ -117,11 +123,13 @@ export default function App() {
               :
               <OptionsProvider>
                 <GameProvider>
-                  <Navigation />
+                  <GestureHandlerRootView>
+                    <Navigation />
+                  </GestureHandlerRootView>
                 </GameProvider>
               </OptionsProvider>
           }
-        </>
+          </>
         : null
       }
     </>

@@ -14,7 +14,7 @@ const getPhoneStyles = () => {
     if (!phoneStyles) {
         phoneStyles = StyleSheet.create({
             ring_container: {
-                height: '100%',
+                height: '96%',
                 maxWidth: 690,//the width contained card image on tablet
                 width: '100%',
                 justifyContent: 'center',
@@ -105,7 +105,7 @@ const getTabletStyles = () => {
             levelImageWrapper: {
                 height: '100%',
                 width: '100%',
-                backfaceVisibility: 'hidden'
+                backfaceVisibility: 'hidden',
             },
             levelImage: {
                 height: '100%',

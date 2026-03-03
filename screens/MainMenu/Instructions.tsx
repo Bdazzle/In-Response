@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React from "react"
 import { Image, Text, StyleSheet, View, Pressable, ImageSourcePropType, useWindowDimensions, ScrollView } from "react-native"
 import Svg, { Path, Polygon } from "react-native-svg"
-import { AllScreenNavProps } from "../.."
+import { AllScreenNavProps } from "../../index"
 import { staticTextScaler } from "../../functions/textScaler"
 import ReactNativeZoomableView from '@openspacelabs/react-native-zoomable-view/src/ReactNativeZoomableView';
 

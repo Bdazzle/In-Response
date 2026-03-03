@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { Dispatch, useContext, useEffect, useReducer } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Easing, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { GameContext, GameContextProps } from '../../GameContext';
@@ -6,7 +6,7 @@ import Svg, { Path } from 'react-native-svg'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation';
 import { useNavigation } from '@react-navigation/native';
-import { CounterCardProps, DungeonData } from '../..';
+import { CounterCardProps, DungeonData } from '../../index';
 import { imageAction, imageReducer, ImageReducerState } from '../../reducers/imageResources';
 import { trackers } from '../../constants/CounterTypes';
 
@@ -28,7 +28,7 @@ interface TrackerButtonProps {
 const DungeonButton: React.FC<{ playerID: number }> = ({ playerID }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { globalPlayerData } = useContext(GameContext) as GameContextProps;
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })
@@ -79,7 +79,7 @@ const DungeonButton: React.FC<{ playerID: number }> = ({ playerID }) => {
 
 const RingButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps;
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })
@@ -107,7 +107,7 @@ const RingButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) =
 
 const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) => {
     const { globalPlayerData, currentInitiative, setCurrentInitiative } = useContext(GameContext) as GameContextProps;
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })
@@ -163,7 +163,7 @@ const InitiativeButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPres
 
 const MonarchButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) => {
     const { globalPlayerData, currentMonarch, setCurrentMonarch } = useContext(GameContext) as GameContextProps
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })
@@ -219,7 +219,7 @@ const MonarchButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }
 
 const SpeedButton: React.FC<TrackerButtonProps> = ({ playerID, cardLongPress }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps;
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })

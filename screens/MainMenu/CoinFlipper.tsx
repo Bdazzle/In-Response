@@ -1,12 +1,14 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import React, { useContext, useEffect, useRef, useState } from "react"
-import { Easing, Animated, Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
-import { AllScreenNavProps } from "../.."
+import { Easing, Animated, Image, Text, KeyboardAvoidingView, Platform, StyleSheet, TextInput, Pressable, View } from "react-native"
+import { AllScreenNavProps } from "../../index"
 import { staticTextScaler } from "../../functions/textScaler"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { GameContext, GameContextProps } from "../../GameContext"
-
+/**
+ * Check image file dimensions
+ */
 const Heads = () => {
     return (
         <Image style={styles.coin}
@@ -61,8 +63,8 @@ const CoinFlipper: React.FC = ({ }) => {
         Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
 
-    const changeQuantity = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-        setQuantity(Number(event.nativeEvent.text))
+    const changeQuantity = (text : string) => {
+        setQuantity(Number(text))
     }
 
     /*
@@ -136,7 +138,7 @@ const CoinFlipper: React.FC = ({ }) => {
                         keyboardType='numeric'
                         accessibilityLabel="input number of coin flips"
                         accessibilityHint={`Flip ${quantity} coins`}
-                        onChange={(e) => changeQuantity(e)}
+                        onChangeText={(e) => changeQuantity(e)}
                         textAlignVertical="bottom"
                     ></TextInput>
                 </View>
@@ -161,7 +163,6 @@ const CoinFlipper: React.FC = ({ }) => {
                         </Animated.View>
                         <Animated.View style={[styles.heads_wrapper, rotateStyle, 
                             headsZStyles
-                            // {zIndex:}
                             ]}>
                             <Heads />
                         </Animated.View>

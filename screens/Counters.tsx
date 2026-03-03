@@ -1,17 +1,18 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { Dispatch, useContext, useEffect, useReducer, useState } from 'react';
 import { Text, View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
 import { imageAction, imageReducer, ImageReducerState } from '../reducers/imageResources';
 import { counters, trackers } from '../constants/CounterTypes';
-import { CounterCardProps, DungeonData } from '..';
-import { textScaler } from '../functions/textScaler';
+import { CounterCardProps, DungeonData } from '../index';
+import { fitFontToContainer } from '../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
 import useScreenRotation from '../hooks/useScreenRotation';
 import getDimensions from '../functions/getComponentDimensions';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CounterRowProps {
     counterType: string
@@ -21,7 +22,7 @@ interface CounterRowProps {
 const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) => {
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: undefined
         })
@@ -56,13 +57,8 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
 
     useEffect(() => {
         if (containerDimensions.width !== 0 && containerDimensions.height !== 0) {
-            setFontSize(textScaler(counterType.length,
-                { ...containerDimensions, width: containerDimensions?.width / 3 },
-                36,
-                24));
-            setTotalFontsize(textScaler(String(displayTotal).length, { ...containerDimensions, width: containerDimensions?.width / 3 },
-                36,
-                16))
+            setFontSize(fitFontToContainer(counterType,{ ...containerDimensions, width: containerDimensions?.width / 3 },{maxSize:36, minSize:24}))
+            setTotalFontsize(fitFontToContainer(String(displayTotal),{ ...containerDimensions, width: containerDimensions?.width / 3 }, {maxSize:36, minSize:16}))
         }
     }, [containerDimensions])
 
@@ -104,7 +100,8 @@ const CounterRow: React.FC<CounterRowProps> = ({ counterType, changeCounters }) 
                     style={[styles.type_text,
                     {
                         height: '30%',
-                        fontSize: fontSize
+                        fontSize: fontSize,
+                        textAlign: 'center'
                     }]}>
                     {counterType.charAt(0).toLocaleUpperCase() + counterType.slice(1)}
                 </Text>
@@ -177,7 +174,7 @@ const CountersCol: React.FC<{ changeCounters: (counterType: string, value: numbe
 
     useEffect(() => {
         if (stormPressDimensions.height !== 0 && stormPressDimensions.width !== 0) {
-            setFontSize(textScaler(5, stormPressDimensions))
+            setFontSize(fitFontToContainer('Storm', stormPressDimensions, {maxSize:24}))
         }
     }, [stormPressDimensions])
 
@@ -223,7 +220,7 @@ const TrackerRow: React.FC<TrackerProps> = ({ icon }) => {
         height: 0
     });
     const [fontSize, setFontSize] = useState<number>(18)
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             Svg: ''
         })
@@ -235,13 +232,8 @@ const TrackerRow: React.FC<TrackerProps> = ({ icon }) => {
 
     useEffect(() => {
         const minSize = icon === "the ring" ? containerDimensions.width / "ring".length : containerDimensions.width / icon.length;
-
         if (containerDimensions.height !== 0 && containerDimensions.width !== 0) {
-            setFontSize(textScaler(icon.length,
-                containerDimensions,
-                undefined,
-                deviceType === 'phone' ? Math.round(minSize) : 32
-            ))
+            setFontSize(fitFontToContainer(icon, containerDimensions, {minSize:minSize, charWidthFactor: 0.7}))
         }
     }, [containerDimensions])
 
@@ -301,14 +293,16 @@ const TrackerRow: React.FC<TrackerProps> = ({ icon }) => {
             <Pressable onPress={() => handlePress()}
                 style={{
                     alignItems: 'center',
-                    width: '60%',
+                    width:'100%'
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={`${icon}`}
                 accessibilityHint={icon === 'monarch' || icon === 'initiative' ? `activate ${icon}` : `go to ${icon}`}
             >
-                <Text style={[styles.total_text, {
-                    fontSize: fontSize
+                <Text testID='icon_text' style={[styles.total_text, {
+                    fontSize: fontSize,
+                    paddingHorizontal:1,
+                    textAlign: 'center',
                 }]}>
                     {icon}
                 </Text>
@@ -341,7 +335,7 @@ const TrackersCol: React.FC = ({ }) => {
 }
 
 const Counters: React.FC = ({ }) => {
-    const { totalPlayers, deviceType } = useContext(OptionsContext) as OptionsContextProps
+    const { totalPlayers } = useContext(OptionsContext) as OptionsContextProps
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Counters'>>()
@@ -375,10 +369,8 @@ const Counters: React.FC = ({ }) => {
     }
 
     return (
-        <View style={[styles.counters_container,{
-            height: deviceType === 'phone' ? '95%' : '98%'
-        }]}>
-            <View style={[styles.counter_rows_container,
+        <View style={styles.counters_container}>
+            <SafeAreaView style={[styles.counter_rows_container,
             rotate && {
                 transform: [rotate]
             }
@@ -386,8 +378,8 @@ const Counters: React.FC = ({ }) => {
             >
                 <CountersCol changeCounters={changeCounters} />
                 <TrackersCol />
-            </View>
-            <Pressable style={[styles.close_icon,
+            </SafeAreaView>
+            <Pressable style={[styles.close_button,
             (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 2)) ?
                 {
                     top: 0,
@@ -414,7 +406,8 @@ const Counters: React.FC = ({ }) => {
 
 const styles = StyleSheet.create({
     counters_container: {
-        width: '100%'
+        width: '100%',
+        height:'100%',
     },
     counter_rows_container: {
         width: '100%',
@@ -422,10 +415,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         alignItems: 'center',
         display: 'flex',
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     counters_wrapper: {
         width: '60%',
+        // height:'100%',
     },
     row_container: {
         width: '100%',
@@ -434,7 +428,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         borderBottomColor: '#6e6e6e',
         borderBottomWidth: 1,
-        marginTop: 5
+        marginTop: 5,
     },
     tracker_wrapper: {
         width: '30%',
@@ -463,6 +457,13 @@ const styles = StyleSheet.create({
     total_text: {
         color: 'white',
         fontFamily: 'Beleren',
+    },
+    close_button : {
+        position: "absolute",
+        zIndex: 1,
+        width: 60,
+        height: 60,
+        marginBottom: 60,
     },
     close_icon: {
         position: "absolute",

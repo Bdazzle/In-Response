@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { Game } from '../screens/Game';
-import { CounterCardProps, CountersProps, DungeonData } from '..';
+import { CounterCardProps, CountersProps, DungeonData } from '../index';
 import LifeMenu from '../screens/StartMenus/GameType';
 import TotalPlayers from '../screens/StartMenus/TotalPlayers';
 import PlayerOptions from '../screens/StartMenus/PlayerOptions';

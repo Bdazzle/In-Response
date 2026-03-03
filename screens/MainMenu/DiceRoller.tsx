@@ -1,10 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useContext, useState } from "react"
-import { Image, Text, StyleSheet, TextInput, Pressable, View, KeyboardAvoidingView, NativeSyntheticEvent, TextInputChangeEventData } from "react-native"
+import { Image, Text, StyleSheet, TextInput, Pressable, View, KeyboardAvoidingView } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { Path, Polygon } from "react-native-svg";
-import { AllScreenNavProps } from "../..";
+import { AllScreenNavProps } from "../../index";
 import { colorLibrary } from "../../constants/Colors";
 import { staticTextScaler } from "../../functions/textScaler";
 import { GameContext } from "../../GameContext";
@@ -148,12 +148,12 @@ const DiceRoller : React.FC = ({}) => {
         Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
 
-    const changeAmount = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-        setAmount(Number(e.nativeEvent.text))
+    const changeAmount = (text: string) => {
+        setAmount(Number(text))
     }
 
-    const changeSides = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-        setSides(Number(e.nativeEvent.text))
+    const changeSides = (text: string) => {
+        setSides(Number(text))
     }
 
 
@@ -196,7 +196,7 @@ const DiceRoller : React.FC = ({}) => {
                         <TextInput
                             style={[styles.input_text, styles.number_text]}
                             keyboardType='numeric'
-                            onChange={(e) => changeAmount(e)}
+                            onChangeText={(e) => changeAmount(e)}
                             accessibilityLabel="amount of dice"
                             textAlignVertical="bottom"
                             aria-label="amount of dice"
@@ -217,7 +217,7 @@ const DiceRoller : React.FC = ({}) => {
                         <TextInput
                             style={[styles.input_text, styles.number_text]}
                             keyboardType='numeric'
-                            onChange={(e) => changeSides(e)}
+                            onChangeText={(e) => changeSides(e)}
                             textAlignVertical="bottom"
                             accessibilityLabel="dice sides"
                             aria-label="dice sides"

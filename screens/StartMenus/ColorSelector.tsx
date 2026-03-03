@@ -1,12 +1,13 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useContext, useState } from "react"
 import { StyleSheet, View, Pressable, Text } from "react-native"
-import { AllScreenNavProps, ColorTheme, HSLAVals } from "../..";
+import { AllScreenNavProps, ColorTheme, HSLAVals } from "../../index";
 import { GameContext, GameContextProps } from "../../GameContext";
 import { StartMenuStackParamList } from "../../navigation";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorPicker from "../../components/color picker/ColorPicker";
 import deriveHSLAValues from "../../components/color picker/convertColorTypes";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export interface ColorSelectorProps {
     playerID: number;
@@ -61,7 +62,7 @@ const ColorSelector: React.FC = ({ }) => {
     }
 
     return (
-        <View style={styles().container}>
+        <SafeAreaView style={styles().container}>
             <View nativeID="saveColorWrapper"
                 style={route.params.themePosition === 'primary' ?
                     styles(color).saveColorWrapper :
@@ -84,7 +85,7 @@ const ColorSelector: React.FC = ({ }) => {
             <ColorPicker onColorChange={handleColorChange}
                 initialColor={deriveHSLAValues(globalPlayerData[route.params.playerID].colors[route.params.themePosition as keyof ColorTheme]) as HSLAVals}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

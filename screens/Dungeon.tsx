@@ -1,15 +1,16 @@
 import { StyleSheet, Text, View, ImageBackground, GestureResponderEvent, ImageSourcePropType, Pressable, LayoutChangeEvent, useWindowDimensions, StatusBar, PanResponder, PanResponderInstance } from 'react-native';
-import React, { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import React, { Dispatch, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import Svg, { Path } from 'react-native-svg'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
-import { textScaler } from '../functions/textScaler';
+import { fitFontToContainer } from '../functions/textScaler';
 import useScreenRotation from '../hooks/useScreenRotation';
 import Marker from '../components/Marker';
 import AnimatedModal from '../components/modals/AnimatedModal';
 import { OptionsContext, OptionsContextProps } from '../OptionsContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type dungeonInfo = {
     name: string | undefined,
@@ -80,8 +81,8 @@ const DungeonButton: React.FC<DungeonButtonProps> = ({ title, dispatchDungeon, s
 
     useEffect(() => {
         setFontSize(pressDimensions ? (title === "Undercity" ?
-            textScaler(`${title} (Initiative Only)`.length, pressDimensions, 36, 24) :
-            textScaler(title.length, pressDimensions, 36, 24)
+            fitFontToContainer(`${title} (Initiative Only)`, pressDimensions, { maxSize: 36 }) :
+            fitFontToContainer(title, pressDimensions, {maxSize: 24 })
         ) : 18)
     }, [pressDimensions])
 
@@ -111,7 +112,7 @@ const Dungeon: React.FC = ({ }) => {
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const statusBarHeight = StatusBar.currentHeight;
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [currentDungeon, dispatchDungeon] = useReducer<(state: dungeonInfo, action: DungeonAction) => dungeonInfo>(dungeonReducer,
+    const [currentDungeon, dispatchDungeon] : [dungeonInfo, Dispatch<DungeonAction>] = useReducer(dungeonReducer,
         {
             name: undefined,
             uri: undefined,
@@ -126,8 +127,9 @@ const Dungeon: React.FC = ({ }) => {
     const [promptModal, setPromptModal] = useState<boolean>(false)
     //ref for PanResponder
     const promptComplete = useRef<boolean>(false)
-    const dungeonDataRef = useRef<dungeonInfo>()
-    const rotateRef = useRef<{ rotate: string; } | undefined>()
+    const dungeonDataRef = useRef<dungeonInfo>(undefined)
+    const rotateRef = useRef<{ rotate: string; } | undefined>(undefined)
+    const insets = useSafeAreaInsets()
     /* set saved coordinates, else center marker to top */
     useEffect(() => {
         if (route.params.currentDungeon) {
@@ -286,9 +288,6 @@ const Dungeon: React.FC = ({ }) => {
 
     return (
         <View style={[styles.dungeon_container,
-        {
-            height: height + (deviceType === "phone" && statusBarHeight || 0)
-        },
         rotate && {
             transform: [rotate]
         }
@@ -296,7 +295,9 @@ const Dungeon: React.FC = ({ }) => {
             {
                 currentDungeon.name === undefined ?
                     <>
-                        <Pressable style={styles.close_icon}
+                        <Pressable style={[styles.close_icon, {
+                            top: insets.top ? insets.top : 26
+                        }]}
                             onPress={() => closeDungeon()}
                             accessibilityLabel="Close Dungeon"
                             accessibilityHint='Back to Game'
@@ -325,7 +326,9 @@ const Dungeon: React.FC = ({ }) => {
                     :
                     <>
                         {/*Back to game/Close*/}
-                        <Pressable style={styles.close_icon}
+                        <Pressable style={[styles.close_icon, {
+                            top: insets.top ? insets.top : 28
+                        }]}
                             onPress={() => closeDungeon()}
                             accessibilityLabel="Close Dungeon"
                             accessibilityHint='Back to Game'
@@ -353,7 +356,9 @@ const Dungeon: React.FC = ({ }) => {
                         </View>
 
                         {/* Cancel Dungeon */}
-                        <Pressable style={styles.cancel_icon}
+                        <Pressable style={[styles.cancel_icon,  {
+                            top: insets.top ? insets.top : 28
+                        }]}
                             onPress={() => cancelDungeon()}
                             accessibilityLabel="Cancel Dungeon"
                             accessibilityHint='Back to dungeon selection'
@@ -416,6 +421,7 @@ const styles = StyleSheet.create({
     },
     close_icon: {
         position: "absolute",
+        // top:10,
         right: 0,
         zIndex: 1,
         width: 80,
@@ -423,6 +429,7 @@ const styles = StyleSheet.create({
     },
     cancel_icon: {
         position: "absolute",
+        // top:25,
         left: 0,
         zIndex: 1,
         width: 80,

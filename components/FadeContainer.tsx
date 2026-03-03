@@ -6,7 +6,7 @@ interface FadeContainerProps {
     style : CSSProperties,
 }
 
-const FadeContainer : React.FC<FadeContainerProps> = ({ children }, style ) =>{
+const FadeContainer : React.FC<FadeContainerProps> = ({ children } , style : CSSProperties ) =>{
     const opacityVal = useRef(new Animated.Value(0)).current
 
     const fadeInStyle = () =>{

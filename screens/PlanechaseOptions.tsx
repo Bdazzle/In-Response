@@ -2,11 +2,12 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useContext, useState } from "react"
 import { View, Text, Pressable, StyleSheet, useWindowDimensions, StatusBar, ImageSourcePropType } from "react-native"
-import { AllScreenNavProps } from "..";
+import { AllScreenNavProps } from "../index";
 import getComponentDimensions from "../functions/getComponentDimensions";
-import { textScaler } from "../functions/textScaler";
+import { fitFontToContainer } from "../functions/textScaler";
 import { GameContext, GameContextProps } from "../GameContext";
 import { planechaseSets } from "../constants/PlanechaseImages";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 /**
  * I have Planechase Anthology images in app already, 
@@ -49,7 +50,7 @@ const PlanechaseOptions: React.FC = ({ }) => {
     }
 
     return (
-        <View testID="screen_container" style={[styles.screen_container, {
+        <SafeAreaView testID="screen_container" style={[styles.screen_container, {
             height: height + (statusBarHeight || 0)
         }]}>
             <Text style={[styles.option_text, styles.title_text]}>
@@ -71,7 +72,7 @@ const PlanechaseOptions: React.FC = ({ }) => {
                             <Text
                                 style={[selections.includes(opt[0]) ? styles.active_option_text : styles.option_text,
                                 {
-                                    fontSize: containerDimensions ? textScaler(Object.keys(planechaseSets).length, containerDimensions, 24, 18) : 18
+                                    fontSize: containerDimensions ? fitFontToContainer(Object.keys(planechaseSets).length, containerDimensions, { maxSize: 24}) : 18
                                 }
                                 ]}
                             >
@@ -90,7 +91,7 @@ const PlanechaseOptions: React.FC = ({ }) => {
                         opacity: pressed ? .5 : 1,
                     }]}>
                     <Text style={[styles.option_text, {
-                        fontSize: containerDimensions ? textScaler(10, containerDimensions, 30, 18) : 18
+                        fontSize: containerDimensions ? fitFontToContainer(10, containerDimensions, { maxSize: 30, minSize: 18 }) : 18
                     }]}>
                         Reset Deck
                     </Text>
@@ -103,12 +104,12 @@ const PlanechaseOptions: React.FC = ({ }) => {
                 accessibilityRole="button"
             >
                 <Text style={[styles.option_text, {
-                    fontSize: containerDimensions ? textScaler(9, containerDimensions, 30, 18) : 18
+                    fontSize: containerDimensions ? fitFontToContainer(9, containerDimensions, { maxSize: 30, minSize: 18 }) : 18
                 }]}>
                     Load Deck
                 </Text>
             </Pressable>
-        </View>
+        </SafeAreaView>
     )
 }
 

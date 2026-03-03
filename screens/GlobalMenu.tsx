@@ -1,27 +1,41 @@
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import React, { useContext, useState } from "react"
-import { View, StyleSheet, Text, Pressable } from "react-native"
-import { AllScreenNavProps } from ".."
+import React, { useContext, useEffect, useState } from "react"
+import { View, StyleSheet, Text } from "react-native"
+import { RectButton } from 'react-native-gesture-handler'
+import { AllScreenNavProps } from "../index"
 import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
-import { textScaler } from "../functions/textScaler"
+import { fitFontToContainer } from "../functions/textScaler"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import getComponentDimensions from "../functions/getComponentDimensions"
 import iconData from "../images/staticResources"
 import { GameContext, GameContextProps } from "../GameContext"
+import { SafeAreaView } from "react-native-safe-area-context"
 
-const options = ['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions", "Card Search"]
+const options = ['New Game', 'Coin Flip', 'Dice', "Planechase", "Instructions", "Card Search"]
 
 const GlobalMenu: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<AllScreenNavProps>>();
-    const { setTotalPlayers } = useContext<OptionsContextProps>(OptionsContext)
+    const { setTotalPlayers, totalPlayers } = useContext<OptionsContextProps>(OptionsContext)
     const { planarData } = useContext<GameContextProps>(GameContext)
     const [containerDimensions, setContainerDimensions] = useState<{ height: number, width: number }>({ height: 666, width: 230 });
+    const [visibleOptions, setVisibleOptions] = useState<string[]>(options)
 
     const resetGame = () => {
         navigation.navigate('StartMenu', { screen: "Life" })
         setTotalPlayers(0)
     }
+
+    /*
+    when no game is created, PlayerOptions screen is blank. only add option if players exist
+    */
+    useEffect(() => {
+        if (totalPlayers > 0) {
+            setVisibleOptions(['New Game', 'Players', 'Coin Flip', 'Dice', "Planechase", "Instructions", "Card Search"])
+        } else {
+            return
+        }
+    }, [totalPlayers])
 
     const toPlayerOptions = () => {
         navigation.navigate("StartMenu", { screen: "PlayerOptions" })
@@ -36,12 +50,12 @@ const GlobalMenu: React.FC = ({ }) => {
     }
 
     const toPlane = () => {
-        if(planarData.deck.length > 0){
-            navigation.navigate("Planechase", { screen : "PlanarDeck"})
+        if (planarData.deck.length > 0) {
+            navigation.navigate("Planechase", { screen: "PlanarDeck" })
         } else {
             navigation.navigate("Planechase")
         }
-        
+
     }
 
     const toInstructions = () => {
@@ -53,18 +67,21 @@ const GlobalMenu: React.FC = ({ }) => {
     }
 
     return (
-        <View style={styles.menu_container}>
+        <SafeAreaView style={styles.menu_container}>
             <View style={styles.icons_container}
                 onLayout={(e) => getComponentDimensions(e, setContainerDimensions)}
             >
-                {options.map(option => {
+                {visibleOptions.map(option => {
                     return (
-                        <Pressable key={option} style={styles.button_wrapper}
+                        //button for and from gesture-handler
+                        <RectButton
+                            key={option}
+                            style={styles.button_wrapper}
                             testID={`${option}-button`}
                             accessibilityRole="button"
                             onPress={() =>
                                 option === "New Game" ? resetGame() :
-                                    option === 'Players' ? toPlayerOptions() :
+                                    option === 'Players' && totalPlayers > 0 ? toPlayerOptions() :
                                         option === 'Coin Flip' ? toCoin() :
                                             option === 'Dice' ? toDice() :
                                                 option === "Planechase" ? toPlane() :
@@ -83,18 +100,20 @@ const GlobalMenu: React.FC = ({ }) => {
                                 }
                             </View>
                             <Text nativeID={option} style={[styles.button_text, {
-                                fontSize: containerDimensions ? textScaler(option.length, containerDimensions, 24, 18) : 18
+                                fontSize: containerDimensions ? fitFontToContainer(option, containerDimensions, { maxSize: 24, minSize: 18 }) : 18
                             }]}>
                                 {option}
                             </Text>
-                        </Pressable>
+                        </RectButton>
                     )
                 })}
                 <Text style={[styles.button_text, {
-                    fontSize: containerDimensions ? textScaler(55 / 4, containerDimensions, 30, 18) : 18
-                }]} >Swipe to access this menu. Press/hold icons to interact</Text>
+                    fontSize: containerDimensions ? fitFontToContainer(55 / 4, containerDimensions, {maxSize: 24 }) : 18
+                }]} >
+                    Swipe to access this menu. Press/hold icons to interact
+                </Text>
             </View>
-        </View >
+        </SafeAreaView>
     )
 }
 

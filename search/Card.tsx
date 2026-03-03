@@ -1,5 +1,5 @@
-import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle } from "react-native"
-import { Card, Rulings, StringProperties } from ".."
+import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, ScrollView } from "react-native"
+import { Card, Rulings, StringProperties } from "../index"
 import FlipCard from "../components/Flipcard"
 import { useContext, useEffect, useState } from "react"
 import { SvgUri } from "react-native-svg"
@@ -39,9 +39,10 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
     const [langOptions, setLangOptions] = useState<string[]>([])
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     // const buttonSize  = 42;//svg size + margins
-    const chunk = 9
-    const totalChunks = setOptions ? Math.ceil(Object.entries(setOptions).length / chunk) : 1
-    const chunkedSets = [...Array(totalChunks)].map((_, i) => Object.entries(setOptions!).slice(i * chunk, (i + 1) * chunk))
+    // const chunk = 9
+    // const totalChunks = setOptions ? Math.ceil(Object.entries(setOptions).length / chunk) : 1
+    // const chunkedSets = [...Array(totalChunks)].map((_, i) => Object.entries(setOptions!).slice(i * chunk, (i + 1) * chunk))
+    const setEntries = setOptions ? Object.entries(setOptions) : []
     const { opacityVal: setOpacityVal,
         zIndexVal: setZIndexVal,
         translateYVal: setTranslateYVal,
@@ -119,15 +120,14 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
 
     return (
         <View testID="sets_container" style={styles().sets_container}>
-            <View testID="set_buttons_container"
-            >
+            <View testID="set_buttons_container">
                 <Pressable testID="svg_container"
                     accessibilityRole="button"
                     accessibilityLabel="change set"
                     accessibilityHint={`current set ${currentSet}`}
                     style={({ pressed }) => [styles(deviceType).svg_container, {
                         opacity: pressed ? .5 : 1,
-                        zIndex: 2
+                        zIndex: 2,
                     },]}
                     onPress={() => setPressedSet(!pressedSet)}
                 >
@@ -139,9 +139,17 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                         />
                     }
                 </Pressable>
-                <Animated.View testID="list_container"
+                
+            </View>
+
+            <Animated.ScrollView testID="list_container"
+                    showsVerticalScrollIndicator={true}
+                    nestedScrollEnabled={true}
+                    contentContainerStyle={styles().set_list}
                     style={[styles(deviceType).list_container,
                     {
+                        width: '80%',
+                        maxHeight: deviceType === 'phone' ? 170 : 300, //sett phone height to 200+ makes buttons overflow off screen
                         opacity: setOpacityVal,
                         zIndex: setZIndexVal,
                         transform: [{
@@ -151,38 +159,34 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                     ]}
                 >
                     {
-                        chunkedSets.map((setArr, c_index) => {
-                            return (
-                                <Animated.View key={c_index}
-                                    style={styles().set_list}
+                        // double check if this works with fewer versions
+                        setEntries
+                        .filter(([setName]) => setName !== currentSet)
+                            .map(([setName, uri], idx) => (
+                                <Pressable key={idx}
+                                    accessibilityRole="button"
+                                    onPress={() => handleSetSelect(setName)}
+                                    style={({ pressed }) => [
+                                        styles(deviceType).set_btn_container,
+                                        {
+                                            width: Object.keys(setOptions).length > 25 ? 50 : 80,
+                                            height: setEntries.length > 25 ? 30 : 40,
+                                            opacity: pressed ? .5 : 1,
+                                        },
+                                    ]}
                                 >
-                                    {
-                                        setOptions &&
-                                        setArr.filter(set => set[0] !== currentSet).map((set, index) => {
-                                            return (
-                                                <Pressable key={index}
-                                                    accessibilityRole="button"
-                                                    onPress={() => handleSetSelect(set[0])}
-                                                    style={({ pressed }) => [styles(deviceType).svg_container,
-                                                    {
-                                                        opacity: pressed ? .5 : 1,
-                                                    },
-                                                    ]}
-                                                >
-                                                    <SvgUri uri={set[1] as string} width={40} height={40} accessibilityLabel={set[0]} />
-                                                </Pressable>
-                                            )
-                                        })
-                                    }
-                                </Animated.View>
-                            )
-                        })
+                                    <SvgUri
+                                        uri={uri}
+                                        width={setEntries.length > 25 ? 30 : 40}
+                                        height={setEntries.length > 25 ? 30 : 40}
+                                        accessibilityLabel={setName}
+                                    />
+                                </Pressable>
+                            ))
                     }
-                </Animated.View>
-            </View>
+                </Animated.ScrollView>
 
-            <View testID="lang_buttons_container"
-            >
+            <View testID="lang_buttons_container">
                 <Pressable testID="svg_container"
                     accessibilityRole="button"
                     accessibilityLabel="languages"
@@ -198,8 +202,14 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                 </Pressable>
                 {
                     langPress &&
-                    <Animated.View style={[styles(deviceType).lang_list,
+                    <Animated.ScrollView 
+                    showsVerticalScrollIndicator={true}
+                    nestedScrollEnabled={true}
+                    // contentContainerStyle={styles(deviceType).lang_btn_container}
+                    style={[styles(deviceType).lang_list,
                     {
+                        width: '100%',
+                        maxHeight: deviceType === 'phone' ? 170 : 300,
                         opacity: langOpacityVal,
                         zIndex: langZIndexVal,
                         transform: [{
@@ -214,7 +224,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                                     <Pressable
                                         accessibilityRole="button"
                                         accessibilityLabel={languageKey[abrv]}
-                                        style={({ pressed }) => [styles(deviceType).svg_container, {
+                                        style={({ pressed }) => [styles(deviceType).lang_btn_container, {
                                             opacity: pressed ? .5 : 1,
                                         },]} key={index}
                                         onPress={() => handleLangPress(abrv)}
@@ -224,10 +234,9 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                                 )
                             })
                         }
-                    </Animated.View>
+                    </Animated.ScrollView>
                 }
             </View>
-
         </View>
     )
 }
@@ -437,7 +446,7 @@ const styles = (deviceType?: string) => {
             alignItems: 'center',
             borderColor: colorLibrary.offbluish,
             borderTopWidth: 2,
-            borderBottomWidth: 2
+            borderBottomWidth: 2,
         },
         flip_button: {
             borderColor: 'white',
@@ -484,29 +493,63 @@ const styles = (deviceType?: string) => {
             fontSize: deviceType === 'phone' ? 18 : 28
         },
         sets_container: {
-            display: 'flex',
+            // borderWidth: 1, borderColor: 'white',
+            // flex: 1,
             flexDirection: 'row',
             justifyContent: 'space-around',
             flexWrap: 'wrap',
             width: '100%',
         },
-        list_container: {
+        set_list: {
+            // borderWidth: 1, borderColor: 'white',
+            // flexDirection: 'column',
             flexDirection: 'row',
+            flexWrap: 'wrap',
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
+
+            // borderColor:'white', borderWidth: 1,
+        },
+        list_container: {
+            // flexDirection: 'row',
+            // flexDirection: 'column',
+            // alignSelf: "stretch",
+            // width: '100%',
             marginTop: deviceType === 'phone' ? 42 : 62,
-            display: 'flex',
             position: 'absolute',
             backgroundColor: colorLibrary.bluish,
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
         },
         svg_container: {
-            marginTop: 2,
             ...buttonStyles,
+            marginTop: 2,
             backgroundColor: colorLibrary.lightbluish,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 20,
-            borderColor: 'black', borderWidth: 1,
+            borderColor: 'black',
+            borderWidth: 1,
+        },
+        lang_btn_container:{
+// ...buttonStyles,
+            marginTop: 2,
+            backgroundColor: colorLibrary.lightbluish,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 20,
+            borderColor: 'black',
+            borderWidth: 1,
+        },
+        set_btn_container: {
+            height: 40,
+            marginTop: 2,
+            backgroundColor: colorLibrary.lightbluish,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 20,
+            borderColor: 'black',
+            borderWidth: 1,
         },
         set_icon: {
             ...setIconStyles
@@ -519,11 +562,7 @@ const styles = (deviceType?: string) => {
             backgroundColor: 'black',
             margin: 2
         },
-        set_list: {
-            flexDirection: 'column',
-            borderBottomRightRadius: 10,
-            borderBottomLeftRadius: 10
-        },
+
         lang_list: {
             flexDirection: 'column',
             backgroundColor: colorLibrary.bluish,

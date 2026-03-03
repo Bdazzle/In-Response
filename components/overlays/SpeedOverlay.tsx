@@ -86,7 +86,7 @@ const universalStyles = (devicetype : string) =>{
 
     const styles = StyleSheet.create({
         speed_container: {
-            height: '100%',
+            height: '95%',
             maxWidth: 690,//the width contained card image on tablet
             width: '100%',
             justifyContent: 'flex-start',
@@ -188,7 +188,7 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
                 initialFlipVal={globalPlayerData[route.params.playerID as number].speed === 4 ? 1 : 0}
             />
             {showLevels &&
-                <View nativeID="overlay_container"
+                <Animated.View nativeID="overlay_container"
                     style={[frontAnimatedStyle, styles.overlay_container, {
                         width: imageDimensions?.width,
                         height: imageDimensions?.height,
@@ -255,7 +255,7 @@ const SpeedOverlay: React.FC<SpeedProps> = ({ imageSource }) => {
                             </Animated.View>
 
                         </View>
-                </View>
+                </Animated.View>
             }
         </View>
     )

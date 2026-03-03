@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useReducer, useState } from "react"
 import { View, StyleSheet, Text, Pressable, ColorValue } from "react-native"
 import { imageAction, imageReducer, ImageReducerState } from "../../reducers/imageResources"
-import { ColorTheme, CounterCardProps, CounterData } from "../.."
+import { ColorTheme, CounterCardProps, CounterData } from "../../index"
 import { GameContext, GameContextProps } from "../../GameContext"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -20,7 +20,7 @@ interface IncrementCounterProps {
 }
 const IncrementingCounter: React.FC<IncrementCounterProps> = ({ parentDimensions, playerID, colorTheme, counterType }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const [resources, dispatchResources] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [resources, dispatchResources] :[ImageReducerState, React.Dispatch<imageAction>] = useReducer(imageReducer,
         {
             iconImage: undefined,
             cardImage: undefined,

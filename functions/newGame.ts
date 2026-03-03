@@ -14,7 +14,7 @@ const newGameData = (totalPlayers: number, startingLife: number, currPlayers?: G
  */
   if(currPlayers && totalPlayers > Object.keys(currPlayers).length) {
       const playerDiff = playersArr.slice(Object.keys(currPlayers).length, playersArr.length)
-      const newPlayersObj = playerDiff.reduce((acc, curr: number | string) => {
+      const newPlayersObj = playerDiff.reduce((acc, curr: number) => {
         /*
         cdamage creates an object out of an array of totalPlayers/all playerIDs, 
         filters out the current player, and makes a [playerID] : {} out of the remaining players.
@@ -36,7 +36,7 @@ const newGameData = (totalPlayers: number, startingLife: number, currPlayers?: G
       playersObj = {...currPlayers, ...newPlayersObj}
   }
   else {
-    playersObj = playersArr.reduce((acc, curr: number | string, i: number) => {
+    playersObj = playersArr.reduce((acc, curr: number, i: number) => {
       /*
       cdamage creates an object out of an array of totalPlayers/all playerIDs, 
       filters out the current player, and makes a [playerID] : {} out of the remaining players.

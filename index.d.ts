@@ -65,7 +65,6 @@ export interface PlayerData {
     dungeonData?: Partial<DungeonData>,
     dungeonCompleted?: boolean,
     counterData?: CounterData,
-    // citysBlessing?: boolean,
     theRing?: number,
     speed?: number,
     lifeTotal: number,
@@ -126,11 +125,11 @@ export type HSLAVals = {
  * [...]: T[K] - specifies the value type for each key K, which will always be string 
  * because non-strings have already been filtered out with "T[K] extends string ? K : never"
  */
-type StringProperties<T> = {
+export type StringProperties<T> = {
     [K in keyof T as T[K] extends string ? K : never]: T[K];
   };
 
-interface CardData {
+export interface CardData {
     image_uris? : { [key : string] : string };
     card_faces? :  {[key: string] : Card};
     lang:string
@@ -140,7 +139,8 @@ interface CardData {
     oracle_id: string;
     set_name: string
 }
-interface Card extends CardData {
+
+export interface Card extends CardData {
     [key: string]:  string | number | boolean | Card;
     /**
      * properties explicitly extracted from scryfall data are the following:
@@ -152,7 +152,7 @@ interface Card extends CardData {
 /**
  * optional data of ScryFallCard is used, but restructured/reassigned
  */
-interface ScryFallCard extends CardData {
+export interface ScryFallCard extends CardData {
     [key: string]:  string | number | boolean | ScryFallCard;
     name: string;
     set_uri:string;
@@ -161,16 +161,16 @@ interface ScryFallCard extends CardData {
 
 // [key : string] : Omit<Card, 'name'>[]
     // [cardName : string] : Card[];
-type CombinedCards  = {
+export type CombinedCards  = {
     [cardName : string] : {
-        versions: Card[];
+        versions: ScryFallCardCard[] | UsedCard[];
         rules: Rulings
     }
 }
 
-type ScryResultData  = ScryFallCard[]
+export type ScryResultData  = ScryFallCard[]
 
-type Rulings = {
+export type Rulings = {
     [key: number] :{
         // source: string;
         // published_at: string;

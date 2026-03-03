@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from "react"
 import { Animated, Easing, Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue } from 'react-native';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
-import { cdmgLineHeight, cdmgScaler, cNameScaler, handleTaxSize, taxLineHeight, textScaler } from "../functions/textScaler";
+import { cdmgLineHeight, cdmgScaler, cNameScaler, fitFontToContainer, handleTaxSize, taxLineHeight } from "../functions/textScaler";
 import getDimensions from "../functions/getComponentDimensions";
+import { OptionsContext, OptionsContextProps } from "../OptionsContext";
 
 interface CommanderDamageProps {
     playerID: number,
@@ -226,7 +227,7 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                             totalPlayers,
                                             globalPlayerData[playerID!].commander_damage![oppponentID]
                                         ),
-                                        paddingRight: '2%'
+                                        // paddingRight: '2%'
                                     }]}
                                     accessibilityLiveRegion="polite"
                                     accessibilityLabel={`${globalPlayerData[playerID!].commander_damage![oppponentID]} commander damage from ${opponentName}`}
@@ -321,7 +322,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                                 accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                                 style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                                 {
-                                    fontSize: pressDimensions ? textScaler(3, pressDimensions, undefined, 18) : 16
+                                    fontSize: pressDimensions ? fitFontToContainer('Tax', pressDimensions, { maxSize: 18, minSize: 14}) : 16
                                 }
                                 ]}>
                                 Tax
@@ -332,17 +333,17 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             accessibilityLabel={`${globalPlayerData[playerID].screenName} commander tax`}
                         >
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
-                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
+                                fontSize: pressDimensions ? fitFontToContainer('T', { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
                             }]}
                                 accessible={false}
                             >T</Text>
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
-                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
+                                fontSize: pressDimensions ? fitFontToContainer('a', { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16
                             }]}
                                 accessible={false}
                             >a</Text>
                             <Text style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_letter, {
-                                fontSize: pressDimensions ? textScaler(1, { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16,
+                                fontSize: pressDimensions ? fitFontToContainer('x', { ...pressDimensions, height: pressDimensions?.height * .3 }) : 16,
                                 paddingBottom: 10
                             }]}
                                 accessible={false}
@@ -355,7 +356,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                     accessibilityLabel={`${globalPlayerData[playerID].screenName} ${tax} commander tax`}
                     style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                     pressDimensions && {
-                        fontSize: handleTaxSize(totalPlayers, playerID, String(tax), gameType),
+                        fontSize: handleTaxSize(totalPlayers, playerID, tax, pressDimensions, gameType),
                         lineHeight: taxLineHeight(pressDimensions.height, totalPlayers, gameType),
                         paddingLeft: gameType === 'commander' ? 3 : 0,
                     }]}>
@@ -397,10 +398,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                                 accessibilityLabel={`${globalPlayerData[playerID].screenName} spell tax`}
                                 style={[styles(globalPlayerData[playerID].colors.secondary, gameType).tax_text,
                                 {
-                                    fontSize: pressDimensions ? textScaler('Spell Tax'.length,
-                                        pressDimensions,
-                                        36,
-                                        totalPlayers === 2 ? pressDimensions.height / "spell".length : (pressDimensions.height / "spell".length + 4)) : 16
+                                    fontSize: pressDimensions ? fitFontToContainer('Spell Tax', pressDimensions,{maxSize : 36, minSize : totalPlayers === 2 ? pressDimensions.height / "spell".length : (pressDimensions.height / "spell".length + 3)}) : 16
                                 }
                                 ]}>
                                 Spell Tax
@@ -412,7 +410,7 @@ const CommanderDamage: React.FC<CommanderDamageProps> = ({ playerID, scaleTracke
                             numberOfLines={1}
                             style={[styles(globalPlayerData[playerID].colors.secondary).tax_total,
                             pressDimensions && {
-                                fontSize: handleTaxSize(totalPlayers, playerID, String(spellTax), gameType),
+                                fontSize: handleTaxSize(totalPlayers, playerID, spellTax, pressDimensions, gameType),
                                 lineHeight: pressDimensions && taxLineHeight(pressDimensions.height, totalPlayers, gameType),
                                 paddingLeft: totalPlayers === 3 && playerID === 2 ? 4 : 0
                             }]}>
@@ -431,7 +429,7 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
         height: '100%',
         width: '100%',
         marginLeft: 5,
-        paddingBottom: 5,
+        // paddingBottom: 5,
     },
     tax: {
         paddingLeft: '10%',
@@ -488,6 +486,7 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
         width: '100%',
         height: '100%',
         alignItems: 'center',
+        flex:1
     },
     player_pressable: {
         height: '100%',

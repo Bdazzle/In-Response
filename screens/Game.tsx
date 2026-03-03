@@ -10,6 +10,7 @@ import GlobalMenu from './GlobalMenu'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import shuffle from '../functions/shuffler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const window = Dimensions.get("window")
 
@@ -26,16 +27,8 @@ export const Game = () => {
     const designationMap = Object.keys(globalPlayerData).map(i => Number(i))
     //was type Swipeable, but not anymore and gesture handler docs suck
     const swipeRef = useRef<any>(null)
-    //98% of windows height, will be set to game_container height because middle buttons on wonky on tablet v. phone
-    const [gameHeight, setGameHeight] = useState<number>(window.height * .98)
     const [midBtnOffset, setMidBtnOffset] = useState<number>(window.height / 2)
-
-    const getGameHeight = (event: LayoutChangeEvent) => {
-        const { height } = event.nativeEvent.layout
-        if (height !== 0) {
-            setGameHeight(window.height < height ? window.height : height)
-        }
-    }
+    const { height: gameHeight } = useWindowDimensions();
 
     /*
     offset calculated as fraction of 5% (height of mid buttons, aka window.height * .05)
@@ -43,15 +36,9 @@ export const Game = () => {
     icon sizes are: phone = 38, tablet = 58
     */
     useEffect(() => {
-        if (deviceType === 'phone') {
-            const iconSize = 38;
-            const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .65 - (iconSize / 2) : (gameHeight / 2) - (iconSize / 10)
-            setMidBtnOffset(offset)
-        } else {
-            const iconSize = 58;
-            const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .65 : (gameHeight / 2) - (iconSize / 3)
-            setMidBtnOffset(offset)
-        }
+        const iconSize = deviceType === "phone" ? 38 : 58;
+        const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .56 : (gameHeight / 2) - (iconSize * .5)
+        setMidBtnOffset(offset)
     }, [gameHeight])
 
     /* Random Player Functions */
@@ -146,10 +133,9 @@ export const Game = () => {
                 renderLeftActions={renderLeftActions}
                 renderRightActions={() => null}
             >
-                <View
+                <SafeAreaView
                     testID='game_container'
                     style={styles.game_container}
-                    onLayout={(e) => { getGameHeight(e) }}
                 >
                     <View testID='middle_buttons'
                         style={{
@@ -274,8 +260,7 @@ export const Game = () => {
                                         :
                                         undefined
                     }
-                </View>
-
+                </SafeAreaView>
             </Swipeable>
         </GestureHandlerRootView>
     )
@@ -413,19 +398,20 @@ const TwoPlayerScreen: React.FC<TwoPlayerParams> = ({ playerIDs, p1style, p2styl
 
 const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
+    const { deviceType } = useContext(OptionsContext) as OptionsContextProps
     const { height, width } = useWindowDimensions()
 
     return (
         <View
             testID='threeplayer'
-            style={styles.game_wrapper}>
+            style={styles.game_wrapper_3p}>
             {Object.keys(globalPlayerData).length > 0 ?
                 <View style={styles.game_wrapper} >
                     <Twoplayer playerIDs={playerIDs.slice(0, 2)}
                         p1style={{
                             backgroundColor: 'black',
                             height: width / 2,
-                            width: height * .65,
+                            width: height * .55,
                             transform: [
                                 { rotate: '90deg' },
                             ]
@@ -433,7 +419,7 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
                         p2style={{
                             backgroundColor: 'black',
                             height: width / 2,
-                            width: height * .65,
+                            width: height * .55,
                             transform: [
                                 { rotate: '270deg' },
                             ]
@@ -443,11 +429,11 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             width: '100%',
-                            height: height * .65,
+                            height: height * .55,
                         }} />
 
                     <View key="player_3" style={[styles.player_3, {
-                        height: height * .35,
+                        height: deviceType === 'tablet' ? height * .4 : height * .35,
                     }]}>
                         <Player key="Player 3"
                             playerName={globalPlayerData[playerIDs[2]].screenName}
@@ -463,7 +449,7 @@ const Threeplayer: React.FC<GameParams> = ({ playerIDs }) => {
     )
 }
 
-const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
+const Fourplayer: React.FC<GameParams> = () => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
     const { height, width } = useWindowDimensions()
     const [appDimensions, setAppDimensions] = useState<{ width: number, height: number }>({
@@ -537,13 +523,26 @@ const Fourplayer: React.FC<GameParams> = ({ playerIDs }) => {
 
 const styles = StyleSheet.create({
     game_container: {
-        height: '98%',
+        // height: '98%',
+        height: '100%',
         width: '100%',
         backgroundColor: 'black',
         paddingTop: '1%',
+        // paddingLeft:5,
+        // paddingRight:5
+        // borderColor:'white',
+        // borderWidth:1
     },
     game_wrapper: {
         height: '100%',
+        // height: '90%',
+        width: '100%',
+        backgroundColor: 'black',
+    },
+    game_wrapper_3p: {
+        marginTop: '1%',
+        height: '100%',
+        // height: '90%',
         width: '100%',
         backgroundColor: 'black',
     },

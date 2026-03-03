@@ -1,10 +1,11 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React from "react"
 import { Text, StyleSheet, View, Pressable } from "react-native"
-import { StartMenuStackNavProps } from "../..";
+import { StartMenuStackNavProps } from "../../index";
 import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
 import { StartMenuStackParamList } from "../../navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export interface ColorMenuProps {
     playerID: number;
@@ -25,7 +26,7 @@ const ColorMenu: React.FC = ({ }) => {
     }
    
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.options_wrapper}>
 
                 {/* Primary/Background */}
@@ -63,14 +64,14 @@ const ColorMenu: React.FC = ({ }) => {
             <FadeContainer style={styles.fade_container}>
                 <MenuNavButtons navBack="PlayerOptions" labelBack="Player Options" />
             </FadeContainer>
-        </View>
+        </SafeAreaView>
 
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        height: '98%',
+        height: '100%',
         width: '100%',
         backgroundColor: 'black',
         alignContent: 'flex-end',

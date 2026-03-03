@@ -7,11 +7,11 @@ import shuffle from '../../functions/shuffler';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PlaneMenuStackParamList } from '../../navigation';
-import { staticTextScaler, textScaler } from '../../functions/textScaler';
+import { fitFontToContainer, staticTextScaler } from '../../functions/textScaler';
 import { OptionsContext, OptionsContextProps } from '../../OptionsContext';
 import generatePlanarDeck, { collatePlanarData } from '../../functions/planarDeck';
 import { colorLibrary } from '../../constants/Colors';
-import { AllScreenNavProps, PlanarDeck, PlaneCard, PlaneChaseSet } from '../..';
+import { AllScreenNavProps, PlanarDeck, PlaneCard, PlaneChaseSet } from '../../index';
 import { getPlanes } from '../../search/getcards';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -74,7 +74,7 @@ const Planechase: React.FC = ({ }) => {
 
             //check for stored planechase sets. AsyncStorage can return empty and valid
             const storedSets = sets && await loadStoredSet(sets)
-            
+
             if (storedSets) {
                 planarData = storedSets
             }
@@ -92,7 +92,7 @@ const Planechase: React.FC = ({ }) => {
                     storeSets(planarData)
                 }
             }
-            
+
             const newPlanarDeck = generatePlanarDeck(totalPlayers === 0 ? 4 : totalPlayers, planarData)
             setPlanarData({
                 currentPlane: newPlanarDeck[0],
@@ -249,11 +249,13 @@ const Planechase: React.FC = ({ }) => {
                                         style={styles.image_button}
                                         accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
                                     >
-                                        <Image source={typeof currentPlane[1] === 'number' ? currentPlane[1] : { uri: currentPlane[1] } as ImageSourcePropType}
-                                            style={styles.plane_image}
-                                            alt={currentPlane[0]}
-                                            accessibilityHint='Press to go back to game'
-                                        />
+                                        {typeof currentPlane[1] === 'number' &&
+                                            <Image source={typeof currentPlane[1] === 'number' ? currentPlane[1] : { uri: currentPlane[1] } as ImageSourcePropType}
+                                                style={styles.plane_image}
+                                                alt={currentPlane[0]}
+                                                accessibilityHint='Press to go back to game'
+                                            />
+                                        }
                                     </Pressable>
 
                                     <Pressable nativeID='planechase_next'
@@ -302,7 +304,7 @@ const Planechase: React.FC = ({ }) => {
                                                     />
                                                 </G>
                                             </Svg>
-                                            : 
+                                            :
                                             <Svg viewBox='0 0 24 24'>
                                                 <Rect x={4} y={4} width={16} height={16} rx={2} stroke={'white'} strokeWidth={1} strokeLinecap={'round'} ></Rect>
                                             </Svg>
@@ -313,13 +315,10 @@ const Planechase: React.FC = ({ }) => {
                             style={styles.mana_cost_container}
                         >
                             <Text style={[styles.text_style, {
-                                fontSize: dieContainerWidth ? textScaler(String(rollCost).length,
-                                    { height: dieContainerWidth! / 2, width: dieContainerWidth! / 2 },
-                                    deviceType === 'phone' ? 60 : 80,
-                                ) : 18
+                                fontSize: dieContainerWidth ? fitFontToContainer(String(rollCost).length, { height: dieContainerWidth! / 2, width: dieContainerWidth! / 2 }, { maxSize: 60, minSize: 18 }) : 18
                             }]}
-                            accessibilityHint='Mana Cost'
-                            accessibilityLiveRegion="polite"
+                                accessibilityHint='Mana Cost'
+                                accessibilityLiveRegion="polite"
                             >
                                 {rollCost}
                             </Text>
@@ -349,7 +348,7 @@ const Planechase: React.FC = ({ }) => {
                             accessibilityLabel="Back to Planar Deck options"
                             accessibilityRole="button"
                             testID='to_options' onPress={handleBack}>
-                            <Text style={[styles.options_text,{
+                            <Text style={[styles.options_text, {
                                 fontSize: deviceType === 'phone' ? 16 : 20
                             }]}>Options</Text>
                         </Pressable>
@@ -468,7 +467,7 @@ const styles = StyleSheet.create({
         width: 90,
     },
     options_button: {
-        zIndex:2,
+        zIndex: 2,
         borderRadius: 50,
         backgroundColor: 'white',
         transform: [
@@ -479,8 +478,8 @@ const styles = StyleSheet.create({
         left: 0,
         bottom: 150,
         width: 80,
-        minHeight:48,
-        justifyContent:'center'
+        minHeight: 48,
+        justifyContent: 'center'
     },
     options_text: {
         fontFamily: "Beleren",

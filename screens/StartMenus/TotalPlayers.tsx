@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useContext } from "react"
 import { View, StyleSheet, Text, Pressable } from 'react-native';
-import { StartMenuStackNavProps } from "../..";
+import { StartMenuStackNavProps } from "../../index";
 import FadeContainer from "../../components/FadeContainer";
 import MenuNavButtons from "../../components/MenuNavButtons";
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 /* 
 const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
@@ -24,7 +25,7 @@ const TotalPlayers = () => {
     }
 
     return (
-        <View style={styles.container} testID="total-players-screen">
+        <SafeAreaView style={styles.container} testID="total-players-screen">
             <Text style={styles.title_text} >Total Players</Text>
             <View style={styles.options_wrapper}>
                 {chunkedOptions.map((chunks: number[], index: number) => {
@@ -51,7 +52,7 @@ const TotalPlayers = () => {
                     navBack="Life" labelBack="Life Totals" 
                     />
                 </FadeContainer>
-        </View>
+        </SafeAreaView>
     )
 }
 

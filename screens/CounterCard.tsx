@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useContext, useEffect, useReducer, useState } from 'react';
-import { Text, Image, View, StyleSheet, TextInput, TextInputChangeEventData, NativeSyntheticEvent, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions } from 'react-native';
+import React, { Dispatch, useContext, useEffect, useReducer, useState } from 'react';
+import { Text, Image, View, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, ImageSourcePropType, useWindowDimensions, TextInputChangeEvent } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { GameContext, GameContextProps } from '../GameContext';
 import { RootStackParamList } from '../navigation';
@@ -13,9 +13,10 @@ import useScreenRotation from '../hooks/useScreenRotation';
 import FlipCard from '../components/Flipcard';
 import TheRing from '../components/overlays/TheRingOverlay';
 import { cardRules } from '../constants/cardRules'
-import { DungeonData } from '..';
+import { DungeonData } from '../index';
 import { manaSymbols } from '../images/staticResources';
 import SpeedOverlay from '../components/overlays/SpeedOverlay';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ManaCounterProps {
     source: ImageSourcePropType,
@@ -79,20 +80,21 @@ const CounterCard: React.FC = ({ }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'Card'>>()
     const { dispatchGlobalPlayerData, globalPlayerData } = useContext(GameContext) as GameContextProps
-    const [cardImageSource, dispatchCardImageSource] = useReducer<(state: ImageReducerState, action: imageAction) => ImageReducerState>(imageReducer,
+    const [cardImageSource, dispatchCardImageSource] : [ImageReducerState, Dispatch<imageAction>] = useReducer(imageReducer,
         {
             cardImage: undefined,
         })
     const [total, setTotal] = useState<number | undefined>()
     const [rotate] = useScreenRotation(totalPlayers, route.params.playerID!)
     const { width } = useWindowDimensions()
+    const insets = useSafeAreaInsets()
 
     useEffect(() => {
         dispatchCardImageSource({ card: route.params.card })
         setTotal(route.params.currentCounters)
     }, [])
 
-    const handleInputChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+    const handleInputChange = (e: TextInputChangeEvent) => {
         setTotal(Number(e.nativeEvent.text))
     }
 
@@ -114,7 +116,7 @@ const CounterCard: React.FC = ({ }) => {
                         playerID: route.params.playerID,
                         field: 'remove counter',
                         subField: route.params.card,
-                        value: 0
+                        // value: 0
                     })
                 }
             }
@@ -149,7 +151,7 @@ const CounterCard: React.FC = ({ }) => {
             accessibilityHint='Press background to go back to game'
             style={[styles().container, {
                 width: width,
-                height: deviceType === 'phone' ?'95%' : '98%',
+                height: deviceType === 'phone' ? '100%' : '98%',
                 transform: rotate && [rotate],
             }]}>
             {/*The Ring and Speed*/}
@@ -168,7 +170,9 @@ const CounterCard: React.FC = ({ }) => {
                         :
                         <KeyboardAvoidingView testID='card_wrapper'
                             behavior={Platform.OS === "ios" ? "padding" : "height"}
-                            style={styles(route.params.card).card_wrapper}>
+                            style={[styles(route.params.card).card_wrapper, {
+                                marginTop: insets.top ? insets.top : 26
+                            }]}>
                             {/* Image/Close functions */}
                             {
                                 (typeof cardImageSource.cardImage === 'object' &&
@@ -279,7 +283,9 @@ const CounterCard: React.FC = ({ }) => {
             }
 
             {route.params.card === 'storm' &&
-                <View testID='mana_container' style={styles().mana_container}>
+                <View testID='mana_container' style={[styles().mana_container, {
+                    marginBottom: insets.bottom ? insets.bottom : 48
+                }]}>
                     <View testID='mana_wrapper'
                         style={styles().mana_wrapper}>
                         {
@@ -302,7 +308,8 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
     },
     card_wrapper: {
         flex: cardName === 'storm' ? 0 : 1,
-        height: cardName === 'storm' ? '55%' : '100%',
+        // height: cardName === 'storm' ? '55%' : '100%',
+        height: cardName === 'storm' ? '50%' : '100%',
         width: '100%',
         backgroundColor: 'black',
         justifyContent: 'center',
@@ -353,18 +360,19 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
         fontSize: cardName === 'storm' ? staticTextScaler(48) : staticTextScaler(56),
     },
     mana_container: {
-        height: '45%',
+        // height: '45%',
+        height: '40%',
         overflow: 'visible',
     },
     mana_wrapper: {
         justifyContent: 'center',
         flex: 1,
+        height: '100%',
     },
     mana_counter: {
         flexDirection: 'row',
-        height: '16%',
+        height: '17%',
         width: '100%',
-        bottom: 0,
         alignItems: 'center',
         justifyContent: 'space-evenly',
     },

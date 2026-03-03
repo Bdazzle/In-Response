@@ -1,11 +1,17 @@
-import { Card, ScryResultData } from "..";
+import { Card, ScryResultData } from "../index";
 
-const paginatedPages = async (url: string, headers: {}) => {
+const paginatedPages = async (url: string, headers: Record<string, string>) => {
     let allCards: ScryResultData = [];
     let nextPage = url;
-
+    // headers object is not a valid fetch options object.  when calling
+    // `fetch(url, headers)` the second argument is treated as the entire
+    // options (method/body/headers/etc), the headers map would becomes the
+    // request body.  Scryfall rejects GET requests with a body (400), which is
+    // the error being thrown with `onSubmitEditing`, but not when using the named endpoint (exact match), where {method:'GET', headers} were passed correctly).
+    // Always wrap the headers in an options object and include a method so the fetch call behaves as expected.
+    const options = { method: 'GET', headers };
     while (nextPage) {
-        const response = await fetch(nextPage, headers);
+        const response = await fetch(nextPage, options);
         if (!response.ok) {
             //throwing an error instead of console.log halts execution
             throw new Error(`HTTP response error! status: ${response.status}`)
@@ -18,10 +24,10 @@ const paginatedPages = async (url: string, headers: {}) => {
     return allCards
 }
 
-const getScryfallData = async (cardInput: string) => {
+const getCardData = async (cardInput: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const trimmedCard = cardInput.trim()
@@ -38,7 +44,7 @@ const getScryfallData = async (cardInput: string) => {
 export const getAllCardVersion = async (id: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const response = await fetch(`https://api.scryfall.com/cards/search?unique=prints&q=oracle_id:${id}&include_multilingual=true`,
@@ -63,7 +69,7 @@ export const getAllCardVersion = async (id: string) => {
 export const getExactCard = async (cardInput: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const trimmedCard = cardInput.trim()
@@ -90,7 +96,7 @@ export const getExactCard = async (cardInput: string) => {
 export const getSetSymbol = async (uri: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const response = await fetch(uri,
@@ -115,7 +121,7 @@ export const getSetSymbol = async (uri: string) => {
 export const getSuggestedCards = async (cardInput: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const trimmedCard = cardInput.trim()
@@ -147,7 +153,7 @@ export const getPlanes = async (options : string) => {
         //example search for planes: 'type:plane (set:who OR set:pc2) OR type:phenomenon (...sets)'
         const query = `type:plane (${options}) OR type:phenomenon (${options})`
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
 
@@ -166,4 +172,5 @@ export const getPlanes = async (options : string) => {
     }
 }
 
-export default getScryfallData
+
+export default getCardData

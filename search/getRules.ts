@@ -1,10 +1,9 @@
-import { Rulings } from "..";
+import { Rulings } from "../index";
 
-
-const getRules = async (uri: string) => {
+export const getRulesScryfall = async (uri: string) => {
     try {
         const headers = {
-            "User-Agent": "In Response/3.0.0 (React Native, Android)",
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
             "Accept": "application/json"
         };
         const response = await fetch(uri,
@@ -25,8 +24,7 @@ const getRules = async (uri: string) => {
         console.log('Error fetching card rules:', error)
         return
     }
-
 }
 
 
-export default getRules
+export default getRulesScryfall

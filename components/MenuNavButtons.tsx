@@ -2,9 +2,9 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react"
 import { Text, View, StyleSheet, Pressable } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg'
-import { AllScreenNavProps } from "..";
+import { AllScreenNavProps } from "../index";
 import getDimensions from "../functions/getComponentDimensions";
-import { textScaler } from "../functions/textScaler";
+import { fitFontToContainer } from "../functions/textScaler";
 import { GlobalMenuParamsList, RootStackParamList, StartMenuStackParamList } from "../navigation";
 
 interface MenuNavProps {
@@ -67,7 +67,7 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                             />
                         </Svg>
                         <Text style={[styles.label_text, {
-                            fontSize: (labelBack && pressDimensions?.width) ? textScaler(labelBack?.length, pressDimensions, 36, 18) : 18,
+                            fontSize: (labelBack && pressDimensions) ? fitFontToContainer(labelBack, pressDimensions, { maxSize:24, minSize:18}) : 18
                         }]}>
                             {labelBack}
                         </Text>
@@ -102,7 +102,7 @@ const MenuNavButtons: React.FC<MenuNavProps> = ({ labelTo, labelBack, navBack, n
                             />
                         </Svg>
                         <Text style={[styles.label_text, {
-                            fontSize: (labelTo && pressDimensions?.width) ? textScaler(labelTo?.length, pressDimensions, 36, 18) : 18,
+                            fontSize: (labelTo && pressDimensions) ? fitFontToContainer(labelTo, pressDimensions, { maxSize:24, minSize:18}) : 18
                         }]}>
                             {labelTo}
                         </Text>

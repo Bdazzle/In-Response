@@ -3,8 +3,9 @@ import { View, StyleSheet, Text, KeyboardAvoidingView, TextInput, Pressable, Sta
 import MenuNavButtons from "../../components/MenuNavButtons";
 import FadeContainer from "../../components/FadeContainer";
 import { useNavigation } from "@react-navigation/native";
-import { StartMenuStackNavProps } from "../..";
+import { StartMenuStackNavProps } from "../../index";
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 /* 
 const [list,chunkSize] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 6]
@@ -17,8 +18,6 @@ const LifeMenu = () => {
     const chunk = 2
     const totalChunks = Math.ceil(options.length / chunk)
     const chunkedOptions = [...Array(totalChunks)].map((_) => options.splice(0, chunk))
-    const { height } = useWindowDimensions()
-    const statusBarHeight = StatusBar.currentHeight;
 
     const handleSelectTotal = (val: string | number) => {
         setStartingLife(Number(val))
@@ -32,9 +31,7 @@ const LifeMenu = () => {
     }
 
     return (
-        <View style={[styles.container, {
-            height: height + (statusBarHeight || 0)
-        }]} testID="GameType-screen">
+        <SafeAreaView style={styles.container} testID="GameType-screen">
             <View testID="gametype_container"
                 style={styles.gametype_container}
             >
@@ -113,12 +110,13 @@ const LifeMenu = () => {
                     <MenuNavButtons navBack="MainMenu" labelBack="Main Menu" navTo="TotalPlayers" labelTo="Total Players" />
                 </FadeContainer>
             }
-        </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        paddingBottom:'2%',
         height: '100%',
         width: '100%',
         backgroundColor: 'black',
@@ -195,7 +193,7 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'space-evenly',
         width: '70%',
-        height: '37%'
+        height: '35%',
     },
     options_subcontainer: {
         flexDirection: 'row',

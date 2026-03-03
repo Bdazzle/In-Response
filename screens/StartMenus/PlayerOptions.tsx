@@ -1,13 +1,14 @@
 import React, { useContext, useEffect } from "react"
-import { Text, StyleSheet, KeyboardAvoidingView, NativeSyntheticEvent, TextInput, View, Pressable, TextInputSubmitEditingEventData, ColorValue } from "react-native"
+import { Text, StyleSheet, KeyboardAvoidingView, TextInput, View, Pressable, ColorValue, TextInputSubmitEditingEvent, TextInputEndEditingEvent } from "react-native"
 import MenuNavButtons from "../../components/MenuNavButtons"
 import { GameContext, GameContextProps } from "../../GameContext"
-import { ColorTheme, StartMenuStackNavProps } from "../.."
+import { ColorTheme, StartMenuStackNavProps } from "../../index"
 import FadeContainer from "../../components/FadeContainer"
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import Svg, { Path } from "react-native-svg"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 interface ColorSquareParams {
     primary: string,
@@ -64,7 +65,7 @@ const PlayerRow: React.FC<PlayerRowParams> = ({ playerID }) => {
         }
     }
 
-    const handleNameChange = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+    const handleNameChange = (e: TextInputSubmitEditingEvent | TextInputEndEditingEvent) => {
         e.preventDefault()
         storeName(e.nativeEvent.text)
         dispatchGlobalPlayerData({
@@ -136,7 +137,7 @@ const PlayerOptions = ({ }) => {
     const { globalPlayerData } = useContext(GameContext) as GameContextProps
 
     return (
-        <View style={styles.container}
+        <SafeAreaView style={styles.container}
             testID="player_options"
         >
             <Text style={styles.title_text} >Player Names</Text>
@@ -152,7 +153,7 @@ const PlayerOptions = ({ }) => {
             <FadeContainer style={styles.fade_container}>
                 <MenuNavButtons navTo="Game" navBack="TotalPlayers" labelBack="Total Players" labelTo="Start Game" />
             </FadeContainer>
-        </View>
+        </SafeAreaView>
     )
 }
 
