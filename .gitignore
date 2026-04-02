@@ -76,7 +76,7 @@ web-build/
 *.aab
 .env
 assets/
-# screen_shots/
+screen_shots/
 .vscode
 *.doc
 hooks/useSwipe.tsx
