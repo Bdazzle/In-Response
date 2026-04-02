@@ -74,6 +74,7 @@ dist/
 web-build/
 *.apk
 *.aab
+.env
 assets/
 screen_shots/
 .vscode
@@ -84,5 +85,6 @@ components/color picker/useHSLtoRGBA.ts
 credentials.json
 /credentials
 notes.txt
+/utils
 /__tests__
 /__mocks__

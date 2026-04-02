@@ -1,30 +1,34 @@
-import { Rulings } from "../index";
+import { fetchWithLogging } from "../utils/api_debug";
 
-export const getRulesScryfall = async (uri: string) => {
+ const getRules = async (oracle_ids: string[]) =>{
+    const headers = {
+        "User-Agent": "In Response/4.1.3 (React Native, Android)",
+        "Accept": "application/json",
+        'Access-Control-Allow-Origin': '*'
+    };
+
+    const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
     try {
-        const headers = {
-            "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
-        };
-        const response = await fetch(uri,
-            {
+    // const response =  await fetch(endpoint, {
+    //     method: "GET",
+    //     headers: headers
+    // })
+    // const rules_data = await response.json()
+    // const text = await response.text()
+    // const rules_data = JSON.parse(text)
+
+    const response = await fetchWithLogging<any>(endpoint, {
                 method: 'GET',
                 headers: headers
-            });
-
-        if (!response.ok) {
-            //throwing an error instead of console.log halts execution
-            throw new Error(`HTTP response error! status: ${response.status}`)
-        }
-
-        const rules = await response.json()
-        return rules.data as Rulings
-
-    } catch (error) {
-        console.log('Error fetching card rules:', error)
-        return
+            })
+    const rules_data = response
+    
+    return rules_data.data
+    }
+    catch (error) {
+        console.trace('Error fetching rules data:', error);
+        return;
     }
 }
 
-
-export default getRulesScryfall
+export default getRules

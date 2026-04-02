@@ -1,6 +1,5 @@
 import { Text, Image, View, StyleSheet, Pressable, LayoutChangeEvent, ActivityIndicator, ImageSourcePropType } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import planechaseImages, { PlaneswalkerSvg } from '../../constants/PlanechaseImages';
 import { GameContext, GameContextProps } from '../../GameContext';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import shuffle from '../../functions/shuffler';
@@ -11,9 +10,10 @@ import { fitFontToContainer, staticTextScaler } from '../../functions/textScaler
 import { OptionsContext, OptionsContextProps } from '../../OptionsContext';
 import generatePlanarDeck, { collatePlanarData } from '../../functions/planarDeck';
 import { colorLibrary } from '../../constants/Colors';
-import { AllScreenNavProps, PlanarDeck, PlaneCard, PlaneChaseSet } from '../../index';
+import { AllScreenNavProps, CardResults, PlanarDeck, PlaneCard, PlaneChaseSet } from '../../index';
 import { getPlanes } from '../../search/getcards';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PlaneswalkerSvg } from '../../images/staticResources';
 
 /*
 Add caching for plane image uris. Maintain this in AsyncStorage, since the plane sets are complete.
@@ -42,58 +42,56 @@ const Planechase: React.FC = ({ }) => {
     const loadStoredSet = async (sets: string[]) => {
         try {
             const savedSets = await AsyncStorage.multiGet(sets)
-            if (savedSets[0][1] !== null) {
-                const setObj = savedSets.reduce((acc, set) => {
-                    const parsedSetData: PlanarDeck = JSON.parse(set[1] as string)
-                    acc[set[0]] = parsedSetData
-                    return acc
-                }, {} as PlaneChaseSet)
-                // console.log('Successfully loaded planechase data:', savedSets)
-                return setObj
-            } else {
+            if (savedSets) {
+                if (savedSets[0][1] !== null) {
+                    const setObj = savedSets.reduce((acc, set) => {
+                        const parsedSetData: PlanarDeck = JSON.parse(set[1] as string)
+                        acc[set[0]] = parsedSetData
+                        return acc
+                    }, {} as PlaneChaseSet)
+                    console.log('Successfully loaded planechase data:', savedSets)
+                    return setObj
+                }
+            }
+            else {
                 return
             }
         } catch (error) {
-            // console.error('Error loading planechase sets from async storage: ', error)
+            console.error('Error loading planechase sets from async storage: ', error)
         }
     }
 
     const storeSets = async (sets: PlaneChaseSet) => {
         const stringedSets: [string, string][] = Object.entries(sets).map((set: [string, PlanarDeck]) => [set[0], JSON.stringify(set[1])])
         await AsyncStorage.multiSet(stringedSets)
-        // console.log('Saved planechase data: ', stringedSets)
     }
     /**
      * call AsyncStorage here to save fetched planechase card data?
      * @param sets has to be formatted `set:${input}` for uri encoding
+     * 'opca' is planechase anthologies set_code
      */
-    const fetchPlanarDecks = async (sets: string[]) => {
+    const fetchPlanarDecks = async (sets: string[] = ['opca']) => {
         try {
             setLoading(true)
-            let planarData = planechaseImages;
-
-            //check for stored planechase sets. AsyncStorage can return empty and valid
-            const storedSets = sets && await loadStoredSet(sets)
-
-            if (storedSets) {
-                planarData = storedSets
-            }
-            else {
-                /*
-                fetch unstored planechase sets and store them, except for opca (anthologies)
-                */
-                const setOptions = sets.filter(st => st !== 'opca').map(s => `set:${s}`).join(" OR ")
-                const fetchedPlanes = setOptions && await getPlanes(setOptions);
+            /**
+             * Async Storage for planechase set data.
+             */
+            const storedSets = await loadStoredSet(sets)
+            const newSets = storedSets ? sets.filter(st => !Object.keys(storedSets).includes(st)) : sets
+            console.log('new sets', newSets)
+            let planarData : PlaneChaseSet;
+            if (newSets.length) {
+                const setOptions = newSets.map(s => `&set=${s}`).join('')
+                const fetchedPlanes = await getPlanes(setOptions)
                 if (fetchedPlanes) {
-                    /*
-                    check to see if 'opca' (anthologies) set is selected, if true add to planarData
-                    */
-                    planarData = sets.includes('opca') ? { ...planarData, ...collatePlanarData(fetchedPlanes) } : collatePlanarData(fetchedPlanes)
+                    planarData = { ...storedSets, ...collatePlanarData(fetchedPlanes as CardResults) }
                     storeSets(planarData)
                 }
+            } else {
+                planarData = storedSets as PlaneChaseSet
             }
 
-            const newPlanarDeck = generatePlanarDeck(totalPlayers === 0 ? 4 : totalPlayers, planarData)
+            const newPlanarDeck = generatePlanarDeck(totalPlayers === 0 ? 4 : totalPlayers, planarData!)
             setPlanarData({
                 currentPlane: newPlanarDeck[0],
                 deck: newPlanarDeck,
@@ -104,7 +102,7 @@ const Planechase: React.FC = ({ }) => {
             setDiscard([])
 
             setLoading(false)
-
+    
         } catch (error) {
             console.error
         }
@@ -241,22 +239,23 @@ const Planechase: React.FC = ({ }) => {
                                             />
                                         </Svg>
                                     </Pressable>
-
-                                    {/* Image button */}
-                                    <Pressable testID='plane_image_button'
-                                        accessibilityRole="button"
-                                        onPress={() => handleNav()}
-                                        style={styles.image_button}
-                                        accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
-                                    >
-                                        {typeof currentPlane[1] === 'number' &&
-                                            <Image source={typeof currentPlane[1] === 'number' ? currentPlane[1] : { uri: currentPlane[1] } as ImageSourcePropType}
+                                    {
+                                        currentPlane[1] &&
+                                        < Pressable testID='plane_image_button'
+                                            accessibilityRole="button"
+                                            onPress={() => handleNav()}
+                                            style={styles.image_button}
+                                            accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
+                                        >
+                                            <Image
+                                                source={{ uri: currentPlane[1] } as ImageSourcePropType}
                                                 style={styles.plane_image}
                                                 alt={currentPlane[0]}
                                                 accessibilityHint='Press to go back to game'
                                             />
-                                        }
-                                    </Pressable>
+
+                                        </Pressable>
+                                    }
 
                                     <Pressable nativeID='planechase_next'
                                         accessibilityLabel='next plane.'
@@ -356,7 +355,7 @@ const Planechase: React.FC = ({ }) => {
 
                 </View>
             </View>
-        </View>
+        </View >
     )
 }
 

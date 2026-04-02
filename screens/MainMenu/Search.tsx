@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import { KeyboardAvoidingView, StyleSheet, View, Pressable, Text, TextInput, FlatList, ScrollView, ActivityIndicator, TextInputSubmitEditingEvent } from "react-native"
 import { colorLibrary } from "../../constants/Colors"
-import getCardData, { getAllCardVersion, getExactCard, getSuggestedCards } from "../../search/getcards"
-import { AllScreenNavProps,CombinedCards, ScryResultData } from "../../index"
+import getCardData, { getSuggestedCards } from "../../search/getcards"
+import { AllScreenNavProps, CardData, CombinedCards, SetsData } from "../../index"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
@@ -10,11 +10,11 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import collateCardData from "../../functions/cards"
 import useDebounce from "../../hooks/useDebounce"
 import CardContainer from "../../search/Card"
-import sleep from "../../functions/sleep"
-import getSets, { addSetSymbolstoCards } from "../../search/getSetIcons"
+import { addSetSymbolstoCards } from "../../search/getSetIcons"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import { SearchContext, SearchContextProps } from "../../SearchContext"
 import { SafeAreaView } from "react-native-safe-area-context"
+import getUniqueSets from "../../search/getSetIcons"
 
 /* 
 fetch order :
@@ -48,7 +48,7 @@ const SearchScreen: React.FC = ({ }) => {
      * @param suggestions 
      * @returns 
      */
-    const filterBySuggestions = (cards: ScryResultData, suggestions: string[]) => {
+    const filterBySuggestions = (cards: CardData[], suggestions: string[]) => {
         return cards.filter((card) => suggestions.includes(card.name as string))
     }
 
@@ -77,7 +77,6 @@ const SearchScreen: React.FC = ({ }) => {
             }
         }
     }
-
     /**
      * check suggestion array against cache. if not, fetch
      * if suggestions has a card that's not cached while some of the results are cached,
@@ -85,7 +84,7 @@ const SearchScreen: React.FC = ({ }) => {
      * @param searchTerm 
      * @returns 
      */
-    const fetchCards = async (searchTerm: string) => {
+    const fetchCards = async (searchTerm: string, searchType: string | 'exact') => {
         try {
             setLoading(true)
             /*
@@ -94,17 +93,26 @@ const SearchScreen: React.FC = ({ }) => {
             a statement about "all elements" is vacuously true if there are no elements to test.
             */
             if (Object.keys(cachedCardData).length === 0 || (Object.keys(cachedCardData).length > 0 && suggestions.every(c => !Object.keys(cachedCardData).includes(c)))) {
-                const cardRes = await getCardData(searchTerm)
-                const filteredCards = cardRes && filterBySuggestions(cardRes, suggestions)
-                const combined = await collateCardData(filteredCards || [])
-                if (combined) {
-                    const sets = await getSets(combined) as { [key: string]: string; }
-                    addSetSymbolstoCards(combined, sets)
+                const cardRes = await getCardData(searchTerm, searchType)
+                if (cardRes) {
+                    /**
+                     * filtered cards will exist for fuzzy search, for which suggestioned cards will exist
+                     * else it's an exact search
+                     */
+                    const filteredCards = searchType !== 'exact' ? filterBySuggestions(cardRes, suggestions) : null //may be unnecessary withmy api?
+                    const combined = filteredCards ? await collateCardData(filteredCards || []) : await collateCardData(cardRes || [])
+
+                    const sets: { [key: string]: SetsData } = await getUniqueSets(cardRes)
+
+                    if (combined) {
+                        addSetSymbolstoCards(combined, sets)
+                    }
+                    setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
+                    setCardData(combined)
+                } else {
+                    console.trace('Error fetching card results:', cardRes)
                 }
-                setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
-                setCardData(combined)
-                
-            } 
+            }
             else {
                 const cachedCards = checkCache(suggestions, cachedCardData)
                 if (cachedCards) {
@@ -119,55 +127,15 @@ const SearchScreen: React.FC = ({ }) => {
         }
     }
 
-    const debouncedFetchCards = useDebounce(fetchCards, 50)
-
-    /**
-     * check single word search to cache. if not, fetch.
-     * @param searchTerm 
-     * @returns 
-     */
-    const fetchExact = async (searchTerm: string) => {
-        try {
-            setLoading(true)
-            const cachedCards = checkCache(searchTerm, cachedCardData)
-            if (cachedCards) {
-                setCardData(cachedCards)
-            } else {
-                const cardRes = await getExactCard(searchTerm)
-                await sleep(50)
-                /* 
-                to get all versions/languages of a card, we have to get oracle_id of the card,
-                then fetch variants of that card and it's set symbols
-                SCRYFALL CODE
-                */
-                const versionsRes = cardRes && await getAllCardVersion(cardRes.oracle_id as string)
-                const combined = await collateCardData(versionsRes || []);
-                if (combined) {
-                    const sets = await getSets(combined) as { [key: string]: string; }
-                    addSetSymbolstoCards(combined, sets)
-                }
-                setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
-                setCardData(combined)     
-            }
-            setLoading(false)
-        }
-        catch (err) {
-            console.log('Error getting card data:', err);
-            return;
-        }
-    }
-
-    const debounceExactFetch = useDebounce(fetchExact, 50)
-
     /*
     handles keyboard submit. Make sure it tries to fetch exact card match before ambiguous cards that may have search text in name,
     lik "Shock", which is a card, but shows up in a shit load of other card names.
     */
     const handleSubmit = (event: TextInputSubmitEditingEvent) => {
         const text = event.nativeEvent.text || '';
-        const trimmed = text.trim();
-        if (trimmed.length >= 3) {
-            debouncedFetchCards(trimmed);
+        if (text && text.length >= 3) {
+            // debouncedFetchCards(text, '')
+            fetchCards(text, '')
         }
         setInputVal(text)
         setShowSuggestions(false)
@@ -185,6 +153,7 @@ const SearchScreen: React.FC = ({ }) => {
     }
 
     const debouncedFetchSuggestions = useDebounce(fetchSuggestion, 50);
+    // const debouncedFetchCards = useDebounce(fetchCards, 50)
 
     const handleInputChange = (text: string) => {
         setShowSuggestions(true)
@@ -194,7 +163,8 @@ const SearchScreen: React.FC = ({ }) => {
 
     const handleSuggestionPress = (text: string) => {
         setInputVal(text)
-        debounceExactFetch(text)
+        // debouncedFetchCards(text, 'exact')
+        fetchCards(text, 'exact')
         setShowSuggestions(false)
     }
 
@@ -242,7 +212,7 @@ const SearchScreen: React.FC = ({ }) => {
                         styles().search_border
                     ]} >
                     <TextInput testID="search_input"
-                    accessibilityRole="search"
+                        accessibilityRole="search"
                         value={inputVal}
                         style={styles().input_text}
                         onPress={() => setShowSuggestions(!showSuggestions)}
@@ -252,13 +222,13 @@ const SearchScreen: React.FC = ({ }) => {
                 </KeyboardAvoidingView>
                 <FlatList
                     style={[styles().suggestion_list, {
-                        display: showSuggestions ? 'flex' : 'none'
+                        display: showSuggestions ? 'flex' : 'none',
                     }]}
                     data={suggestions}
                     keyExtractor={(item) => item}
                     renderItem={({ item, index }) => (
                         <Pressable key={`${item}_press`}
-                        accessibilityRole="button"
+                            accessibilityRole="button"
                             style={[styles().suggestion,
                             index === suggestions.length - 1 ? styles().last_suggestion :
                                 ''
@@ -274,18 +244,19 @@ const SearchScreen: React.FC = ({ }) => {
             {loading ?
                 <ActivityIndicator size={'large'} color={colorLibrary.vapePurple} />
                 :
-                <ScrollView testID="result_container"
-                    contentContainerStyle={styles().results_container}
-                >
-                    {cardData && Object.keys(cardData).map((card, index) => {
-                        return (
-                            <CardContainer name={card} cardData={cardData[card]} key={index} />
-                        )
-                    })
-                    }
-                </ScrollView>
+                <>
+                    <ScrollView testID="result_container"
+                        contentContainerStyle={styles().results_container}
+                    >
+                        {cardData && Object.entries(cardData).map(([key, val], index) => {
+                            return (
+                                <CardContainer name={key} cardData={val} key={index} />
+                            )
+                        })
+                        }
+                    </ScrollView>
+                </>
             }
-
         </SafeAreaView>
     )
 }
@@ -300,13 +271,14 @@ const styles = (deviceType = 'phone') => {
             flex: 1,
         },
         input_wrapper: {
+            position: 'relative',
             width: '80%',
             marginLeft: '10%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'space-around',
-            marginTop: deviceType === 'phone' ? '30%' : '15%',
+            marginTop: deviceType === 'phone' ? '25%' : '15%',
         },
         search_text: {
             fontFamily: 'Beleren',
@@ -334,7 +306,10 @@ const styles = (deviceType = 'phone') => {
             height: '100%'
         },
         suggestion_list: {
-            width: '100%'
+            width: '100%',
+            position: 'absolute',
+            top: '100%', //top edge of parent's relative position
+            zIndex: 10,
         },
         suggestion: {
             backgroundColor: colorLibrary.offbluish,
@@ -365,9 +340,8 @@ const styles = (deviceType = 'phone') => {
             display: 'flex',
             flexGrow: 1,
             flexDirection: 'column',
-            justifyContent: 'center',
             alignItems: 'center',
-            paddingBottom: '30%',
+            paddingBottom: '30%', //6 set rows...
         },
         card_container: {
             width: '100%',
@@ -384,7 +358,12 @@ const styles = (deviceType = 'phone') => {
             height: 300,
             width: 200,
             resizeMode: 'cover'
-        }
+        },
+        name_text: {
+            fontFamily: 'Beleren',
+            color: 'white',
+            fontSize: deviceType === 'phone' ? 24 : 42,
+        },
     })
 }
 

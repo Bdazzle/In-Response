@@ -1,20 +1,21 @@
 import shuffle from "./shuffler"
-import { PlanarDeck, PlaneChaseSet, ScryResultData } from "../index"
+import { CardResults, PlanarDeck, PlaneChaseSet, } from "../index"
 import { ImageSourcePropType } from "react-native"
 
-export const collatePlanarData = (data: ScryResultData) => {
+
+export const collatePlanarData = (data: CardResults) => {
     return data.reduce((acc, card) => {
-        const { name, image_uris, type_line, set } = card
+        const { name, image_uri, type_line, set_code } = card
         if (!acc) {
             acc = {}
         }
-        if (!acc[set]) {
-            acc[set] = {
+        if (!acc[set_code]) {
+            acc[set_code] = {
                 planes: {},
                 phenomenon: {}
             }
         }
-        type_line === "Phenomenon" ? acc[set].phenomenon[name] = image_uris!.normal as ImageSourcePropType : acc[set].planes[name] = image_uris!.normal as ImageSourcePropType
+        type_line === "Phenomenon" ? acc[set_code].phenomenon[name] = image_uri as ImageSourcePropType : acc[set_code].planes[name] = image_uri as ImageSourcePropType
         return acc
     }, {} as PlaneChaseSet)
 }

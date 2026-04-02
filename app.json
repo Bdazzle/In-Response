@@ -23,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.beedazzle.mtg_counter",
-      "versionCode": 32
+      "versionCode": 33
     },
     "plugins": [
       [
@@ -36,7 +36,7 @@
             "targetSdkVersion": 36,
             "buildToolsVersion": "36.0.0"
           }
-        }        
+        }
       ]
     ],
     "extra": {
