@@ -1,94 +1,76 @@
-import { Card, ScryResultData } from "../index";
+import { Card, CardData, CardResults } from "../index";
+import { fetchWithLogging } from "../utils/api_debug";
 
+/*
+Everything may need to be checked for pagination, since both '?exact=' and card/search/{card name} should get the same stuff
+*/
 const paginatedPages = async (url: string, headers: Record<string, string>) => {
-    let allCards: ScryResultData = [];
+    
+    let allCards: CardResults = [];
     let nextPage = url;
-    // headers object is not a valid fetch options object.  when calling
-    // `fetch(url, headers)` the second argument is treated as the entire
-    // options (method/body/headers/etc), the headers map would becomes the
-    // request body.  Scryfall rejects GET requests with a body (400), which is
-    // the error being thrown with `onSubmitEditing`, but not when using the named endpoint (exact match), where {method:'GET', headers} were passed correctly).
-    // Always wrap the headers in an options object and include a method so the fetch call behaves as expected.
-    const options = { method: 'GET', headers };
+   
     while (nextPage) {
-        const response = await fetch(nextPage, options);
-        if (!response.ok) {
-            //throwing an error instead of console.log halts execution
-            throw new Error(`HTTP response error! status: ${response.status}`)
-        }
-        const data = await response.json()
-        allCards = allCards.concat(data.data as ScryResultData);
-        nextPage = data.has_more ? data.next_page : null;
-    }
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 30000)
+        
+        const options = { 
+            method: 'GET', 
+            signal: controller.signal, 
+            headers 
+        };
+        
+        const response = await fetchWithLogging<any>(nextPage, options)
+        controller.abort()
+        clearTimeout(timeoutId)
 
+        // const response = await fetch(nextPage, options);
+        // if (!response.ok) {
+        //     //throwing an error instead of console.log halts execution
+        //     throw new Error(`HTTP response error! status: ${response.status}`)
+        // }
+        // const text = await response.text();
+        // const data = JSON.parse(text)
+        allCards = allCards.concat(response.data as CardResults);
+        nextPage = response.has_more ? response.next_page : null;
+    }
     return allCards
 }
 
-const getCardData = async (cardInput: string) => {
+const getCardData = async (cardInput: string, searchType?: string | 'exact') : Promise<CardData[] | undefined> => {
+    // const controller = new AbortController()
+    // const timeoutId = setTimeout(() => controller.abort(), 30000)
     try {
         const headers = {
             "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            'Access-Control-Allow-Origin': '*'
         };
         const trimmedCard = cardInput.trim()
-        const endpoint = `https://api.scryfall.com/cards/search?unique=prints&q=${encodeURIComponent(trimmedCard)}&include_multilingual=true`
-        const scryData = await paginatedPages(endpoint, headers)
-        return scryData as ScryResultData;
+        const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` : `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/${trimmedCard}`
+             // const response = await fetchWithLogging<any>(endpoint, {
+            //     method: 'GET',
+            //     headers: headers,
+            //     signal: controller.signal
+            // })
+            // clearTimeout(timeoutId)
+            // const cardData = response
+            // const response = await fetch(endpoint, {
+                // signal: controller.signal,
+            //     method: 'GET',
+            //     headers: headers
+            // })
+            // clearTimeout(timeoutId)
+            // if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            // const text = await response.text()
+            // const cardData = JSON.parse(text)
+            // const cardData = await response.json()
+        const cardData = await paginatedPages(endpoint, headers)
+        return cardData
     }
     catch (error) {
-        console.log('Error fetching card data:', error);
-        return;
-    }
-}
-
-export const getAllCardVersion = async (id: string) => {
-    try {
-        const headers = {
-            "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
-        };
-        const response = await fetch(`https://api.scryfall.com/cards/search?unique=prints&q=oracle_id:${id}&include_multilingual=true`,
-            {
-                method: 'GET',
-                headers: headers
-            }
-        );
-        if (!response.ok) {
-            //throwing an error instead of console.log halts execution
-            throw new Error(`HTTP response error! status: ${response.status}`)
-        }
-        const cardData = await response.json()
-        return cardData.data as ScryResultData
-    }
-    catch (error) {
-        console.log('Error fetching card versions:', error);
-        return;
-    }
-}
-
-export const getExactCard = async (cardInput: string) => {
-    try {
-        const headers = {
-            "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
-        };
-        const trimmedCard = cardInput.trim()
-        const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(trimmedCard)}`,
-            {
-                method: 'GET',
-                headers: headers
-            });
-
-        if (!response.ok) {
-            //throwing an error instead of console.log halts execution
-            throw new Error(`HTTP response error! status: ${response.status}`)
-        }
-
-        const scryData = await response.json();
-        return scryData as Card;
-    }
-    catch (error) {
-        console.log('Error fetching card data:', error);
+        // clearTimeout(timeoutId)
+        // controller.abort()
+        console.trace('Error fetching card data:', error);
         return;
     }
 }
@@ -97,7 +79,8 @@ export const getSetSymbol = async (uri: string) => {
     try {
         const headers = {
             "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            'Access-Control-Allow-Origin': '*'
         };
         const response = await fetch(uri,
             {
@@ -122,7 +105,8 @@ export const getSuggestedCards = async (cardInput: string) => {
     try {
         const headers = {
             "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            'Access-Control-Allow-Origin': '*'
         };
         const trimmedCard = cardInput.trim()
         const response = await fetch(`https://api.scryfall.com/cards/autocomplete?q=${encodeURIComponent(trimmedCard)}`,
@@ -146,25 +130,33 @@ export const getSuggestedCards = async (cardInput: string) => {
 }
 
 /*
-getting type:plane DOES NOT get type:phenomenon
+Gets all cards for a deck INCLUDING foreign ones. Get only english, or check device language?
 */
-export const getPlanes = async (options : string) => {
-    try{
-        //example search for planes: 'type:plane (set:who OR set:pc2) OR type:phenomenon (...sets)'
-        const query = `type:plane (${options}) OR type:phenomenon (${options})`
+export const getPlanes = async (options: string) : Promise<CardResults | undefined> => {
+    try {
+        // url string syntax(&set=) added in Planecahse.tsx
+        const query = `type=plane&type=phenomenon${options}&lang=en`
         const headers = {
             "User-Agent": "In Response/4.1.3 (React Native, Android)",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            'Access-Control-Allow-Origin': '*'
         };
+        const endpoint =`${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search?${query}`
+        console.log('end:', endpoint)
+        // const response = await fetch(endpoint,
+        //     {
+        //         method: 'GET',
+        //         headers: headers
+        //     });
+        // const text = await response.text()
+        // const cardData = JSON.parse(text)
 
-        const response = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(query)}`,
-            {
-                method: 'GET',
-                headers: headers
-            });
-
-            const scryData = await response.json();
-            return scryData.data as ScryResultData
+        const response =  fetchWithLogging<any>(endpoint,{
+            method: 'GET',
+            headers: headers
+        })
+        const cardData = await response;
+        return cardData.data
     }
     catch (error) {
         console.log('Error fetching plane images:', error);

@@ -6,13 +6,16 @@ import { AllScreenNavProps } from "../index";
 import getComponentDimensions from "../functions/getComponentDimensions";
 import { fitFontToContainer } from "../functions/textScaler";
 import { GameContext, GameContextProps } from "../GameContext";
-import { planechaseSets } from "../constants/PlanechaseImages";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+ 
+const planechaseSets = {
+    'opca': 'Planechase Anthology',
+    'ohop': 'Planechase',
+    'opc2': 'Planechase 2012',
+    'who': 'Doctor Who',
+    "moc": "March of the Machine Commander"
+}
 /**
- * I have Planechase Anthology images in app already, 
- * so have that option button load from planechaseimages instead of fetching
- * 
  * May have to add a set key to PlanarDeck to remove cards from current deck from unselecting set option
  * check planecahse assets. might be able to cut them to make app size smaller. Have at least one deck for offline use
  * @param param0 

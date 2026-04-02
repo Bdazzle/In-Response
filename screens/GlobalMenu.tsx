@@ -4,11 +4,10 @@ import React, { useContext, useEffect, useState } from "react"
 import { View, StyleSheet, Text } from "react-native"
 import { RectButton } from 'react-native-gesture-handler'
 import { AllScreenNavProps } from "../index"
-import { PlaneswalkerSvg } from "../constants/PlanechaseImages"
 import { fitFontToContainer } from "../functions/textScaler"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import getComponentDimensions from "../functions/getComponentDimensions"
-import iconData from "../images/staticResources"
+import iconData, { PlaneswalkerSvg } from "../images/staticResources"
 import { GameContext, GameContextProps } from "../GameContext"
 import { SafeAreaView } from "react-native-safe-area-context"
 

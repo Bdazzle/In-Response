@@ -1,12 +1,13 @@
-import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, ScrollView } from "react-native"
+import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, LayoutChangeEvent, StyleProp, ViewStyle, useWindowDimensions } from "react-native"
 import { Card, Rulings, StringProperties } from "../index"
 import FlipCard from "../components/Flipcard"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import { SvgUri } from "react-native-svg"
 import useFadeDownAnimation from "../hooks/useFadeDownAnimation"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import { colorLibrary } from "../constants/Colors"
 import languageKey from "../constants/languageKey"
+import ButtonGrid from "../components/ButtonGrid"
 
 interface CardContainerProps {
     name: string
@@ -38,11 +39,6 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
     const [currentSet, setCurrentSet] = useState<keyof StringProperties<Card> | ''>('')
     const [langOptions, setLangOptions] = useState<string[]>([])
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
-    // const buttonSize  = 42;//svg size + margins
-    // const chunk = 9
-    // const totalChunks = setOptions ? Math.ceil(Object.entries(setOptions).length / chunk) : 1
-    // const chunkedSets = [...Array(totalChunks)].map((_, i) => Object.entries(setOptions!).slice(i * chunk, (i + 1) * chunk))
-    const setEntries = setOptions ? Object.entries(setOptions) : []
     const { opacityVal: setOpacityVal,
         zIndexVal: setZIndexVal,
         translateYVal: setTranslateYVal,
@@ -52,22 +48,50 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         zIndexVal: langZIndexVal,
         translateYVal: langTranslateYVal,
         fadeStyle: langFadeStyle } = useFadeDownAnimation()
+    const setEntries = setOptions ? Object.entries(setOptions) : []
+    // const setEntries = 10
+    const cols = 4
+    const setsRows = Math.ceil(setEntries.length / cols)
+    const langRows = Math.ceil(langOptions.length / cols)
+    // const testEntries = [...Array(setEntries)].map((_, index) => String(index))
+    const maxNormalRows = 7
+    const setsRowDiff = setsRows - maxNormalRows
+    const langsRowDiff = langRows - maxNormalRows
+    const [setsScale, setSetsScale] = useState<number>(1)
+    const [langScale, setLangScale] = useState<number>(1)
+    /**
+     * scale down button grids by 20% (.2) per row
+     * for every row >= 8, reduce sizes by an amount? 1/5 (.2)?
+     * if rows-8>0, dimensions * (diff * .2)?
+     */
+    useEffect(() => {
+        if (setsRowDiff > 0) {
+            const newScale = 1 - (setsRowDiff * .2)
+            setSetsScale(newScale)
+        }
+        if (langsRowDiff > 0) {
+            const newLangScale = 1 - (langsRowDiff * .2)
+            setLangScale(newLangScale)
+            console.log(langsRowDiff)
+        }
+    }, [setEntries, langOptions])
 
     /**
      * check for new card data when component loads, 
      * so stale data (from a previoulsy searched card) isn't displayed
      */
     useEffect(() => {
-        setCurrentSet(cardData.versions[0].set_name as keyof StringProperties<Card>)
-        setCurrentLang(cardData.versions[0].lang as string)
+        const initVersion: Card[] = cardData.versions.filter((card) => card.lang === 'en') || cardData.versions[0]
+        setCurrentSet(initVersion[0].set_name as keyof StringProperties<Card>)
+        setCurrentLang(initVersion[0].lang)
 
         const sets = cardData.versions.reduce((acc, curr) => {
-            const { set_name, set_icon_svg_uri } = curr
+            const { set_name, icon_svg_uri } = curr
             if (!acc) {
                 acc = {}
             }
             if (!acc[set_name as keyof StringProperties<Card>]) {
-                acc[set_name] = set_icon_svg_uri as string
+                acc[set_name] = icon_svg_uri as string
             }
             return acc
         }, {} as { [set_name: string]: string })
@@ -87,8 +111,11 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                 acc.push(curr.lang as string)
             }
             return acc
-        }, [] as string[])
-
+        }, [] as string[]).sort((a, b) => {//sort languages so the 'en' is first for rendering new cards
+            if (a === 'en') return -1;
+            if (b === 'en') return 1;
+            return 0
+        })
         return languages
     }
 
@@ -118,18 +145,56 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         langPress ? langFadeStyle(1, 1, 0, 50) : langFadeStyle(0, -1, -40, 50)
     }, [langPress])
 
+    const filteredSets = useMemo(() => {
+        return setEntries.filter(([setName]) => setName !== currentSet);
+    }, [setEntries, currentSet])
+
+    const filteredLangs = useMemo(() => {
+        return langOptions.filter(l => l !== currentLang)
+    }, [langOptions, currentLang])
+
+
+    /**
+     * Measure left screen to left button edge
+     */
+    const [ogSetsPos, setogSetsPos] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
+    const handleSetBtnLayout = (event: LayoutChangeEvent) => {
+        //distance between left screen edge and set button edge (for alignment)
+        const { x, y } = event.nativeEvent.layout;
+        setogSetsPos({ x, y })
+    }
+
+    /**
+     * Measure difference between right button edge to right screen edge
+     */
+    // const [langXOffset, setLangXOffset] = useState<number>(0)
+    // const [langY, setLangY] = useState<number>(0)
+    // const { width: screenWidth } = useWindowDimensions()
+    // const viewRef = useRef<View>(null);
+    // const handleLangBtnLayout = (event: LayoutChangeEvent) => {
+    // viewRef.current?.measure((x, y, width, height, pageX, pageY) => {
+    // const rightEdge = pageX + width;
+    // const diff = screenWidth - rightEdge
+    // setLangXOffset(Math.floor(diff))
+    // const bottomEdge = pageY - height
+    // setLangY(bottomEdge)
+    // });  
+    // }
+
     return (
-        <View testID="sets_container" style={styles().sets_container}>
-            <View testID="set_buttons_container">
-                <Pressable testID="svg_container"
+        <View testID="sets_container">
+            <View testID="btns_row" style={styles().btns_row}>
+                <Pressable testID="svg_btn"
                     accessibilityRole="button"
                     accessibilityLabel="change set"
                     accessibilityHint={`current set ${currentSet}`}
-                    style={({ pressed }) => [styles(deviceType).svg_container, {
+                    style={({ pressed }) => [styles(deviceType).svg_btn, {
                         opacity: pressed ? .5 : 1,
-                        zIndex: 2,
+                        height: deviceType === 'phone' ? 40 : 60,
+                        width: deviceType === 'phone' ? 80 : 100,
                     },]}
                     onPress={() => setPressedSet(!pressedSet)}
+                    onLayout={(e) => handleSetBtnLayout(e)}
                 >
                     {
                         setOptions &&
@@ -139,54 +204,6 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                         />
                     }
                 </Pressable>
-                
-            </View>
-
-            <Animated.ScrollView testID="list_container"
-                    showsVerticalScrollIndicator={true}
-                    nestedScrollEnabled={true}
-                    contentContainerStyle={styles().set_list}
-                    style={[styles(deviceType).list_container,
-                    {
-                        width: '80%',
-                        maxHeight: deviceType === 'phone' ? 170 : 300, //sett phone height to 200+ makes buttons overflow off screen
-                        opacity: setOpacityVal,
-                        zIndex: setZIndexVal,
-                        transform: [{
-                            translateY: setTranslateYVal
-                        }]
-                    }
-                    ]}
-                >
-                    {
-                        // double check if this works with fewer versions
-                        setEntries
-                        .filter(([setName]) => setName !== currentSet)
-                            .map(([setName, uri], idx) => (
-                                <Pressable key={idx}
-                                    accessibilityRole="button"
-                                    onPress={() => handleSetSelect(setName)}
-                                    style={({ pressed }) => [
-                                        styles(deviceType).set_btn_container,
-                                        {
-                                            width: Object.keys(setOptions).length > 25 ? 50 : 80,
-                                            height: setEntries.length > 25 ? 30 : 40,
-                                            opacity: pressed ? .5 : 1,
-                                        },
-                                    ]}
-                                >
-                                    <SvgUri
-                                        uri={uri}
-                                        width={setEntries.length > 25 ? 30 : 40}
-                                        height={setEntries.length > 25 ? 30 : 40}
-                                        accessibilityLabel={setName}
-                                    />
-                                </Pressable>
-                            ))
-                    }
-                </Animated.ScrollView>
-
-            <View testID="lang_buttons_container">
                 <Pressable testID="svg_container"
                     accessibilityRole="button"
                     accessibilityLabel="languages"
@@ -194,49 +211,84 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                     style={({ pressed }) => [styles(deviceType).svg_container,
                     {
                         opacity: pressed ? .5 : 1,
+                        height: deviceType === 'phone' ? 40 : 60,
+                        width: deviceType === 'phone' ? 80 : 100
                     },
                     ]}
                     onPress={() => handleLangPress(currentLang)}
+                // onLayout={(e) => handleLangBtnLayout(e)}
+                // ref={viewRef}
                 >
                     <Text style={styles(deviceType).lang_text}>{currentLang}</Text>
                 </Pressable>
-                {
-                    langPress &&
-                    <Animated.ScrollView 
-                    showsVerticalScrollIndicator={true}
-                    nestedScrollEnabled={true}
-                    // contentContainerStyle={styles(deviceType).lang_btn_container}
-                    style={[styles(deviceType).lang_list,
+            </View>
+
+            <Animated.View testID="set_buttons_container"
+                style={[styles(deviceType).set_button_container, {
+                    transform: [
+                        { scale: setsScale },
+                    ],
+                    transformOrigin: 'top left',
+                    marginLeft: ogSetsPos.x,
+                    zIndex: setZIndexVal,
+                }]}
+            >
+                <Animated.View testID="list_container"
+                    style={[styles(deviceType).list_container,
                     {
-                        width: '100%',
-                        maxHeight: deviceType === 'phone' ? 170 : 300,
-                        opacity: langOpacityVal,
-                        zIndex: langZIndexVal,
+                        opacity: setOpacityVal,
                         transform: [{
-                            translateY: langTranslateYVal
-                        }]
+                            translateY: setTranslateYVal
+                        }],
+
                     }
                     ]}
-                    >
-                        {
-                            langOptions.filter(l => l !== currentLang).map((abrv, index) => {
-                                return (
-                                    <Pressable
-                                        accessibilityRole="button"
-                                        accessibilityLabel={languageKey[abrv]}
-                                        style={({ pressed }) => [styles(deviceType).lang_btn_container, {
-                                            opacity: pressed ? .5 : 1,
-                                        },]} key={index}
-                                        onPress={() => handleLangPress(abrv)}
-                                    >
-                                        <Text style={styles(deviceType).lang_text}>{abrv}</Text>
-                                    </Pressable>
-                                )
-                            })
-                        }
-                    </Animated.ScrollView>
+                >
+                    {/* <ButtonGrid testID="setsGrid" rows={Math.ceil(setEntries / cols)} cols={cols} entries={testEntries}
+                        buttStyle={{
+                            ...styles(deviceType).svg_btn,
+                            // ...buttonStyles
+                        }}
+                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>} onPress={handleLangPress} /> */}
+                    <ButtonGrid rows={Math.ceil(Object.keys(setOptions).length / cols)} cols={cols}
+                        entries={filteredSets}
+                        buttStyle={styles(deviceType).svg_container}
+                        innerStyle={styles(deviceType).set_icon}
+                        onPress={handleSetSelect} />
+                </Animated.View>
+            </Animated.View>
+
+            <Animated.View testID="lang_buttons_container"
+                style={[styles(deviceType).set_button_container, {
+                    alignSelf: 'flex-end',
+                    marginRight: ogSetsPos.x,
+                    transformOrigin: 'top right',
+                    transform: [
+                        { scale: langScale },
+                    ],
+                    zIndex: langZIndexVal,
+                }]}
+            >
+
+                <Animated.View style={[styles(deviceType).list_container,//lang_list
+                {
+                    opacity: langOpacityVal,
+                    transform: [{
+                        translateY: langTranslateYVal
+                    }],
                 }
-            </View>
+                ]}
+                >
+                    <ButtonGrid rows={Math.ceil((langOptions).length / cols)} cols={cols} entries={filteredLangs}
+                        buttStyle={styles(deviceType).svg_container} onPress={handleLangPress}
+                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>} />
+                    {/* <ButtonGrid testID="langGrid" rows={Math.ceil(setEntries/ cols)} cols={cols}
+                        entries={testEntries}
+                        buttStyle={styles(deviceType).svg_btn}
+                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>}
+                        onPress={handleLangPress} /> */}
+                </Animated.View>
+            </Animated.View>
         </View>
     )
 }
@@ -245,7 +297,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
  * split cards (aftermath, fuse, adventure, etc.) have card_faces[text fields], but no image_uri for those faces.
  * mdfc's have all data for both card_faces.
  * add some sort of priorety hierarchy check to load card_face/not card face data first.
- * if card_data.versions[0]/currentVersion.image_uris -> render image, else render card_faces.image_uris.normal
+ * if card_data.versions[0]: currentVersion.image_uri -> render image, else render card_faces.image_uris.normal
  * if card.printed_text => printed_text => oracle_text, else card_faces => card_faces.printed_text => card_faces.oracle_text
  * text priority printed => oracle, if neither go to card_faces printed => oracle
  * @param param0 
@@ -264,7 +316,8 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
      * or when card data changes, so new searches don't have stale data from previous results
      */
     useEffect(() => {
-        setCurrentVersion(cardData.versions[0])
+        const initVersion: Card[] = cardData.versions.filter((card) => card.lang === 'en') || cardData.versions[0]
+        setCurrentVersion(initVersion[0])
     }, [cardData])
 
     const handleVersionChange = (card: Card) => {
@@ -285,15 +338,14 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
      * check for printed_text if foreign language is selected, otherwise display oracle_text for EN
      * set images of set/lang version of card.
      *  printed text > oracle text
-        if image_uris and cardfaces, split card, need image, then text from cardfaces
-        if image_uris and !cardfaces, normal cards -> get image and text
-        if no image_uris, flip card, and need image and text from both cardfaces
+        if image_uri and cardfaces, split card, need image, then text from cardfaces
+        if image_uri and !cardfaces, normal cards -> get image and text
+        if no image_uri, flip card, and need image and text from both cardfaces
      */
     useEffect(() => {
         if (currentVersion) {
-            //check to see if one image, which is split cards and normal cards, both use image_uris
-            if (currentVersion?.image_uris) {
-                setCardFront(currentVersion.image_uris?.normal)
+            if (currentVersion?.image_uri) {
+                setCardFront(currentVersion.image_uri)
                 if (currentVersion.card_faces) { // check for split card
                     const cardText = currentVersion.card_faces[0].printed_text ?
                         checkForFuse(currentVersion.card_faces[0].printed_text, currentVersion.card_faces[1].printed_text) :
@@ -305,8 +357,8 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             } else {
                 //for double faced cards
                 if (currentVersion.card_faces) {
-                    setCardFront(currentVersion.card_faces[0].image_uris?.normal)
-                    setCardBack(currentVersion.card_faces[1].image_uris?.normal)
+                    setCardFront(currentVersion.card_faces[0].image_uri)
+                    setCardBack(currentVersion.card_faces[1].image_uri)
                     if (showFront) {
                         currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
                     } else {
@@ -327,16 +379,17 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
-
-
     return (
         <View testID="card_container"
             style={styles().card_container}
         >
-            <Text style={styles(deviceType).name_text}>{name}</Text>
             {
-                /*if no image_uris, has to be flip card*/
-                !cardData.versions[0].image_uris ?
+                !name.includes('//') ? <Text style={styles(deviceType).name_text}>{name}</Text> :
+                    <Text style={styles(deviceType).name_text}>{name}</Text>
+            }
+            {
+                /*if no image_uri, has to be flip card*/
+                !cardData.versions[0].image_uri ?
                     <View testID="flipcard_container"
                         style={styles(deviceType).flipcard_container}
                     >
@@ -367,23 +420,21 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
                         }
                     </Text>
                 </View>
-
                 {
                     <View testID="rules_container" style={styles().text_container}>
-                        <Text style={styles(deviceType).rules_header}>Rules</Text>
+                        <Text style={styles(deviceType).rules_header}>
+                            Rules
+                        </Text>
                         {
                             Object.values(cardData.rules).map((rule, index) => {
                                 return <Text key={`rule_${index}`}
                                     style={styles(deviceType).rules_text}>
-                                    {`${index + 1}). ${rule.comment}`}
+                                    {`${index + 1}). ${rule}`}
                                 </Text>
                             })
                         }
                     </View>
                 }
-                {/* <View testID="prices">
-
-                            </View> */}
             </View>
         </View>
     )
@@ -444,6 +495,7 @@ const styles = (deviceType?: string) => {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
+            paddingHorizontal: 10,
             borderColor: colorLibrary.offbluish,
             borderTopWidth: 2,
             borderBottomWidth: 2,
@@ -467,7 +519,7 @@ const styles = (deviceType?: string) => {
             fontSize: deviceType === 'phone' ? 24 : 42,
         },
         card_info: {
-            width: '100%'
+            width: '100%',
         },
         text_container: {
             display: 'flex',
@@ -492,34 +544,46 @@ const styles = (deviceType?: string) => {
             color: 'black',
             fontSize: deviceType === 'phone' ? 18 : 28
         },
-        sets_container: {
-            // borderWidth: 1, borderColor: 'white',
-            // flex: 1,
+        set_button_container: {
+            position: 'absolute',
+            top: '100%'
+        },
+        options_container: {
+            flex: 1,
             flexDirection: 'row',
             justifyContent: 'space-around',
             flexWrap: 'wrap',
             width: '100%',
         },
         set_list: {
-            // borderWidth: 1, borderColor: 'white',
-            // flexDirection: 'column',
             flexDirection: 'row',
             flexWrap: 'wrap',
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
-
-            // borderColor:'white', borderWidth: 1,
         },
         list_container: {
-            // flexDirection: 'row',
-            // flexDirection: 'column',
-            // alignSelf: "stretch",
-            // width: '100%',
-            marginTop: deviceType === 'phone' ? 42 : 62,
-            position: 'absolute',
+            flexDirection: 'row',
+            display: 'flex',
             backgroundColor: colorLibrary.bluish,
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
+        },
+        btns_row: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            width: '100%',
+        },
+        svg_btn: {
+            ...buttonStyles,
+            marginTop: 2,
+            backgroundColor: colorLibrary.lightbluish,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 20,
+            borderColor: 'black',
+            borderWidth: 1,
+            zIndex: 2,
         },
         svg_container: {
             ...buttonStyles,
@@ -531,18 +595,7 @@ const styles = (deviceType?: string) => {
             borderColor: 'black',
             borderWidth: 1,
         },
-        lang_btn_container:{
-// ...buttonStyles,
-            marginTop: 2,
-            backgroundColor: colorLibrary.lightbluish,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 20,
-            borderColor: 'black',
-            borderWidth: 1,
-        },
-        set_btn_container: {
-            height: 40,
+        lang_btn_container: {
             marginTop: 2,
             backgroundColor: colorLibrary.lightbluish,
             justifyContent: 'center',
@@ -561,16 +614,6 @@ const styles = (deviceType?: string) => {
             justifyContent: 'center',
             backgroundColor: 'black',
             margin: 2
-        },
-
-        lang_list: {
-            flexDirection: 'column',
-            backgroundColor: colorLibrary.bluish,
-            marginTop: deviceType === 'phone' ? 42 : 62,
-            display: 'flex',
-            position: 'absolute',
-            borderBottomRightRadius: 10,
-            borderBottomLeftRadius: 10
         },
         lang_text: {
             fontFamily: 'Beleren',

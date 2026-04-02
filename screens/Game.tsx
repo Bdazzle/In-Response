@@ -37,7 +37,7 @@ export const Game = () => {
     */
     useEffect(() => {
         const iconSize = deviceType === "phone" ? 38 : 58;
-        const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .56 : (gameHeight / 2) - (iconSize * .5)
+        const offset = totalPlayers === 1 ? 0 : totalPlayers === 3 ? (gameHeight) * .56 : (gameHeight / 2) - (iconSize * .7)
         setMidBtnOffset(offset)
     }, [gameHeight])
 

@@ -5,7 +5,7 @@ import { Animated } from "react-native"
 const useFadeDownAnimation = () => {
     const opacityVal = useRef(new Animated.Value(0)).current;
     const zIndexVal = useRef<Animated.Value>(new Animated.Value(0)).current;
-    const translateYVal = useRef<Animated.Value>(new Animated.Value(-40)).current;
+    const translateYVal = useRef<Animated.Value>(new Animated.Value(-80)).current;
 
     const fadeStyle = (opacity: number, z: number, y : number, duration: number) =>{
         Animated.parallel([

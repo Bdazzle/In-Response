@@ -4,7 +4,6 @@ import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
 import { cdmgLineHeight, cdmgScaler, cNameScaler, fitFontToContainer, handleTaxSize, taxLineHeight } from "../functions/textScaler";
 import getDimensions from "../functions/getComponentDimensions";
-import { OptionsContext, OptionsContextProps } from "../OptionsContext";
 
 interface CommanderDamageProps {
     playerID: number,

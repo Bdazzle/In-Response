@@ -74,8 +74,9 @@ dist/
 web-build/
 *.apk
 *.aab
+.env
 assets/
-screen_shots/
+# screen_shots/
 .vscode
 *.doc
 hooks/useSwipe.tsx
@@ -84,5 +85,6 @@ components/color picker/useHSLtoRGBA.ts
 credentials.json
 /credentials
 notes.txt
+/utils
 /__tests__
 /__mocks__

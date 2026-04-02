@@ -16,7 +16,7 @@ import { cardRules } from '../constants/cardRules'
 import { DungeonData } from '../index';
 import { manaSymbols } from '../images/staticResources';
 import SpeedOverlay from '../components/overlays/SpeedOverlay';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ManaCounterProps {
     source: ImageSourcePropType,
@@ -308,7 +308,6 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
     },
     card_wrapper: {
         flex: cardName === 'storm' ? 0 : 1,
-        // height: cardName === 'storm' ? '55%' : '100%',
         height: cardName === 'storm' ? '50%' : '100%',
         width: '100%',
         backgroundColor: 'black',
@@ -360,7 +359,6 @@ const styles = (cardName?: string, deviceType?: string) => StyleSheet.create({
         fontSize: cardName === 'storm' ? staticTextScaler(48) : staticTextScaler(56),
     },
     mana_container: {
-        // height: '45%',
         height: '40%',
         overflow: 'visible',
     },

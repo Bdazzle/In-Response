@@ -1,82 +1,54 @@
-import { CombinedCards } from "../index"
-import sleep from "../functions/sleep"
-import { getSetSymbol } from "./getcards"
+import { CardData, CombinedCards, SetsData } from "../index"
+import { fetchWithLogging } from "../utils/api_debug";
 
-/*
-get unique sets for all card results, then fetch each svg and pass to Card (or add to a card's data object)
-so you don't have to make redundant API requests for each card.
-*/
-const getSets = async (data: CombinedCards) => {
-    if (data) {
-        const uniqueSets = Object.values(data).reduce((acc, curr) => {
-            if (!acc) {
-                acc = {}
-            }
-            curr.versions.forEach((card) => {
-                const { set, set_uri } = card
-                if (!acc[set as string]) {
-                    acc[set as string] = set_uri as string
-                }
-            })
-            return acc
-        }, {} as { [key: string]: string })
 
-        for (const [key, uri] of Object.entries(uniqueSets)) {
-            /*
-            with cards like Lightning Bolt, where there's a gillion printings, 
-            this request is hitting th Scryfall API too much and through 429 errors.
-            So we have to stagger request attempts. 
-            */
-            let attempts = 0;
-            while (attempts < 2) {
-                try {
-                    const svg = await getSetSymbol(uri);
-                    uniqueSets[key] = svg;
-                    break; // success
-                } catch (error: any) {
-                    if (error instanceof Error &&
-                        /429/.test(error.message) &&
-                        attempts === 0
-                    ) {
-                        // back off 500ms and retry once
-                        await sleep(500);
-                        attempts += 1;
-                        continue;
-                    }
-                    console.error('Error fetching set SVGs!', error, [key, uri]);
-                    break;
-                }
-            }
-            await sleep(100)//200 is too long for cards w/many different versions
-
-            // try {
-            //     const svg = await getSetSymbol(uri)
-            //     uniqueSets[key] = svg
-            // }
-            // catch (error) {
-            //     console.error('Error fetching set SVGs!', error, [key, uri])
-            // }
-            // await sleep(100)
-        }
+const getUniqueSets = async (cardData : CardData[]) =>{
+    try {
+        const set_codes = [...new Set(cardData.map(card => encodeURIComponent(card.set_code)))];
+        const headers = {
+            "User-Agent": "In Response/4.1.3 (React Native, Android)",
+            "Accept": "application/json",
+            'Access-Control-Allow-Origin': '*'
+        };
+        // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${encodeURIComponent(set_codes.join(','))}`
+        const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${set_codes.join(',')}`
+        // const response = await fetchWithLogging<any>(endpoint, {
+        //                 method: 'GET',
+        //                 headers: headers
+        //             })
+        // const setData = response
+        const response = await fetch(endpoint,
+            {
+                method: 'GET',
+                headers: headers
+            });
+        // const setData = await response.json()
+        const text = await response.text()
+        const setData = JSON.parse(text)
         
-        return uniqueSets
+        return setData
+    } catch (error){
+        console.log("Error getting set data:", error)
     }
 }
 
-export const addSetSymbolstoCards = (data: CombinedCards, sets: { [key: string]: string }) => {
-    if (data && sets) {
-        Object.values(data).forEach((cardVersions) => {
-            cardVersions.versions.forEach((card) => {
-                if (!card.set_icon_svg_uri) {
-                    card.set_icon_svg_uri = ''
+export const addSetSymbolstoCards = (data : CombinedCards, sets : {[key: string]: SetsData}) =>{
+    
+    if(data && sets){
+        const setsSymbolsMap = new Map
+        Object.values(sets).map(set =>{
+            setsSymbolsMap.set(set.set_code,set.icon_svg_uri)
+        })
+        Object.values(data).forEach((cardVersions) =>{
+            cardVersions.versions.forEach((card) =>{
+                if (!card.icon_svg_uri){
+                    card.icon_svg_uri = ''
                 }
-                const { set } = card;
-                if (Object.keys(sets).includes(set as string)) {
-                    card.set_icon_svg_uri = sets[set as string]
-                }
+                const { set_code } = card;
+                card.icon_svg_uri = setsSymbolsMap.get(set_code)
             })
         })
     }
 }
 
-export default getSets
+export default getUniqueSets
