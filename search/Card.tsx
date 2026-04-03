@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, LayoutChangeEvent, StyleProp, ViewStyle, useWindowDimensions } from "react-native"
-import { Card, Rulings, StringProperties } from "../index"
+import { Card, StringProperties } from "../index"
 import FlipCard from "../components/Flipcard"
 import { useContext, useEffect, useMemo, useState } from "react"
 import { SvgUri } from "react-native-svg"
@@ -13,14 +13,14 @@ interface CardContainerProps {
     name: string
     cardData: {
         versions: Card[];
-        rules: Rulings
+        rules: string[]
     }
 }
 
 interface SetRowProps {
     cardData: {
         versions: Card[];
-        rules: Rulings
+        rules: string[]
     }
     handlePress: (card: Card) => void;
 }

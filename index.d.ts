@@ -21,7 +21,7 @@ type PlanarData = {
 }
 
 type PlaneChaseSet = {
-    [set: string] : PlanarDeck
+    [set: string]: PlanarDeck
 }
 
 type PlaneCard = [string, ImageSourcePropType]
@@ -31,11 +31,11 @@ type PlaneProps = {
 }
 
 type PlanarDeck = {
-       planes: PlaneProps;
-       phenomenon : PlaneProps
+    planes: PlaneProps;
+    phenomenon: PlaneProps
 }
 
-export type StoredData =  [string, string | null][] | readonly KeyValuePair[]
+export type StoredData = [string, string | null][] | readonly KeyValuePair[]
 
 export type DungeonData = {
     playerID: number
@@ -52,7 +52,7 @@ export type ColorTheme = {
 }
 
 export type CounterData = {
-    [key: string] : number
+    [key: string]: number
 }
 
 export type Dimensions = {
@@ -69,8 +69,8 @@ export interface PlayerData {
     speed?: number,
     lifeTotal: number,
     commander_tax: number,
-    commander_damage:{
-        [key: number] : number
+    commander_damage: {
+        [key: number]: number
     }
 }
 
@@ -85,13 +85,13 @@ export type CountersProps = {
 }
 
 export type GlobalPlayerData = {
-    [key: string | number] : PlayerData
+    [key: string | number]: PlayerData
 }
 
 export type AllScreenNavProps = CompositeNavigationProp<
-NativeStackNavigationProp<StartMenuStackParamList, keyof StartMenuStackParamList>,
-NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>,
-NativeStackNavigationProp<GlobalMenuParamsList, keyof GlobalMenuParamsList>
+    NativeStackNavigationProp<StartMenuStackParamList, keyof StartMenuStackParamList>,
+    NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>,
+    NativeStackNavigationProp<GlobalMenuParamsList, keyof GlobalMenuParamsList>
 >
 
 export type StartMenuStackNavProps = NativeStackNavigationProp<StartMenuStackParamList, keyof StartMenuStackParamList>
@@ -110,7 +110,7 @@ export type HSLAVals = {
     hue: number,
     saturation: number,
     lightness: number,
-    alpha? : number
+    alpha?: number
 }
 
 
@@ -127,7 +127,7 @@ export type HSLAVals = {
  */
 export type StringProperties<T> = {
     [K in keyof T as T[K] extends string ? K : never]: T[K];
-  };
+};
 
 
 // export interface CardData {
@@ -157,15 +157,15 @@ export interface CardData {
     image_uri: string;
     type_line: string;
     set_name: string;
-    image_uris? : { [key : string] : string };
-    card_faces? :  {[key: string] : Card};
+    image_uris?: { [key: string]: string };
+    card_faces?: { [key: string]: Card };
 }
 /*
 Card is CardData (returned from card query),
 + Sets query for name and icon
 */
 export interface Card extends CardData {
-    [key: string]:  string | number | boolean | Card;
+    [key: string]: string | number | boolean | Card;
     // set_name: string;
     icon_svg_uri: string
 }
@@ -195,9 +195,9 @@ export interface Card extends CardData {
 // }
 
 // [key : string] : Omit<Card, 'name'>[]
-    // [cardName : string] : Card[];
-export type CombinedCards  = {
-    [cardName : string] : {
+// [cardName : string] : Card[];
+export type CombinedCards = {
+    [cardName: string]: {
         versions: Card[];
         rules: Rulings
     }
@@ -212,16 +212,20 @@ export type CombinedCards  = {
 // export type ScryResultData  = ScryFallCard[]
 export type CardResults = CardData[]
 
-export type Rulings = {
-    [key: number] :{
-        // source: string;
-        // published_at: string;
-        comment: string
-    }
+export type RulesData = {
+    oracle_id: string;
+    rule_text: string
 }
+// export type Rulings = {
+//     [key: number]: {
+//         // source: string;
+//         // published_at: string;
+//         comment: string
+//     }
+// }
 
 export type SetsData = {
-    icon_svg_uri : string;
+    icon_svg_uri: string;
     set_code: string;
     set_name: string
 }

@@ -1,4 +1,4 @@
-import { Card, CardData, CombinedCards } from "../index";
+import { Card, CardData, CombinedCards, RulesData } from "../index";
 import getRules from "../search/getRules";
 
 /* 
@@ -17,12 +17,13 @@ const collateCardData = async (cardData: CardData[]) =>{
         if (cardData){
             const oracle_ids = [...new Set(cardData.map(card => card.oracle_id))];
             
-            const rules_data = await getRules(oracle_ids)
+            const rules_data = await getRules(oracle_ids) as RulesData[]
             
             const rulesMap = new Map
-            Object.keys(rules_data).map(key =>{
-                rulesMap.set(rules_data[key]["oracle_id"], rules_data[key]["rules"])
-            })
+            rules_data.forEach((item) => {
+                const id = item["oracle_id"];
+                rulesMap.set(id, [...(rulesMap.get(id) || []), item["rule_text"]]);
+            });
 
             const collated = cardData.reduce((res: CombinedCards, item) =>{
                 const { 
