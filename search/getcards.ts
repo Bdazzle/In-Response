@@ -1,4 +1,4 @@
-import { Card, CardData, CardResults } from "../index";
+import { CardData, CardResults } from "../index";
 import { fetchWithLogging } from "../utils/api_debug";
 
 /*
@@ -19,17 +19,18 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
             headers 
         };
         
-        const response = await fetchWithLogging<any>(nextPage, options)
+        // const response = await fetchWithLogging<any>(nextPage, options)
+        
+
+        const res = await fetch(nextPage, options);
+        if (!res.ok) {
+            //throwing an error instead of console.log halts execution
+            throw new Error(`HTTP response error! status: ${res.status}`)
+        }
+        const text = await res.text();
+        const response = JSON.parse(text)
         controller.abort()
         clearTimeout(timeoutId)
-
-        // const response = await fetch(nextPage, options);
-        // if (!response.ok) {
-        //     //throwing an error instead of console.log halts execution
-        //     throw new Error(`HTTP response error! status: ${response.status}`)
-        // }
-        // const text = await response.text();
-        // const data = JSON.parse(text)
         allCards = allCards.concat(response.data as CardResults);
         nextPage = response.has_more ? response.next_page : null;
     }
@@ -142,20 +143,20 @@ export const getPlanes = async (options: string) : Promise<CardResults | undefin
             'Access-Control-Allow-Origin': '*'
         };
         const endpoint =`${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search?${query}`
-        console.log('end:', endpoint)
-        // const response = await fetch(endpoint,
-        //     {
-        //         method: 'GET',
-        //         headers: headers
-        //     });
-        // const text = await response.text()
-        // const cardData = JSON.parse(text)
 
-        const response =  fetchWithLogging<any>(endpoint,{
-            method: 'GET',
-            headers: headers
-        })
-        const cardData = await response;
+        const response = await fetch(endpoint,
+            {
+                method: 'GET',
+                headers: headers
+            });
+        const text = await response.text()
+        const cardData = JSON.parse(text)
+
+        // const response =  fetchWithLogging<any>(endpoint,{
+        //     method: 'GET',
+        //     headers: headers
+        // })
+        // const cardData = await response;
         return cardData.data
     }
     catch (error) {
