@@ -10,7 +10,6 @@ const getUniqueSets = async (cardData : CardData[]) =>{
             "Accept": "application/json",
             'Access-Control-Allow-Origin': '*'
         };
-        // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${encodeURIComponent(set_codes.join(','))}`
         const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${set_codes.join(',')}`
         // const response = await fetchWithLogging<any>(endpoint, {
         //                 method: 'GET',
@@ -22,7 +21,6 @@ const getUniqueSets = async (cardData : CardData[]) =>{
                 method: 'GET',
                 headers: headers
             });
-        // const setData = await response.json()
         const text = await response.text()
         const setData = JSON.parse(text)
         

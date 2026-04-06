@@ -38,8 +38,7 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
 }
 
 const getCardData = async (cardInput: string, searchType?: string | 'exact') : Promise<CardData[] | undefined> => {
-    // const controller = new AbortController()
-    // const timeoutId = setTimeout(() => controller.abort(), 30000)
+
     try {
         const headers = {
             "User-Agent": "In Response/4.1.3 (React Native, Android)",
