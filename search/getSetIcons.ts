@@ -1,5 +1,5 @@
 import { CardData, CombinedCards, SetsData } from "../index"
-import { fetchWithLogging } from "../utils/api_debug";
+// import { fetchWithLogging } from "../utils/api_debug";
 
 
 const getUniqueSets = async (cardData : CardData[]) =>{

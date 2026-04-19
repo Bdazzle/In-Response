@@ -1,13 +1,13 @@
-import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, LayoutChangeEvent, StyleProp, ViewStyle, useWindowDimensions } from "react-native"
+import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, useWindowDimensions } from "react-native"
 import { Card, StringProperties } from "../index"
 import FlipCard from "../components/Flipcard"
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import { SvgUri } from "react-native-svg"
 import useFadeDownAnimation from "../hooks/useFadeDownAnimation"
 import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import { colorLibrary } from "../constants/Colors"
 import languageKey from "../constants/languageKey"
-import ButtonGrid from "../components/ButtonGrid"
+import { FlatList } from "react-native-gesture-handler"
 
 interface CardContainerProps {
     name: string
@@ -49,33 +49,26 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         translateYVal: langTranslateYVal,
         fadeStyle: langFadeStyle } = useFadeDownAnimation()
     const setEntries = setOptions ? Object.entries(setOptions) : []
-    // const setEntries = 10
-    const cols = 4
-    const setsRows = Math.ceil(setEntries.length / cols)
-    const langRows = Math.ceil(langOptions.length / cols)
-    // const testEntries = [...Array(setEntries)].map((_, index) => String(index))
-    const maxNormalRows = 7
-    const setsRowDiff = setsRows - maxNormalRows
-    const langsRowDiff = langRows - maxNormalRows
-    const [setsScale, setSetsScale] = useState<number>(1)
-    const [langScale, setLangScale] = useState<number>(1)
-    /**
-     * scale down button grids by 20% (.2) per row
-     * for every row >= 8, reduce sizes by an amount? 1/5 (.2)?
-     * if rows-8>0, dimensions * (diff * .2)?
-     */
-    useEffect(() => {
-        if (setsRowDiff > 0) {
-            const newScale = 1 - (setsRowDiff * .2)
-            setSetsScale(newScale)
-        }
-        if (langsRowDiff > 0) {
-            const newLangScale = 1 - (langsRowDiff * .2)
-            setLangScale(newLangScale)
-            console.log(langsRowDiff)
-        }
-    }, [setEntries, langOptions])
-
+    // const testSets = 60 //20 is scroll cut off
+    // const [testEntries, setTestEntries] = useState<string[]>([...Array(60)].map((_, index) => String(index)))
+    const cols = deviceType === 'phone' ? 4 : 6
+    // const setsRows = Math.ceil(testSets / cols)
+    // const langRows = Math.ceil(langOptions.length / cols)
+    // const maxNormalRows = 7
+    const btnSize = deviceType === 'phone' ? {
+        height: 40,
+        width: 80,
+    }
+        :
+        {
+            height: 60,
+            width: 100,
+        };
+    const [ogSetsPos, setogSetsPos] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
+    const { height: screenHeight } = useWindowDimensions()
+    const setbtnRef = useRef<View>(null);
+    const langbtnRef = useRef<View>(null);
+    const [setContainerHeight, setSetContainerHeight] = useState<number>(400)
     /**
      * check for new card data when component loads, 
      * so stale data (from a previoulsy searched card) isn't displayed
@@ -97,7 +90,10 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         }, {} as { [set_name: string]: string })
 
         setSetOptions(sets)
+        const langOpts = getLanguageOptions(initVersion[0].set_name)
+        setLangOptions(langOpts)
     }, [cardData])
+
 
     /**
      * get language options for a given set
@@ -121,20 +117,35 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
 
     const handleSetSelect = (set: string) => {
         setPressedSet(!pressedSet)
-        const newLanguageOptions = getLanguageOptions(set)
-        setLangOptions(newLanguageOptions)
-        setCurrentLang(newLanguageOptions[0])
         setLangPressed(false)
-        setCurrentSet(set as keyof StringProperties<Card>)
-        const currentCard = cardData.versions.filter(card => card.set_name === set && card.lang === newLanguageOptions[0])
-        handlePress(currentCard[0])
+        if (set !== currentSet) {
+            const newLanguageOptions = getLanguageOptions(set)
+            const currentCard = cardData.versions.filter(card => card.set_name === set && card.lang === newLanguageOptions[0])
+            if (currentCard.length > 0) {
+                handlePress(currentCard[0])
+                setLangOptions(newLanguageOptions)
+                setCurrentLang(newLanguageOptions[0])
+                setCurrentSet(set as keyof StringProperties<Card>)
+            }
+            else {
+                console.log('No Localized Card found by set')
+            }
+        }
     }
 
     const handleLangPress = (lang: string) => {
         setLangPressed(!langPress)
-        setCurrentLang(lang)
-        const currentCard = cardData.versions.filter(card => card.lang === lang && card.set_name === currentSet)
-        handlePress(currentCard[0])
+        setPressedSet(false)
+
+        if (lang !== currentLang) {
+            const currentCard = cardData.versions.filter(card => card.lang === lang && card.set_name === currentSet)
+            if (currentCard.length > 0) {
+                handlePress(currentCard[0])
+                setCurrentLang(lang)
+            } else {
+                console.log('No Localized Card found by language')
+            }
+        }
     }
 
     useEffect(() => {
@@ -153,33 +164,17 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         return langOptions.filter(l => l !== currentLang)
     }, [langOptions, currentLang])
 
-
-    /**
-     * Measure left screen to left button edge
-     */
-    const [ogSetsPos, setogSetsPos] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
-    const handleSetBtnLayout = (event: LayoutChangeEvent) => {
-        //distance between left screen edge and set button edge (for alignment)
-        const { x, y } = event.nativeEvent.layout;
-        setogSetsPos({ x, y })
-    }
-
+    
     /**
      * Measure difference between right button edge to right screen edge
      */
-    // const [langXOffset, setLangXOffset] = useState<number>(0)
-    // const [langY, setLangY] = useState<number>(0)
-    // const { width: screenWidth } = useWindowDimensions()
-    // const viewRef = useRef<View>(null);
-    // const handleLangBtnLayout = (event: LayoutChangeEvent) => {
-    // viewRef.current?.measure((x, y, width, height, pageX, pageY) => {
-    // const rightEdge = pageX + width;
-    // const diff = screenWidth - rightEdge
-    // setLangXOffset(Math.floor(diff))
-    // const bottomEdge = pageY - height
-    // setLangY(bottomEdge)
-    // });  
-    // }
+    const handleSetBtnLayout = () => {
+        setbtnRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            setogSetsPos({ x, y })
+            const containerSpace = screenHeight - pageY
+            setSetContainerHeight(containerSpace)
+        });
+    }
 
     return (
         <View testID="sets_container">
@@ -193,8 +188,9 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                         height: deviceType === 'phone' ? 40 : 60,
                         width: deviceType === 'phone' ? 80 : 100,
                     },]}
-                    onPress={() => setPressedSet(!pressedSet)}
-                    onLayout={(e) => handleSetBtnLayout(e)}
+                    onPress={() => handleSetSelect(currentSet)}
+                    onLayout={() => handleSetBtnLayout()}
+                    ref={setbtnRef}
                 >
                     {
                         setOptions &&
@@ -216,61 +212,72 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                     },
                     ]}
                     onPress={() => handleLangPress(currentLang)}
-                // onLayout={(e) => handleLangBtnLayout(e)}
-                // ref={viewRef}
+                    ref={langbtnRef}
                 >
                     <Text style={styles(deviceType).lang_text}>{currentLang}</Text>
                 </Pressable>
             </View>
 
-            <Animated.View testID="set_buttons_container"
-                style={[styles(deviceType).set_button_container, {
+            <Animated.View
+                style={{
+                    opacity: setOpacityVal,
                     transform: [
-                        { scale: setsScale },
-                    ],
-                    transformOrigin: 'top left',
-                    marginLeft: ogSetsPos.x,
-                    zIndex: setZIndexVal,
-                }]}
-            >
-                <Animated.View testID="list_container"
-                    style={[styles(deviceType).list_container,
-                    {
-                        opacity: setOpacityVal,
-                        transform: [{
+                        {
                             translateY: setTranslateYVal
-                        }],
+                        },
+                    ],
+                    zIndex: setZIndexVal,
+                    marginLeft: ogSetsPos.x,
+                    position: 'absolute',
+                    top: btnSize.height,
+                    left: 0,
+                    transformOrigin: 'top left',
+                    width: '90%',
 
-                    }
-                    ]}
-                >
-                    {/* <ButtonGrid testID="setsGrid" rows={Math.ceil(setEntries / cols)} cols={cols} entries={testEntries}
-                        buttStyle={{
-                            ...styles(deviceType).svg_btn,
-                            // ...buttonStyles
-                        }}
-                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>} onPress={handleLangPress} /> */}
-                    <ButtonGrid rows={Math.ceil(Object.keys(setOptions).length / cols)} cols={cols}
-                        entries={filteredSets}
-                        buttStyle={styles(deviceType).svg_container}
-                        innerStyle={styles(deviceType).set_icon}
-                        onPress={handleSetSelect} />
-                </Animated.View>
+                }}
+            >
+                <FlatList data={filteredSets}
+                    numColumns={cols}
+                    keyExtractor={([key, val]) => key}
+                    scrollEnabled={true}
+                    nestedScrollEnabled={true}
+                    style={{
+                        height: setContainerHeight,
+                    }}
+                    contentContainerStyle={{
+                        paddingBottom: Object.keys(setOptions).length > 28 ? 0 : btnSize.height * 3,
+                    }}
+                    renderItem={({ item }) => (
+                        <Pressable
+                            style={[styles(deviceType).svg_btn, {
+                                width: btnSize.width,
+                                height: btnSize.height,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }]}
+                            onPress={() => handleSetSelect(item[0])}
+                        >
+                            <SvgUri
+                                uri={item[1]}
+                                style={styles(deviceType).set_icon}
+                                accessibilityLabel={item[0]}
+                            />
+                        </Pressable>
+                    )}
+                />
             </Animated.View>
 
             <Animated.View testID="lang_buttons_container"
                 style={[styles(deviceType).set_button_container, {
-                    alignSelf: 'flex-end',
-                    marginRight: ogSetsPos.x,
-                    transformOrigin: 'top right',
-                    transform: [
-                        { scale: langScale },
-                    ],
+                    width: '100%',
                     zIndex: langZIndexVal,
+                    position: 'absolute',
+                    top: btnSize.height,
+                    right: btnSize.width / 2,
+
                 }]}
             >
-
-                <Animated.View style={[styles(deviceType).list_container,//lang_list
+                <Animated.View style={[styles(deviceType).list_container,
                 {
                     opacity: langOpacityVal,
                     transform: [{
@@ -278,21 +285,39 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
                     }],
                 }
                 ]}
-                >
-                    <ButtonGrid rows={Math.ceil((langOptions).length / cols)} cols={cols} entries={filteredLangs}
-                        buttStyle={styles(deviceType).svg_container} onPress={handleLangPress}
-                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>} />
-                    {/* <ButtonGrid testID="langGrid" rows={Math.ceil(setEntries/ cols)} cols={cols}
-                        entries={testEntries}
-                        buttStyle={styles(deviceType).svg_btn}
-                        innerStyle={styles(deviceType).lang_text as StyleProp<ViewStyle>}
-                        onPress={handleLangPress} /> */}
+                ><FlatList data={filteredLangs}
+                    numColumns={cols}
+                    keyExtractor={(item) => item}
+                    scrollEnabled={true}
+                    nestedScrollEnabled={true}
+                    contentContainerStyle={{
+                        alignItems: 'flex-end',
+                        paddingBottom: Object.keys(setOptions).length > 28 ? 0 : btnSize.height * 3,
+                    }}
+                    renderItem={({ item }) => (
+                        <Pressable
+                            style={[styles(deviceType).svg_btn, {
+                                width: btnSize.width,
+                                height: btnSize.height,
+                            }]}
+                            onPress={() => handleLangPress(item)}
+                        >
+                            <Text style={styles(deviceType).lang_text}>{item}</Text>
+                        </Pressable>
+                    )}
+                    />
                 </Animated.View>
             </Animated.View>
+
         </View>
     )
 }
 
+type TreatmentSort = {
+    [set: string]: {
+        [lang: string]: Card[]
+    }
+}
 /**
  * split cards (aftermath, fuse, adventure, etc.) have card_faces[text fields], but no image_uri for those faces.
  * mdfc's have all data for both card_faces.
@@ -310,7 +335,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     const [cardBack, setCardBack] = useState<string>()
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const [currentVersion, setCurrentVersion] = useState<Card>()
-
+    const [cardName, setCardName] = useState<string>()
     /**
      * initialize component with first card in cardData,
      * or when card data changes, so new searches don't have stale data from previous results
@@ -318,13 +343,20 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     useEffect(() => {
         const initVersion: Card[] = cardData.versions.filter((card) => card.lang === 'en') || cardData.versions[0]
         setCurrentVersion(initVersion[0])
+        setCardName(name)
     }, [cardData])
 
     const handleVersionChange = (card: Card) => {
         if (card) {
             setCurrentVersion(card)
+            if (card.printed_name) {
+                setCardName(card.printed_name)
+            } else {
+                setCardName(card.name)
+            }
         }
     }
+
 
     const checkForFuse = (face1: string, face2: string) => {
         if (face1.slice(face1.lastIndexOf('\n'), face1.length) === face2.slice(face2.lastIndexOf('\n'), face2.length)) {
@@ -379,13 +411,15 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
+
+
     return (
         <View testID="card_container"
             style={styles().card_container}
         >
             {
-                !name.includes('//') ? <Text style={styles(deviceType).name_text}>{name}</Text> :
-                    <Text style={styles(deviceType).name_text}>{name}</Text>
+                cardName && !cardName.includes('//') ? <Text style={styles(deviceType).name_text}>{cardName}</Text> :
+                    <Text style={styles(deviceType).name_text}>{cardName}</Text>
             }
             {
                 /*if no image_uri, has to be flip card*/
@@ -564,7 +598,7 @@ const styles = (deviceType?: string) => {
         list_container: {
             flexDirection: 'row',
             display: 'flex',
-            backgroundColor: colorLibrary.bluish,
+            // backgroundColor: colorLibrary.bluish,
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
         },
@@ -575,7 +609,7 @@ const styles = (deviceType?: string) => {
             width: '100%',
         },
         svg_btn: {
-            ...buttonStyles,
+            // ...buttonStyles,
             marginTop: 2,
             backgroundColor: colorLibrary.lightbluish,
             justifyContent: 'center',

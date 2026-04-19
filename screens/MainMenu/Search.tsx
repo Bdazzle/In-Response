@@ -92,9 +92,10 @@ const SearchScreen: React.FC = ({ }) => {
             .every(=> includes) will always return true on an empty array.
             a statement about "all elements" is vacuously true if there are no elements to test.
             */
-            if (Object.keys(cachedCardData).length === 0 || (Object.keys(cachedCardData).length > 0 && suggestions.every(c => !Object.keys(cachedCardData).includes(c)))) {
+            // if (Object.keys(cachedCardData).length === 0 || (Object.keys(cachedCardData).length > 0 && suggestions.every(c => !Object.keys(cachedCardData).includes(c)))) {
+            if (!Object.keys(cachedCardData).some(key => key.toLowerCase().includes(searchTerm.toLowerCase()))) {
                 const cardRes = await getCardData(searchTerm, searchType)
-                if (cardRes) {
+                if (cardRes !== undefined && cardRes?.length > 0) {
                     /**
                      * filtered cards will exist for fuzzy search, for which suggestioned cards will exist
                      * else it's an exact search
@@ -114,10 +115,17 @@ const SearchScreen: React.FC = ({ }) => {
                 }
             }
             else {
-                const cachedCards = checkCache(suggestions, cachedCardData)
-                if (cachedCards) {
-                    setCardData(cachedCards)
+                if (searchType === 'exact') {
+                    setCardData({ searchTerm: cachedCardData[searchTerm] })
+                } else {
+                    // instead of checking suggestions, check each key in cache for text similar to search term for partial/whole matches
+                    const cachedCards = checkCache(searchTerm, cachedCardData)
+                    if (cachedCards) {
+                        console.log("retrieved from page cache:", cachedCards)
+                        setCardData(cachedCards)
+                    }
                 }
+
             }
             setLoading(false)
         }
@@ -172,91 +180,104 @@ const SearchScreen: React.FC = ({ }) => {
         Object.keys(globalPlayerData).length > 0 ? navigation.navigate('Game') : navigation.navigate('MainMenu')
     }
 
+    const closeSuggestions = () => {
+        if (showSuggestions) {
+            setShowSuggestions(false)
+        }
+    }
+
     return (
         <SafeAreaView style={styles().search_container}>
-            {/* Back Button */}
-            <Pressable style={styles().back_button}
-                onPress={() => handleBack()}
-                accessibilityRole="button"
-                accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
-            >
-                <Svg viewBox="0 0 800 800" style={{
+            <Pressable
+                style={{
                     width: '100%',
                     height: '100%',
-                    transform: [
-                        { rotate: '180deg' }
-                    ],
-                }}>
-                    <Path d="M206.78,341.58v-47.04l-81.44,47.04V153.42l81.44,47.04v-47.04l40.72,23.52V0   C110.81,0,0,110.81,0,247.5S110.81,495,247.5,495V318.06L206.78,341.58z"
-                        fill={"#6D2C93"}
-                    />
-                    <Path d="M247.5,0v176.94l122.16,70.56L247.5,318.06V495C384.19,495,495,384.19,495,247.5S384.19,0,247.5,0z"
-                        fill={"#3D1952"}
-                    />
-                    <Polygon points={"125.34,247.5 125.34,341.58 206.78,294.54 206.78,341.58 247.5,318.06 369.66,247.5  "}
-                        fill={"#9CDD05"}
-                    />
-                    <Polygon points={"206.78,200.46 125.34,153.42 125.34,247.5 369.66,247.5 247.5,176.94 206.78,153.42  "}
-                        fill={"#B2FA09"}
-                    />
-                </Svg>
-            </Pressable>
+                }}
+                onPress={() => showSuggestions && closeSuggestions()}>
+                {/* Back Button */}
+                <Pressable style={styles().back_button}
+                    onPress={() => handleBack()}
+                    accessibilityRole="button"
+                    accessibilityLabel={Object.keys(globalPlayerData).length > 0 ? "Back to Game" : "back to main menu"}
+                >
+                    <Svg viewBox="0 0 800 800" style={{
+                        width: '100%',
+                        height: '100%',
+                        transform: [
+                            { rotate: '180deg' }
+                        ],
+                    }}>
+                        <Path d="M206.78,341.58v-47.04l-81.44,47.04V153.42l81.44,47.04v-47.04l40.72,23.52V0   C110.81,0,0,110.81,0,247.5S110.81,495,247.5,495V318.06L206.78,341.58z"
+                            fill={"#6D2C93"}
+                        />
+                        <Path d="M247.5,0v176.94l122.16,70.56L247.5,318.06V495C384.19,495,495,384.19,495,247.5S384.19,0,247.5,0z"
+                            fill={"#3D1952"}
+                        />
+                        <Polygon points={"125.34,247.5 125.34,341.58 206.78,294.54 206.78,341.58 247.5,318.06 369.66,247.5  "}
+                            fill={"#9CDD05"}
+                        />
+                        <Polygon points={"206.78,200.46 125.34,153.42 125.34,247.5 369.66,247.5 247.5,176.94 206.78,153.42  "}
+                            fill={"#B2FA09"}
+                        />
+                    </Svg>
+                </Pressable>
 
-            <View testID="input_wrapper" style={styles(deviceType).input_wrapper}>
-                <Text style={styles().search_text}>
-                    Card Search :
-                </Text>
-                <KeyboardAvoidingView testID="input_text_wrapper"
-                    style={[styles().search_input,
-                    suggestions.length > 0 && showSuggestions ? styles().search_suggestion_border :
-                        styles().search_border
-                    ]} >
-                    <TextInput testID="search_input"
-                        accessibilityRole="search"
-                        value={inputVal}
-                        style={styles().input_text}
-                        onPress={() => setShowSuggestions(!showSuggestions)}
-                        onChangeText={handleInputChange}
-                        onSubmitEditing={handleSubmit}>
-                    </TextInput>
-                </KeyboardAvoidingView>
-                <FlatList
-                    style={[styles().suggestion_list, {
-                        display: showSuggestions ? 'flex' : 'none',
-                    }]}
-                    data={suggestions}
-                    keyExtractor={(item) => item}
-                    renderItem={({ item, index }) => (
-                        <Pressable key={`${item}_press`}
-                            accessibilityRole="button"
-                            style={[styles().suggestion,
-                            index === suggestions.length - 1 ? styles().last_suggestion :
-                                ''
-                            ]}
-                            onPress={() => handleSuggestionPress(item)}>
-                            <Text style={styles().suggestion_text} key={item}>
-                                {item}
-                            </Text>
-                        </Pressable>
-                    )}
-                />
-            </View>
-            {loading ?
-                <ActivityIndicator size={'large'} color={colorLibrary.vapePurple} />
-                :
-                <>
-                    <ScrollView testID="result_container"
-                        contentContainerStyle={styles().results_container}
-                    >
-                        {cardData && Object.entries(cardData).map(([key, val], index) => {
-                            return (
-                                <CardContainer name={key} cardData={val} key={index} />
-                            )
-                        })
-                        }
-                    </ScrollView>
-                </>
-            }
+                <View testID="input_wrapper" style={styles(deviceType).input_wrapper}>
+                    <Text style={styles().search_text}>
+                        Card Search :
+                    </Text>
+                    <KeyboardAvoidingView testID="input_text_wrapper"
+                        style={[styles().search_input,
+                        suggestions.length > 0 && showSuggestions ? styles().search_suggestion_border :
+                            styles().search_border
+                        ]} >
+                        <TextInput testID="search_input"
+                            accessibilityRole="search"
+                            value={inputVal}
+                            style={styles().input_text}
+                            onPress={() => setShowSuggestions(!showSuggestions)}
+                            onChangeText={handleInputChange}
+                            onSubmitEditing={handleSubmit}>
+                        </TextInput>
+                    </KeyboardAvoidingView>
+                    <FlatList
+                        style={[styles().suggestion_list, {
+                            display: showSuggestions ? 'flex' : 'none',
+                        }]}
+                        data={suggestions}
+                        keyExtractor={(item) => item}
+                        renderItem={({ item, index }) => (
+                            <Pressable key={`${item}_press`}
+                                accessibilityRole="button"
+                                style={[styles().suggestion,
+                                index === suggestions.length - 1 ? styles().last_suggestion :
+                                    ''
+                                ]}
+                                onPress={() => handleSuggestionPress(item)}>
+                                <Text style={styles().suggestion_text} key={item}>
+                                    {item}
+                                </Text>
+                            </Pressable>
+                        )}
+                    />
+                </View>
+                {loading ?
+                    <ActivityIndicator size={'large'} color={colorLibrary.vapePurple} />
+                    :
+                    <>
+                        <ScrollView testID="result_container"
+                            contentContainerStyle={styles().results_container}
+                        >
+                            {cardData && Object.entries(cardData).map(([key, val], index) => {
+                                return (
+                                    <CardContainer name={key} cardData={val} key={index} />
+                                )
+                            })
+                            }
+                        </ScrollView>
+                    </>
+                }
+            </Pressable>
         </SafeAreaView>
     )
 }

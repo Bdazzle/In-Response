@@ -11,7 +11,7 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
    
     while (nextPage) {
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 30000)
+        const timeoutId = setTimeout(() => controller.abort(), 45000)
         
         const options = { 
             method: 'GET', 
@@ -29,6 +29,7 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
         }
         const text = await res.text();
         const response = JSON.parse(text)
+
         controller.abort()
         clearTimeout(timeoutId)
         allCards = allCards.concat(response.data as CardResults);
@@ -36,6 +37,7 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
     }
     return allCards
 }
+
 
 const getCardData = async (cardInput: string, searchType?: string | 'exact') : Promise<CardData[] | undefined> => {
 
@@ -46,7 +48,12 @@ const getCardData = async (cardInput: string, searchType?: string | 'exact') : P
             'Access-Control-Allow-Origin': '*'
         };
         const trimmedCard = cardInput.trim()
-        const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` : `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/${trimmedCard}`
+        // const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
+        // : `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
+      
+        const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
+        : 
+        `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
              // const response = await fetchWithLogging<any>(endpoint, {
             //     method: 'GET',
             //     headers: headers,
@@ -67,9 +74,9 @@ const getCardData = async (cardInput: string, searchType?: string | 'exact') : P
         const cardData = await paginatedPages(endpoint, headers)
         return cardData
     }
-    catch (error) {
-        // clearTimeout(timeoutId)
+    // clearTimeout(timeoutId)
         // controller.abort()
+    catch (error) {
         console.trace('Error fetching card data:', error);
         return;
     }
@@ -166,3 +173,4 @@ export const getPlanes = async (options: string) : Promise<CardResults | undefin
 
 
 export default getCardData
+

@@ -146,6 +146,7 @@ export interface CardData {
     image_uri: string;
     type_line: string;
     set_name: string;
+    treatments: string[]
     image_uris?: { [key: string]: string };
     card_faces?: { [key: string]: Card };
 }

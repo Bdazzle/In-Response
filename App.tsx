@@ -9,6 +9,7 @@ import { GameProvider } from './GameContext';
 import { OptionsProvider } from './OptionsContext';
 import { useFonts } from "expo-font";
 import React, { useEffect, useRef, useState } from 'react';
+import SearchProvider from './SearchContext';
 // import * as NavigationBar from 'expo-navigation-bar'
 // import * as SplashScreen from 'expo-splash-screen';
 // import {
@@ -123,9 +124,11 @@ export default function App() {
               :
               <OptionsProvider>
                 <GameProvider>
+                  <SearchProvider>
                   <GestureHandlerRootView>
                     <Navigation />
                   </GestureHandlerRootView>
+                  </SearchProvider>
                 </GameProvider>
               </OptionsProvider>
           }

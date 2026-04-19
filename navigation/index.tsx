@@ -17,8 +17,9 @@ import DiceRoller from '../screens/MainMenu/DiceRoller';
 import Planechase from '../screens/MainMenu/Planechase';
 import Instructions from '../screens/MainMenu/Instructions';
 import Counters from '../screens/Counters';
-import SearchCosumer from '../search/SearchConsumer';
+// import SearchCosumer from '../search/SearchConsumer';
 import PlanechaseOptions from '../screens/PlanechaseOptions';
+import SearchScreen from '../screens/MainMenu/Search';
 
 export default function Navigation() {
 
@@ -108,7 +109,8 @@ function GlobalMenuNavigator() {
       <GlobalMenuStack.Screen name="DiceRoller" component={DiceRoller} />
       <GlobalMenuStack.Screen name="Planechase" component={PlaneMenuNavigator} />
       <GlobalMenuStack.Screen name="Instructions" component={Instructions} />
-      <GlobalMenuStack.Screen name="Search" component={SearchCosumer} />
+      <GlobalMenuStack.Screen name="Search" component={SearchScreen} />
+      {/* <GlobalMenuStack.Screen name="Search" component={SearchConsumer} /> */}
     </GlobalMenuStack.Navigator>
   )
 }
