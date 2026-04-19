@@ -1,5 +1,5 @@
 import { CardData, CombinedCards, SetsData } from "../index"
-import { fetchWithLogging } from "../utils/api_debug";
+// import { fetchWithLogging } from "../utils/api_debug";
 
 
 const getUniqueSets = async (cardData : CardData[]) =>{
@@ -10,8 +10,8 @@ const getUniqueSets = async (cardData : CardData[]) =>{
             "Accept": "application/json",
             'Access-Control-Allow-Origin': '*'
         };
-        // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${encodeURIComponent(set_codes.join(','))}`
-        const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${set_codes.join(',')}`
+        const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${encodeURIComponent(set_codes.join(','))}`
+        // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/sets/${set_codes.join(',')}`
         // const response = await fetchWithLogging<any>(endpoint, {
         //                 method: 'GET',
         //                 headers: headers

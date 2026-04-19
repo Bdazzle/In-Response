@@ -10,4 +10,4 @@ const SearchCosumer : React.FC= ({}) =>{
     )
 }
 
-export default SearchCosumer
+// export default SearchCosumer

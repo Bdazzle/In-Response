@@ -1,5 +1,5 @@
 import { RulesData } from "../index";
-import { fetchWithLogging } from "../utils/api_debug";
+// import { fetchWithLogging } from "../utils/api_debug";
 
  const getRules = async (oracle_ids: string[]) : Promise<RulesData[] | undefined> =>{
     const headers = {
@@ -8,7 +8,8 @@ import { fetchWithLogging } from "../utils/api_debug";
         'Access-Control-Allow-Origin': '*'
     };
 
-    const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
+    const endpoint = `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
+    // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
     try {
     const response =  await fetch(endpoint, {
         method: "GET",

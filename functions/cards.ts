@@ -36,6 +36,7 @@ const collateCardData = async (cardData: CardData[]) =>{
                     oracle_text,
                     printed_text,
                     image_uri,
+                    treatments,
                     set_name } = item;
 
                     const { card_faces } = item

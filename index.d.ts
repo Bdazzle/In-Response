@@ -157,6 +157,7 @@ export interface CardData {
     image_uri: string;
     type_line: string;
     set_name: string;
+    treatments: string[]
     image_uris?: { [key: string]: string };
     card_faces?: { [key: string]: Card };
 }
@@ -170,30 +171,6 @@ export interface Card extends CardData {
     icon_svg_uri: string
 }
 
-// export interface Card extends CardData {
-//     [key: string]:  string | number | boolean | Card;
-//     /**
-//      * properties explicitly extracted from scryfall data are the following:
-//      */
-//     set_icon_svg_uri? : string
-//     rules?: Rulings;
-// }
-
-/**
- * optional data of ScryFallCard is used, but restructured/reassigned
- */
-// export interface ScryFallCard extends CardData {
-//     [key: string]:  string | number | boolean | ScryFallCard;
-//     name: string;
-//     set_uri:string;
-//     rulings_uri: string
-// }
-
-// export interface UsedCard extends CardData {
-//     name: string;
-//     type_line: string;
-// }
-
 // [key : string] : Omit<Card, 'name'>[]
 // [cardName : string] : Card[];
 export type CombinedCards = {
@@ -202,27 +179,14 @@ export type CombinedCards = {
         rules: Rulings
     }
 }
-// export type CombinedCards  = {
-//     [cardName : string] : {
-//         versions: ScryFallCard[] | CardData[];
-//         rules: Rulings
-//     }
-// }
 
-// export type ScryResultData  = ScryFallCard[]
 export type CardResults = CardData[]
 
 export type RulesData = {
     oracle_id: string;
     rule_text: string
 }
-// export type Rulings = {
-//     [key: number]: {
-//         // source: string;
-//         // published_at: string;
-//         comment: string
-//     }
-// }
+
 
 export type SetsData = {
     icon_svg_uri: string;
