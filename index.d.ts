@@ -129,17 +129,6 @@ export type StringProperties<T> = {
     [K in keyof T as T[K] extends string ? K : never]: T[K];
 };
 
-
-// export interface CardData {
-//     image_uris? : { [key : string] : string };
-//     card_faces? :  {[key: string] : Card};
-//     oracle_id: string;
-//     lang:string
-//     oracle_text : string;
-//     printed_text: string;
-//     set: string;
-//     set_name: string
-// }
 /*
 My backend data shape:
 oracle_id, name, id, printed_name, lang, set_code, oracle_text, printed_text, image_uri, type_line, set_name, 
@@ -186,7 +175,6 @@ export type RulesData = {
     oracle_id: string;
     rule_text: string
 }
-
 
 export type SetsData = {
     icon_svg_uri: string;
