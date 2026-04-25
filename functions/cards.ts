@@ -1,5 +1,6 @@
 import { Card, CardData, CombinedCards, RulesData } from "../index";
 import getRules from "../search/getRules";
+import { validIcon } from "../search/getSetIcons";
 
 /* 
 return object like 
@@ -12,7 +13,7 @@ since traversing an object to render components has to be an array anyway
 /*
 Gets rules for each unique card. Set data is added later.
 */
-const collateCardData = async (cardData: CardData[]) =>{
+const collateCardData = async (cardData: CardData[], iconCache : Map<string, boolean>) =>{
     try {
         if (cardData){
             const oracle_ids = [...new Set(cardData.map(card => card.oracle_id))];
@@ -25,21 +26,24 @@ const collateCardData = async (cardData: CardData[]) =>{
                 rulesMap.set(id, [...(rulesMap.get(id) || []), item["rule_text"]]);
             });
 
+            // Prefetch icon validations in parallel (to avoid sequential async calls which take longer)
+            const iconsMap = new Map<string, boolean>(
+                await Promise.all(
+                    (cardData).map(async (item :CardData) : Promise<[string, boolean]> => [
+                        item.set_code, await validIcon(item.set_code, iconCache) as boolean
+                    ])
+                )
+            );
+            
             const collated = cardData.reduce((res: CombinedCards, item) =>{
                 const { 
-                    id, 
                     name,
                     oracle_id,
-                    printed_name,
-                    set_code,
-                    lang,
-                    oracle_text,
-                    printed_text,
-                    image_uri,
-                    treatments,
-                    set_name } = item;
+                    set_code } = item;
 
-                    const { card_faces } = item
+                    const isValid = iconsMap.get(set_code)
+                    const icon_svg_uri = isValid ? `https://svgs.scryfall.io/sets/${set_code}.svg?1772427600`
+                    : `https://svgs.scryfall.io/sets/default.svg?1772427600`;
 
                     if (!res[name as string]) {
                         res[name as string] = {
@@ -47,7 +51,7 @@ const collateCardData = async (cardData: CardData[]) =>{
                             rules: rulesMap.get(oracle_id) || []
                         }
                     }
-                    res[name as string].versions.push(item as Card)
+                    res[name as string].versions.push({...item, icon_svg_uri} as Card)
                     return res
             },{})
             
@@ -62,77 +66,3 @@ const collateCardData = async (cardData: CardData[]) =>{
 }
 
 export default collateCardData
-
-// const collateCardData = async (cardData: ScryResultData): Promise<CombinedCards | undefined> => {
-//     try {
-//         if (cardData) {
-//             /*
-//             making a new Set and mapping over it will have an O(m) where m is the number of cards,
-//             instead of something like pushing into a new array and checking that array in the reducer, 
-//             which has O(m*n) (m = cards, n = uris) since it will check every element in the array until it finds a match.
-            
-//             uris Set and reduced cards MAY NOT have the same corresponding indicies, 
-//             so I have to create a Map to maintain the uri, not just the data fetched from it.
-//             */
-//             const uniqueRulesUris = [...new Set(cardData.map(card => card.rulings_uri))];
-//             const rulesMap = new Map
-
-//             await Promise.all(
-//                 uniqueRulesUris.map(async (uri) => {
-//                     const ruling = await getRulesScryfall(uri as string);
-//                     rulesMap.set(uri, ruling)
-//                 })
-//             )
-
-//             const collated = cardData.reduce((res: CombinedCards, item) => {
-
-//                 const { name, 
-//                     set_uri,
-//                     rulings_uri,
-//                     image_uris,
-//                     lang,
-//                     oracle_id,
-//                     oracle_text,
-//                     printed_text,
-//                     set,
-//                     set_name } = item;
-
-//                 const { card_faces } = item
-
-//                 /*
-//                 don't need to add ruling_uri to new card object, only need response
-//                 */
-//                 const usedData = {
-//                     set_uri,
-//                     image_uris,
-//                     lang,
-//                     oracle_id,
-//                     oracle_text,
-//                     printed_text,
-//                     set,
-//                     set_name
-//                 }
-//                 const rest = card_faces ? { ...usedData, card_faces } : usedData
-
-//                 if (!res[name as string]) {
-//                     res[name as string] = {
-//                         versions: [],
-//                         rules: rulesMap.get(rulings_uri)
-//                     }
-//                 }
-//                 res[name as string].versions.push(rest as ScryFallCard)
-
-//                 return res
-//             }, {})
-//             return collated
-//         }
-//         else {
-//             return
-//         }
-//     }
-//     catch (error) {
-//         console.error('Error fetching card rules!', error)
-//     }
-// }
-
-// export default collateCardData
