@@ -1,5 +1,5 @@
-import { StyleSheet, View, Text, Image, Pressable, Animated, ImageStyle, useWindowDimensions } from "react-native"
-import { Card, StringProperties } from "../index"
+import { StyleSheet, View, Text, Image, Pressable, Animated, useWindowDimensions, Platform } from "react-native"
+import { Card, StringProperties, TreatmentImage } from "../index"
 import FlipCard from "../components/Flipcard"
 import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import { SvgUri } from "react-native-svg"
@@ -8,6 +8,7 @@ import { OptionsContext, OptionsContextProps } from "../OptionsContext"
 import { colorLibrary } from "../constants/Colors"
 import languageKey from "../constants/languageKey"
 import { FlatList } from "react-native-gesture-handler"
+import ImageDeck from "../components/Deck"
 
 interface CardContainerProps {
     name: string
@@ -75,25 +76,24 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
      */
     useEffect(() => {
         const initVersion: Card[] = cardData.versions.filter((card) => card.lang === 'en') || cardData.versions[0]
-        setCurrentSet(initVersion[0].set_name as keyof StringProperties<Card>)
+        setCurrentSet(initVersion[0].set_code as keyof StringProperties<Card>)
         setCurrentLang(initVersion[0].lang)
 
         const sets = cardData.versions.reduce((acc, curr) => {
-            const { set_name, icon_svg_uri } = curr
+            const { set_code, icon_svg_uri } = curr
             if (!acc) {
                 acc = {}
             }
-            if (!acc[set_name as keyof StringProperties<Card>]) {
-                acc[set_name] = icon_svg_uri as string
+            if (!acc[set_code as keyof StringProperties<Card>]) {
+                acc[set_code] = icon_svg_uri as string
             }
             return acc
-        }, {} as { [set_name: string]: string })
+        }, {} as { [set_code: string]: string })
 
         setSetOptions(sets)
-        const langOpts = getLanguageOptions(initVersion[0].set_name)
+        const langOpts = getLanguageOptions(initVersion[0].set_code)
         setLangOptions(langOpts)
     }, [cardData])
-
 
     /**
      * get language options for a given set
@@ -103,7 +103,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
             if (!acc) {
                 acc = []
             }
-            if (curr.set_name === selectedSet && !acc.includes(curr.lang as string)) {
+            if (curr.set_code === selectedSet && !acc.includes(curr.lang as string)) {
                 acc.push(curr.lang as string)
             }
             return acc
@@ -116,11 +116,12 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
     }
 
     const handleSetSelect = (set: string) => {
+        console.log('SetSelect', set)
         setPressedSet(!pressedSet)
         setLangPressed(false)
         if (set !== currentSet) {
             const newLanguageOptions = getLanguageOptions(set)
-            const currentCard = cardData.versions.filter(card => card.set_name === set && card.lang === newLanguageOptions[0])
+            const currentCard = cardData.versions.filter(card => card.set_code === set && card.lang === newLanguageOptions[0])
             if (currentCard.length > 0) {
                 handlePress(currentCard[0])
                 setLangOptions(newLanguageOptions)
@@ -138,7 +139,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         setPressedSet(false)
 
         if (lang !== currentLang) {
-            const currentCard = cardData.versions.filter(card => card.lang === lang && card.set_name === currentSet)
+            const currentCard = cardData.versions.filter(card => card.lang === lang && card.set_code === currentSet)
             if (currentCard.length > 0) {
                 handlePress(currentCard[0])
                 setCurrentLang(lang)
@@ -147,6 +148,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
             }
         }
     }
+    
 
     useEffect(() => {
         pressedSet ? setFadeStyle(1, 1, 0, 50) : setFadeStyle(0, -1, -40, 50)
@@ -164,7 +166,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
         return langOptions.filter(l => l !== currentLang)
     }, [langOptions, currentLang])
 
-    
+
     /**
      * Measure difference between right button edge to right screen edge
      */
@@ -336,6 +338,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const [currentVersion, setCurrentVersion] = useState<Card>()
     const [cardName, setCardName] = useState<string>()
+    const [versionTreats, setVersionTreats] = useState<TreatmentImage[]>()
     /**
      * initialize component with first card in cardData,
      * or when card data changes, so new searches don't have stale data from previous results
@@ -398,6 +401,17 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
                     }
                 }
             }
+            // get card version treatments (treatments[], images/card faces)
+            const treats = cardData.versions.filter((card: Card) => card.lang === currentVersion?.lang && card.set_code === currentVersion?.set_code)
+
+            const treatsData: TreatmentImage[] = treats.map((t) => {
+                if (t.card_faces) {
+                    return [t.treatment, t.card_faces]
+                } else {
+                    return [t.treatment as string[], t.image_uri]
+                }
+            })
+            setVersionTreats(treatsData)
         }
     }, [currentVersion])
 
@@ -412,7 +426,6 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     }, [showFront])
 
 
-
     return (
         <View testID="card_container"
             style={styles().card_container}
@@ -422,27 +435,43 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
                     <Text style={styles(deviceType).name_text}>{cardName}</Text>
             }
             {
-                /*if no image_uri, has to be flip card*/
-                !cardData.versions[0].image_uri ?
-                    <View testID="flipcard_container"
-                        style={styles(deviceType).flipcard_container}
-                    >
-                        <FlipCard
-                            front={{ uri: cardFront }}
-                            back={{ uri: cardBack }}
-                            onFlip={() => setShowFront(!showFront)}
-                            buttonStyle={styles().flip_button}
-                            altBack={name.split('//')[1]}
-                            altFront={name.split('//')[0]}
-                        ></FlipCard>
-                    </View>
-                    :
-                    <Image
-                        source={{ uri: cardFront }}
-                        alt={`${name}`}
-                        style={styles(deviceType).card_image}
-                    ></Image>
+                versionTreats && <ImageDeck imageWidth={deviceType === 'phone' ? 220 : 360}
+                    imageHeight={deviceType === 'phone' ? 300 : 500}
+                    containerStyle={styles(deviceType).image_container} stackSize={3}
+                    captions={versionTreats.map(v => v[0].join('\n'))}
+                    captionContainerStyle={styles(deviceType).caption_container}
+                    cards={
+                        versionTreats.map((vt: TreatmentImage, idx: number) => {
+                            if (typeof vt[1] === 'string') {
+                                return (
+                                    <Image
+                                        key={idx}
+                                        source={{ uri: vt[1] }}
+                                        alt={`${name}`}
+                                        style={[styles(deviceType).card_image]}
+                                    ></Image>
+                                )
+                            } else {
+                                return (
+                                    <View testID="flipcard_container"
+                                        style={styles(deviceType).flipcard_container}
+                                    >
+                                        <FlipCard
+                                            front={{ uri: vt[1][0].image_uri }}
+                                            back={{ uri: vt[1][1].image_uri }}
+                                            onFlip={() => setShowFront(!showFront)}
+                                            buttonStyle={styles().flip_button}
+                                            altBack={name.split('//')[1]}
+                                            altFront={name.split('//')[0]}
+                                        ></FlipCard>
+                                    </View>
+                                )
+                            }
+                        })
+                    }
+                />
             }
+
             <View testID="card_info" style={styles().card_info}>
 
                 <SetRow cardData={cardData} handlePress={handleVersionChange} />
@@ -478,28 +507,26 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
 const styles = (deviceType?: string) => {
     const imageStyle = deviceType === 'phone' ?
         {
+            image_dimensions: {
+                height: 300,
+                width: 220,
+            },
             flipcard_container: {
                 height: 300,
                 width: 220,
             },
-            card_image: {
-                height: 300,
-                width: 220,
-                resizeMode: 'cover'
-            } as ImageStyle
         }
         :
         {
+            image_dimensions: {
+                height: 500,
+                width: 360,
+            },
             flipcard_container: {
                 height: 500,
                 width: 360,
                 borderColor: 'white', borderWidth: 1,
             },
-            card_image: {
-                height: 500,
-                width: 360,
-                resizeMode: 'cover'
-            } as ImageStyle
         };
 
     const buttonStyles = deviceType === 'phone' ? {
@@ -598,7 +625,6 @@ const styles = (deviceType?: string) => {
         list_container: {
             flexDirection: 'row',
             display: 'flex',
-            // backgroundColor: colorLibrary.bluish,
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
         },
@@ -609,7 +635,6 @@ const styles = (deviceType?: string) => {
             width: '100%',
         },
         svg_btn: {
-            // ...buttonStyles,
             marginTop: 2,
             backgroundColor: colorLibrary.lightbluish,
             justifyContent: 'center',
@@ -653,6 +678,36 @@ const styles = (deviceType?: string) => {
             fontFamily: 'Beleren',
             color: 'black',
             fontSize: deviceType === 'phone' ? 24 : 32
+        },
+        image_container: {
+            marginTop: 50,
+            marginBottom: 20,
+            justifyContent: 'center',
+            ...imageStyle.image_dimensions,
+        },
+        card_image: {
+            resizeMode: 'cover',
+            position: 'absolute',
+            ...Platform.select({
+                ios: {
+                    shadowColor: 'black',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                },
+                android: {
+                    elevation: 5,
+                },
+            }),
+            borderColoe: 'black', borderWidth: 1,
+            ...imageStyle.image_dimensions
+        },
+        caption_container: {
+            width: '100%',
+            position: 'absolute',
+            bottom: -70,
+            height: 70,
+            alignSelf: 'baseline',
         },
         ...imageStyle,
 

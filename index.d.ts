@@ -146,7 +146,7 @@ export interface CardData {
     image_uri: string;
     type_line: string;
     set_name: string;
-    treatments: string[]
+    treatment: string[]
     image_uris?: { [key: string]: string };
     card_faces?: { [key: string]: Card };
 }
@@ -156,7 +156,6 @@ Card is CardData (returned from card query),
 */
 export interface Card extends CardData {
     [key: string]: string | number | boolean | Card;
-    // set_name: string;
     icon_svg_uri: string
 }
 
@@ -179,5 +178,7 @@ export type RulesData = {
 export type SetsData = {
     icon_svg_uri: string;
     set_code: string;
-    set_name: string
+    // set_name: string
 }
+
+export type TreatmentImage = [string[], string | { [key: string]: Card }]

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { KeyboardAvoidingView, StyleSheet, View, Pressable, Text, TextInput, FlatList, ScrollView, ActivityIndicator, TextInputSubmitEditingEvent } from "react-native"
 import { colorLibrary } from "../../constants/Colors"
 import getCardData, { getSuggestedCards } from "../../search/getcards"
-import { AllScreenNavProps, CardData, CombinedCards, SetsData } from "../../index"
+import { AllScreenNavProps, CardData, CombinedCards } from "../../index"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
@@ -10,11 +10,11 @@ import { GameContext, GameContextProps } from "../../GameContext"
 import collateCardData from "../../functions/cards"
 import useDebounce from "../../hooks/useDebounce"
 import CardContainer from "../../search/Card"
-import { addSetSymbolstoCards } from "../../search/getSetIcons"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import { SearchContext, SearchContextProps } from "../../SearchContext"
 import { SafeAreaView } from "react-native-safe-area-context"
-import getUniqueSets from "../../search/getSetIcons"
+import testCards from "../../utils/test_cards"
+// import getUniqueSets from "../../search/getSetIcons"
 
 /* 
 fetch order :
@@ -31,7 +31,7 @@ const SearchScreen: React.FC = ({ }) => {
     const [showSuggestions, setShowSuggestions] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
-    const { cachedCardData, setCachedCardData } = useContext<SearchContextProps>(SearchContext)
+    const { setIconCache, cachedCardData, setCachedCardData } = useContext<SearchContextProps>(SearchContext)
 
     /**
      * clear input stuff when loading component
@@ -39,6 +39,7 @@ const SearchScreen: React.FC = ({ }) => {
     useEffect(() => {
         setSuggestions([]);
         setInputVal('')
+        setCardData(testCards as any)
     }, [])
 
     /**
@@ -92,7 +93,6 @@ const SearchScreen: React.FC = ({ }) => {
             .every(=> includes) will always return true on an empty array.
             a statement about "all elements" is vacuously true if there are no elements to test.
             */
-            // if (Object.keys(cachedCardData).length === 0 || (Object.keys(cachedCardData).length > 0 && suggestions.every(c => !Object.keys(cachedCardData).includes(c)))) {
             if (!Object.keys(cachedCardData).some(key => key.toLowerCase().includes(searchTerm.toLowerCase()))) {
                 const cardRes = await getCardData(searchTerm, searchType)
                 if (cardRes !== undefined && cardRes?.length > 0) {
@@ -101,13 +101,13 @@ const SearchScreen: React.FC = ({ }) => {
                      * else it's an exact search
                      */
                     const filteredCards = searchType !== 'exact' ? filterBySuggestions(cardRes, suggestions) : null //may be unnecessary withmy api?
-                    const combined = filteredCards ? await collateCardData(filteredCards || []) : await collateCardData(cardRes || [])
+                    const combined = filteredCards ? await collateCardData(filteredCards || [], setIconCache) : await collateCardData(cardRes || [], setIconCache)
 
-                    const sets: { [key: string]: SetsData } = await getUniqueSets(cardRes)
+                    // const sets: { [key: string]: SetsData } = await getUniqueSets(cardRes)
 
-                    if (combined) {
-                        addSetSymbolstoCards(combined, sets)
-                    }
+                    // if (combined) {
+                    //     addSetSymbolstoCards(combined, setIconCache)
+                    // }
                     setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
                     setCardData(combined)
                 } else {
@@ -362,7 +362,7 @@ const styles = (deviceType = 'phone') => {
             flexGrow: 1,
             flexDirection: 'column',
             alignItems: 'center',
-            paddingBottom: '30%', //6 set rows...
+            paddingBottom: '30%',
         },
         card_container: {
             width: '100%',

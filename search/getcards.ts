@@ -19,16 +19,16 @@ const paginatedPages = async (url: string, headers: Record<string, string>) => {
             headers 
         };
         
-        // const response = await fetchWithLogging<any>(nextPage, options)
+        const response = await fetchWithLogging<any>(nextPage, options)
         
 
-        const res = await fetch(nextPage, options);
-        if (!res.ok) {
-            //throwing an error instead of console.log halts execution
-            throw new Error(`HTTP response error! status: ${res.status}`)
-        }
-        const text = await res.text();
-        const response = JSON.parse(text)
+        // const res = await fetch(nextPage, options);
+        // if (!res.ok) {
+        //     //throwing an error instead of console.log halts execution
+        //     throw new Error(`HTTP response error! status: ${res.status}`)
+        // }
+        // const text = await res.text();
+        // const response = JSON.parse(text)
 
         controller.abort()
         clearTimeout(timeoutId)
@@ -54,6 +54,7 @@ const getCardData = async (cardInput: string, searchType?: string | 'exact') : P
         const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
         : 
         `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
+
              // const response = await fetchWithLogging<any>(endpoint, {
             //     method: 'GET',
             //     headers: headers,
@@ -72,6 +73,7 @@ const getCardData = async (cardInput: string, searchType?: string | 'exact') : P
             // const cardData = JSON.parse(text)
             // const cardData = await response.json()
         const cardData = await paginatedPages(endpoint, headers)
+        
         return cardData
     }
     // clearTimeout(timeoutId)
