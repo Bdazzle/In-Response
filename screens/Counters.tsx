@@ -367,7 +367,6 @@ const Counters: React.FC = ({ }) => {
             setCounterTotals({ ...counterTotals, [counterType]: value })
         }
     }
-
     return (
         <View style={styles.counters_container}>
             <SafeAreaView style={[styles.counter_rows_container,
@@ -382,10 +381,10 @@ const Counters: React.FC = ({ }) => {
             <Pressable style={[styles.close_button,
             (totalPlayers === 2 && route.params.playerID === 2) || (totalPlayers === 3 && route.params.playerID !== 3) || (totalPlayers === 4 && (route.params.playerID === 1 || route.params.playerID === 2)) ?
                 {
-                    top: 0,
+                    top: 40,
                     left: 0
                 } : {
-                    bottom: 0,
+                    bottom: 40,
                     right: 0
                 }
             ]}
@@ -408,6 +407,7 @@ const styles = StyleSheet.create({
     counters_container: {
         width: '100%',
         height:'100%',
+        position:'relative'
     },
     counter_rows_container: {
         width: '100%',
@@ -419,7 +419,6 @@ const styles = StyleSheet.create({
     },
     counters_wrapper: {
         width: '60%',
-        // height:'100%',
     },
     row_container: {
         width: '100%',
@@ -463,7 +462,6 @@ const styles = StyleSheet.create({
         zIndex: 1,
         width: 60,
         height: 60,
-        marginBottom: 60,
     },
     close_icon: {
         position: "absolute",
