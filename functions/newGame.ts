@@ -14,12 +14,28 @@ const newGameData = (totalPlayers: number, startingLife: number, currPlayers?: G
  */
   if(currPlayers && totalPlayers > Object.keys(currPlayers).length) {
       const playerDiff = playersArr.slice(Object.keys(currPlayers).length, playersArr.length)
+      
+      // Update existing players to include new player IDs in commander_damage
+      const updatedCurrPlayers = Object.entries(currPlayers).reduce((acc, [playerID, playerData]) => {
+        const updatedCdamage = { ...playerData.commander_damage };
+        playerDiff.forEach(newPlayerID => {
+          updatedCdamage[newPlayerID] = 0;
+        });
+        return {
+          ...acc,
+          [playerID]: {
+            ...playerData,
+            commander_damage: updatedCdamage
+          }
+        };
+      }, {} as GlobalPlayerData);
+      
       const newPlayersObj = playerDiff.reduce((acc, curr: number) => {
         /*
         cdamage creates an object out of an array of totalPlayers/all playerIDs, 
         filters out the current player, and makes a [playerID] : {} out of the remaining players.
         */
-        const cdamage = playerDiff.filter((n) => n !== curr).reduce((o, key) => ({ ...o, [key]: 0 }), {})
+        const cdamage = playersArr.filter((n) => n !== curr).reduce((o, key) => ({ ...o, [key]: 0 }), {})
         
         return {
           ...acc, [curr]: {
@@ -33,7 +49,7 @@ const newGameData = (totalPlayers: number, startingLife: number, currPlayers?: G
         }
       }, {} as GlobalPlayerData)
   
-      playersObj = {...currPlayers, ...newPlayersObj}
+      playersObj = {...updatedCurrPlayers, ...newPlayersObj}
   }
   else {
     playersObj = playersArr.reduce((acc, curr: number, i: number) => {

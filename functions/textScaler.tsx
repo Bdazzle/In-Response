@@ -38,7 +38,6 @@ export function RFPercentage(percent: number): number {
   return Math.round(heightPercent);
 }
 
-
 // export function textScaler(textLength: number,
 //   parentDimensions: { width: number, height: number },
 //   maxSize?: number,
@@ -193,6 +192,7 @@ export const cdmgScaler = (dmgtotal: number, totalPlayers: number, playerID: num
     case 4: {
       if (deviceType === 1) {//phone
         fontSize = RFPercentage(5.5)
+        // fontSize = fitFontToContainer(String(dmgtotal).length, )
       }
       else {
         fontSize = RFPercentage(7)
@@ -220,11 +220,11 @@ export function cdmgLineHeight(dimension: { width: number, height: number }, tot
     if (dimension.height < dimension.width) {
       /* wide containers, which seems to be all containers on my phone, samsung s22*/
       if (damage < 10) {
-        // return totalPlayers === 2 ? dimension.height * 1.05 : dimension.height * 1.08
-        return totalPlayers === 2 ? dimension.height * 1.05 : dimension.height
+        return totalPlayers === 2 ? dimension.height * 1.05 : dimension.height * 1.15
+        // return totalPlayers === 2 ? dimension.height * 1.05 : dimension.height
       }
       else {
-        return totalPlayers === 4 ? dimension.height * 1.05 : totalPlayers === 3 ? dimension.height * 1.08 : dimension.height * 1.05
+        return totalPlayers === 4 ? dimension.height * 1.1 : totalPlayers === 3 ? dimension.height * 1.08 : dimension.height * 1.05
       }
     } else {
       /* tall containers*/
@@ -313,4 +313,50 @@ export const counterTextScaler = (totalPlayers: number, playerID: number, counte
     }
     return fitFontToContainer(String(counterTotal).length, containerDimensions, { maxSize: maxSize, minSize: 18})
   }
+}
+
+/**
+ * Calculate maximum font size for commander damage display in cdmgTotalWrapper.
+ * Optimized for the centered, flexed container with dynamic damage values (0-99).
+ * 
+ * @param damageValue The damage amount to display
+ * @param totalPlayers Number of players (affects container height allocation)
+ * @param containerDimensions The dimensions of the cdmgTotalWrapper container
+ * @returns Optimal font size that fits the container
+ */
+export const cDmgSize = (
+  damageValue: number,
+  totalPlayers: number,
+  containerDimensions: { width: number, height: number }
+): number => {
+  const charLength = String(damageValue).length;
+  
+  // Character width factor specific to damage numbers (more uniform than text)
+  // Beleren font char factor may be closer to 0.7
+  const charWidthFactor = 0.5; // Numbers are typically narrower than 0.55
+  
+  // Calculate width-limited size
+  const widthLimited = containerDimensions.width / (charLength * charWidthFactor);
+  
+  const heightLimited = containerDimensions.height;
+  
+  // Take the smaller of the two constraints
+  let fontSize = Math.min(widthLimited, heightLimited);
+  
+  // Device-specific adjustments
+  if (deviceType === 1) {
+    // Phone: slightly larger for better visibility
+    fontSize = fontSize * 1.2;
+  } else if (deviceType === 2) {
+    // Tablet: can handle slightly larger sizes
+    fontSize = fontSize * 1.1;
+  }
+  
+  // Set min/max boundaries
+  const minSize = 16;
+  const maxSize = deviceType === 1 ? 72 : 120;
+  
+  fontSize = Math.max(minSize, Math.min(fontSize, maxSize));
+  
+  return Math.round(fontSize);
 }
