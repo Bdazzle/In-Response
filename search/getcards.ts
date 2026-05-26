@@ -48,12 +48,12 @@ const getCardData = async (cardInput: string, searchType?: string | 'exact') : P
             'Access-Control-Allow-Origin': '*'
         };
         const trimmedCard = cardInput.trim()
-        // const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
-        // : `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
+        const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
+        : `${process.env.EXPO_PUBLIC_API_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
       
-        const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
-        : 
-        `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
+        // const endpoint = searchType === 'exact' ? `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/?exact=${encodeURIComponent(trimmedCard)}` 
+        // : 
+        // `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/cards/search/${encodeURIComponent(trimmedCard)}`
 
              // const response = await fetchWithLogging<any>(endpoint, {
             //     method: 'GET',

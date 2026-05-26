@@ -8,8 +8,8 @@ import { RulesData } from "../index";
         'Access-Control-Allow-Origin': '*'
     };
 
-    const endpoint = `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
-    // const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
+    // const endpoint = `${process.env.EXPO_PUBLIC_LOCAL_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
+    const endpoint = `${process.env.EXPO_PUBLIC_API_ENDPOINT}/rules/?oracle_id=${encodeURIComponent(oracle_ids.join(','))}`
     try {
     const response =  await fetch(endpoint, {
         method: "GET",

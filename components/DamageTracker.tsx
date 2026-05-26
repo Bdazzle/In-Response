@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react"
 import { Animated, Easing, Pressable, StyleSheet, Text, View, LayoutChangeEvent, ColorValue } from 'react-native';
 import { GameContext, GameContextProps } from "../GameContext"
 import Svg, { Path } from "react-native-svg";
-import { cdmgLineHeight, cdmgScaler, cNameScaler, fitFontToContainer, handleTaxSize, taxLineHeight, cDmgSize } from "../functions/textScaler";
+import { cdmgLineHeight, cNameScaler, fitFontToContainer, handleTaxSize, taxLineHeight, cDmgSize } from "../functions/textScaler";
 import getDimensions from "../functions/getComponentDimensions";
 
 
@@ -226,19 +226,11 @@ const Tracker: React.FC<TrackerProps> = ({ playerID, position, oppponentID, oppo
                                             totalPlayers,
                                             textWrapperDimensions
                                         ),
-                                        // fontSize:38,
-                                        // fontSize: fitFontToContainer(
-                                        //     globalPlayerData[playerID!].commander_damage![oppponentID],
-                                        //     textWrapperDimensions, 
-                                        //     {minSize: 16}
-                                        // ),
                                         lineHeight: cdmgLineHeight(
                                             textWrapperDimensions,
                                             totalPlayers,
                                             globalPlayerData[playerID!].commander_damage![oppponentID]
                                         ),
-                                        // borderWidth:1
-                                        // borderWidth:1, borderColor:'green',
                                     }]}
                                     numberOfLines={1}
                                     accessibilityLiveRegion="polite"
@@ -488,7 +480,6 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        // height: '75%',
         height: '70%',
     },
     damage_pressable: {
@@ -497,11 +488,9 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
     },
     cdmgTotalWrapper: {
         width: '100%',
-        // height: '110%',
         height:'100%',
         alignItems: 'center',
         flex:1, 
-        // borderColor: 'red', borderWidth:1
     },
     player_pressable: {
         height: '100%',
@@ -511,8 +500,6 @@ const styles = (textColor?: ColorValue | undefined, gameType?: string) => StyleS
         textAlign: 'center',
         fontFamily: 'Beleren',
         color: textColor,
-        // flexGrow: 1,
-        // fontSize:34
     }
 })
 

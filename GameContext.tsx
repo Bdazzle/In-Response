@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, useContext, useEffect, useReducer, useState } from "react"
+import React, { createContext, useContext, useEffect, useReducer, useState } from "react"
 import { GlobalPlayerData, PlanarData } from "./index"
 import globalPlayerReducer, { GlobalPlayerAction } from "./reducers/globalPlayerReducer";
 import { OptionsContext, OptionsContextProps } from "./OptionsContext";

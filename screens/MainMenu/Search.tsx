@@ -13,7 +13,7 @@ import CardContainer from "../../search/Card"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import { SearchContext, SearchContextProps } from "../../SearchContext"
 import { SafeAreaView } from "react-native-safe-area-context"
-import testCards from "../../utils/test_cards"
+// import testCards from "../../utils/test_cards"
 // import getUniqueSets from "../../search/getSetIcons"
 
 /* 
@@ -39,7 +39,7 @@ const SearchScreen: React.FC = ({ }) => {
     useEffect(() => {
         setSuggestions([]);
         setInputVal('')
-        setCardData(testCards as any)
+        // setCardData(testCards as any)
     }, [])
 
     /**

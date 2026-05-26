@@ -116,7 +116,6 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
     }
 
     const handleSetSelect = (set: string) => {
-        console.log('SetSelect', set)
         setPressedSet(!pressedSet)
         setLangPressed(false)
         if (set !== currentSet) {
