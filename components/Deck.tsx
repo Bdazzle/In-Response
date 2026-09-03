@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Animated, PanResponder, StyleProp, StyleSheet, TextStyle, View, ViewStyle, Text, Pressable } from "react-native"
 import Svg, { Path } from "react-native-svg"
 
@@ -8,7 +8,8 @@ interface DeckProps {
     stackSize: number,
     imageWidth: number,
     imageHeight: number,
-    captions?: string[],
+    captions: React.ReactElement[],
+    // captions?: string[],
     captionStyles?: StyleProp<TextStyle>
     captionContainerStyle?: StyleProp<ViewStyle>
 }
@@ -111,7 +112,11 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
      * Right swipes means +x values, means index goes down.
      */
     const panResponder = PanResponder.create({
-        onStartShouldSetPanResponderCapture: () => true,
+        /**
+         * onStartShouldSetPanResponderCapture asks whether a parent component wants to claim touch responder status during the capture phase when a touch first starts.
+         * Setting it to false will allow child touches (like a Press that triggers card flip animation) to execute (parent won't capture).
+         */
+        onStartShouldSetPanResponderCapture: () => false,
         onStartShouldSetPanResponder: () => !lastCard,
         onMoveShouldSetPanResponder: (_, gestureState) => {
             // Activate for omnidirectionaal swipe threshold
@@ -261,12 +266,8 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
                     {currentCard}
 
                 </Animated.View>
-                {captions &&
-                    <View style={captionContainerStyle || styles.text_wrapper}>
-                        <Text style={captionStyles || styles.captionText}>
-                            {captions[currentIndex]}
-                        </Text>
-                    </View>
+                {
+                    captions && captions[currentIndex]
                 }
             </View>
             {cards.length > 1 &&
@@ -311,19 +312,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: '50%',
     },
-    text_wrapper: {
-        width: '100%',
-        position: 'relative',
-        // alignItems:'flex-start'
-        // borderColor: 'green', borderWidth: 2,
-    },
-    captionText: {
-        fontSize: 16,
-        color: 'white',
-        fontFamily: 'Beleren',
-        textAlign: 'center',
-        // borderColor: 'green', borderWidth: 2,
-    }
 })
 
 export default ImageDeck

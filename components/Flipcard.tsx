@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, ImageSourcePropType, Pressable, View, Image, Dimensions, StyleProp, ViewStyle, AccessibilityInfo } from "react-native";
+import { StyleSheet, ImageSourcePropType, Pressable, View, Dimensions, StyleProp, ViewStyle, AccessibilityInfo } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import iconData from "../images/staticResources";
+import { Image, ImageSource, useImage } from "expo-image";
 
 interface FlipCardProps {
-    front: ImageSourcePropType,
-    back: ImageSourcePropType,
+    // front: ImageSourcePropType,
+    // back: ImageSourcePropType,
+    front: ImageSource,
+    back: ImageSource,
     onLayout?: ({ width, height }: { width: number, height: number }) => void,
     onFlip?: () => void,
     altFront?: string,
@@ -20,7 +23,8 @@ const screenHeight = Dimensions.get('screen').height;
 const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altFront, altBack, initialFlipVal, buttonStyle }) => {
     const flipVal = useSharedValue(0)
     const imageRef = useRef<Image>(null)
-
+    const image= useImage(front)
+console.log('flip back:', back)
     const frontAnimatedStyle = useAnimatedStyle(() => {
         /*Front card spins from 0 - 180 degrees*/
         
@@ -47,6 +51,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
     })
 
     const flipCard = () => {
+        console.log('flipped')
         flipVal.value = flipVal.value ? 0 : 1;
         onFlip && onFlip();
         (altFront && altBack ) && AccessibilityInfo.announceForAccessibility(flipVal.value === 0 ? altBack : altFront);
@@ -64,8 +69,11 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
         then scales it down, 
         and passes dimensions to parent to create overlay based on them.
         */
-        if (imageRef.current) {
-            const { height, width } = Image.resolveAssetSource(front)
+        // if (imageRef.current) {
+        // const { height, width } = Image.resolveAssetSource(front)
+        if(image){
+            const width = image.width;
+            const height = image.height;
             let imageWidth, imageHeight;
 
             const widthRatio = width / screenWidth;
@@ -172,7 +180,7 @@ const styles = StyleSheet.create({
         zIndex: 10,
         backgroundColor: 'black',
         bottom:'5%',
-        position: 'absolute'
+        position: 'absolute',
     }
 })
 

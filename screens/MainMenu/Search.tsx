@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { KeyboardAvoidingView, StyleSheet, View, Pressable, Text, TextInput, FlatList, ScrollView, ActivityIndicator, TextInputSubmitEditingEvent } from "react-native"
 import { colorLibrary } from "../../constants/Colors"
 import getCardData, { getSuggestedCards } from "../../search/getcards"
-import { AllScreenNavProps, CardData, CombinedCards } from "../../index"
+import { AllScreenNavProps, CardData, CardResponse, CombinedCards } from "../../index"
 import Svg, { Path, Polygon } from "react-native-svg"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
@@ -13,6 +13,7 @@ import CardContainer from "../../search/Card"
 import { OptionsContext, OptionsContextProps } from "../../OptionsContext"
 import { SearchContext, SearchContextProps } from "../../SearchContext"
 import { SafeAreaView } from "react-native-safe-area-context"
+import findMatches from "../../functions/levenshteinSearch"
 // import testCards from "../../utils/test_cards"
 // import getUniqueSets from "../../search/getSetIcons"
 
@@ -31,16 +32,7 @@ const SearchScreen: React.FC = ({ }) => {
     const [showSuggestions, setShowSuggestions] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(false)
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
-    const { setIconCache, cachedCardData, setCachedCardData } = useContext<SearchContextProps>(SearchContext)
-
-    /**
-     * clear input stuff when loading component
-     */
-    useEffect(() => {
-        setSuggestions([]);
-        setInputVal('')
-        // setCardData(testCards as any)
-    }, [])
+    const { setIconCache, cachedCardData, setCachedCardData, lastDisplayed, setLastDisplayed } = useContext<SearchContextProps>(SearchContext)
 
     /**
      * fetch results w/multilingual flag will match foreign card name w/search terms in them,
@@ -49,7 +41,7 @@ const SearchScreen: React.FC = ({ }) => {
      * @param suggestions 
      * @returns 
      */
-    const filterBySuggestions = (cards: CardData[], suggestions: string[]) => {
+    const filterBySuggestions = (cards: CardResponse[], suggestions: string[]) => {
         return cards.filter((card) => suggestions.includes(card.name as string))
     }
 
@@ -73,11 +65,32 @@ const SearchScreen: React.FC = ({ }) => {
             return cardObj
         }
         else {
+            console.log('exact cache match')
             if (Object.keys(cardCache).includes(cardNames)) {
                 return { [cardNames]: cardCache[cardNames] }
             }
         }
     }
+
+    const displayResults = (results: CombinedCards) => {
+        setCardData(results)
+        setLastDisplayed(Object.keys(results))
+    }
+
+    useEffect(() => {
+        setSuggestions([])
+        if (lastDisplayed.length > 0) {
+            const cached = checkCache(lastDisplayed, cachedCardData)
+            if (cached && Object.keys(cached).length > 0) {
+                setCardData(cached)
+            } else {
+                setInputVal('')
+            }
+        } else {
+            setInputVal('')
+        }
+    }, [])
+
     /**
      * check suggestion array against cache. if not, fetch
      * if suggestions has a card that's not cached while some of the results are cached,
@@ -102,27 +115,33 @@ const SearchScreen: React.FC = ({ }) => {
                      */
                     const filteredCards = searchType !== 'exact' ? filterBySuggestions(cardRes, suggestions) : null //may be unnecessary withmy api?
                     const combined = filteredCards ? await collateCardData(filteredCards || [], setIconCache) : await collateCardData(cardRes || [], setIconCache)
-
-                    // const sets: { [key: string]: SetsData } = await getUniqueSets(cardRes)
-
-                    // if (combined) {
-                    //     addSetSymbolstoCards(combined, setIconCache)
-                    // }
+                    /** saved from having Sets table
+                     * const sets: { [key: string]: SetsData } = await getUniqueSets(cardRes)
+                    if (combined) {
+                        addSetSymbolstoCards(combined, setIconCache)
+                    }
+                     */
+                    
                     setCachedCardData({ ...cachedCardData, ...combined })//combined has priorety and will overwrite cached keys
-                    setCardData(combined)
+                    displayResults(combined as CombinedCards)
                 } else {
                     console.trace('Error fetching card results:', cardRes)
                 }
             }
             else {
                 if (searchType === 'exact') {
-                    setCardData({ searchTerm: cachedCardData[searchTerm] })
+                    displayResults({ [searchTerm]: cachedCardData[searchTerm] })
+                    console.log('exact cache')
                 } else {
                     // instead of checking suggestions, check each key in cache for text similar to search term for partial/whole matches
-                    const cachedCards = checkCache(searchTerm, cachedCardData)
+                    // const cachedCards = checkCache(searchTerm, cachedCardData)
+                    const cacheMatches = findMatches(Object.keys(cachedCardData), searchTerm)
+                    console.log('levDist matches: ', cacheMatches)
+                    // const cachedCards = checkCache(suggestions, cachedCardData)
+                    const cachedCards = checkCache(cacheMatches, cachedCardData)
                     if (cachedCards) {
-                        console.log("retrieved from page cache:", cachedCards)
-                        setCardData(cachedCards)
+                        // console.log("retrieved from page cache:", cachedCards)
+                        displayResults(cachedCards)
                     }
                 }
 

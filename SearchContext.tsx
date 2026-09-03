@@ -6,11 +6,11 @@ export interface SearchContextProps {
     setIconCache: Map<string, boolean>
     cachedCardData: CombinedCards
     setCachedCardData: React.Dispatch<React.SetStateAction<CombinedCards | {}>>
+    lastDisplayed: string[]
+    setLastDisplayed: React.Dispatch<React.SetStateAction<string[]>>
 };
 
 export const SearchContext = createContext({} as SearchContextProps)
-
-const DEFAULT_ICON_URL = `https://svgs.scryfall.io/sets/default.svg?1772427600`
 
 /**
  * Context for card caching. ({cardname:[{card version},{card version}]})
@@ -22,13 +22,16 @@ const DEFAULT_ICON_URL = `https://svgs.scryfall.io/sets/default.svg?1772427600`
  */
 const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [cachedCardData, setCachedCardData] = useState<CombinedCards>({})
+    const [lastDisplayed, setLastDisplayed] = useState<string[]>([])
     const setIconCache = new Map()
     
     return <SearchContext.Provider
         value={{
             setIconCache,
             cachedCardData,
-            setCachedCardData
+            setCachedCardData,
+            lastDisplayed,
+            setLastDisplayed
         }}
     >
         {children}

@@ -89,3 +89,4 @@ notes.txt
 /__tests__
 /__mocks__
 Carousel.tsx
+.code-workspace

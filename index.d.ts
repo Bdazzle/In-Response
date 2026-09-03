@@ -145,10 +145,26 @@ export interface CardData {
     printed_text: string;
     image_uri: string;
     type_line: string;
-    set_name: string;
-    treatment: string[]
+    // set_name: string;
+    treatment: string | string[]
     image_uris?: { [key: string]: string };
     card_faces?: { [key: string]: Card };
+}
+
+export interface CardResponse {
+    id: string;
+    printed_name: string;
+    lang: string;
+    set_code: string;
+    oracle_text: string;
+    printed_text: string;
+    image_uri: string;
+    oracle_id: string;
+    name: string;
+    type_line: string;
+    treatment: string | string[]
+    card_faces: string | null; //card_faces are stored as JSON strings
+    // card_faces?: { [key: string]: Card };
 }
 /*
 Card is CardData (returned from card query),
@@ -181,4 +197,4 @@ export type SetsData = {
     // set_name: string
 }
 
-export type TreatmentImage = [string[], string | { [key: string]: Card }]
+export type TreatmentImage = [string[] | string, string | { [key: string]: Card }]
