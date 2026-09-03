@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Image, Pressable, Animated, useWindowDimensions, Platform } from "react-native"
+import { StyleSheet, View, Text, Pressable, Animated, useWindowDimensions, Platform } from "react-native"
 import { Card, StringProperties, TreatmentImage } from "../index"
 import FlipCard from "../components/Flipcard"
 import { useContext, useEffect, useMemo, useRef, useState } from "react"
@@ -9,6 +9,7 @@ import { colorLibrary } from "../constants/Colors"
 import languageKey from "../constants/languageKey"
 import { FlatList } from "react-native-gesture-handler"
 import ImageDeck from "../components/Deck"
+import { Image } from "expo-image"
 
 interface CardContainerProps {
     name: string
@@ -147,7 +148,7 @@ const SetRow: React.FC<SetRowProps> = ({ cardData, handlePress }) => {
             }
         }
     }
-    
+
 
     useEffect(() => {
         pressedSet ? setFadeStyle(1, 1, 0, 50) : setFadeStyle(0, -1, -40, 50)
@@ -332,8 +333,8 @@ type TreatmentSort = {
 const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     const [showFront, setShowFront] = useState<boolean>(true)
     const [oracleText, setOracleText] = useState<string>('')
-    const [cardFront, setCardFront] = useState<string>()
-    const [cardBack, setCardBack] = useState<string>()
+    // const [cardFront, setCardFront] = useState<string>()
+    // const [cardBack, setCardBack] = useState<string>()
     const { deviceType } = useContext<OptionsContextProps>(OptionsContext)
     const [currentVersion, setCurrentVersion] = useState<Card>()
     const [cardName, setCardName] = useState<string>()
@@ -379,7 +380,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     useEffect(() => {
         if (currentVersion) {
             if (currentVersion?.image_uri) {
-                setCardFront(currentVersion.image_uri)
+                // setCardFront(currentVersion.image_uri)
                 if (currentVersion.card_faces) { // check for split card
                     const cardText = currentVersion.card_faces[0].printed_text ?
                         checkForFuse(currentVersion.card_faces[0].printed_text, currentVersion.card_faces[1].printed_text) :
@@ -391,8 +392,8 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             } else {
                 //for double faced cards
                 if (currentVersion.card_faces) {
-                    setCardFront(currentVersion.card_faces[0].image_uri)
-                    setCardBack(currentVersion.card_faces[1].image_uri)
+                    // setCardFront(currentVersion.card_faces[0].image_uri)
+                    // setCardBack(currentVersion.card_faces[1].image_uri)
                     if (showFront) {
                         currentVersion.card_faces[0].printed_text ? setOracleText(currentVersion.card_faces[0].printed_text) : setOracleText(currentVersion.card_faces[0].oracle_text)
                     } else {
@@ -402,7 +403,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             }
             // get card version treatments (treatments[], images/card faces)
             const treats = cardData.versions.filter((card: Card) => card.lang === currentVersion?.lang && card.set_code === currentVersion?.set_code)
-
+            // console.log('treats', treats)
             const treatsData: TreatmentImage[] = treats.map((t) => {
                 if (t.card_faces) {
                     return [t.treatment, t.card_faces]
@@ -424,7 +425,13 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
-
+    // if(versionTreats){
+    //     console.log(versionTreats)
+    //     // console.log(typeof versionTreats[0][1], JSON.parse((versionTreats[0][1]) as unknown as { [key: string]: Card }))
+    //     console.log(typeof versionTreats[0][1], (versionTreats[0][1]))
+    //     // console.log('DATA', cardData)
+    //     console.log(currentVersion?.card_faces)
+    // }
     return (
         <View testID="card_container"
             style={styles().card_container}
@@ -436,8 +443,22 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
             {
                 versionTreats && <ImageDeck imageWidth={deviceType === 'phone' ? 220 : 360}
                     imageHeight={deviceType === 'phone' ? 300 : 500}
-                    containerStyle={styles(deviceType).image_container} stackSize={3}
-                    captions={versionTreats.map(v => v[0].join('\n'))}
+                    containerStyle={styles(deviceType).image_container}
+                    stackSize={3}
+                    // captions={versionTreats.map(v => v[0].join('\n'))}
+                    captions={versionTreats.map((version: TreatmentImage) => {
+                        return (
+                            // styles(deviceType).caption_container || styles(deviceType).text_wrapper
+                            <View style={ typeof version[1] === 'string' ? styles(deviceType).caption_container : styles(deviceType).flip_captions_container}>
+                                <Text style={[styles(deviceType).captionText, {
+                                    fontSize: version[0].length < 4 ? 16 : 14
+                                }]}>
+                                    {version[0].length > 0 ? (version[0] as string[]).join('\n') : ""}
+                                    {/* {version[0] !== undefined ? (version[0] as string[]).join('\n') : ""} */}
+                                </Text>
+                            </View>
+                        )
+                    })}
                     captionContainerStyle={styles(deviceType).caption_container}
                     cards={
                         versionTreats.map((vt: TreatmentImage, idx: number) => {
@@ -453,7 +474,8 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
                             } else {
                                 return (
                                     <View testID="flipcard_container"
-                                        style={styles(deviceType).flipcard_container}
+                                        // style={styles(deviceType).flipcard_container}
+                                        style={[styles(deviceType).card_image]}
                                     >
                                         <FlipCard
                                             front={{ uri: vt[1][0].image_uri }}
@@ -587,7 +609,8 @@ const styles = (deviceType?: string) => {
             borderColor: colorLibrary.offbluish,
             borderBottomWidth: 1,
             paddingLeft: 5,
-            paddingRight: 5
+            paddingRight: 5,
+            marginTop: 5
         },
         rules_header: {
             fontFamily: 'Beleren',
@@ -679,13 +702,14 @@ const styles = (deviceType?: string) => {
             fontSize: deviceType === 'phone' ? 24 : 32
         },
         image_container: {
-            marginTop: 50,
+            marginTop: 30,
             marginBottom: 20,
             justifyContent: 'center',
             ...imageStyle.image_dimensions,
         },
         card_image: {
-            resizeMode: 'cover',
+            // resizeMode: 'cover',
+            contentFit:'cover',
             position: 'absolute',
             ...Platform.select({
                 ios: {
@@ -698,7 +722,7 @@ const styles = (deviceType?: string) => {
                     elevation: 5,
                 },
             }),
-            borderColoe: 'black', borderWidth: 1,
+            borderColor: 'black', borderWidth: 1,
             ...imageStyle.image_dimensions
         },
         caption_container: {
@@ -707,6 +731,23 @@ const styles = (deviceType?: string) => {
             bottom: -70,
             height: 70,
             alignSelf: 'baseline',
+        },
+        flip_captions_container: {
+            width: '100%',
+            position: 'absolute',
+            bottom: -95,
+            height: 70,
+            alignSelf: 'baseline',
+        },
+        captionText: {
+            // fontSize: 16,
+            color: 'white',
+            fontFamily: 'Beleren',
+            textAlign: 'center',
+        },
+        text_wrapper: {
+            width: '100%',
+            position: 'relative',
         },
         ...imageStyle,
 

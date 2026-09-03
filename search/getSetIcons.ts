@@ -1,7 +1,8 @@
-import { CardData, CombinedCards, SetsData } from "../index"
+import { CombinedCards } from "../index"
 import { Image } from "react-native"
 // import { fetchWithLogging } from "../utils/api_debug";
 
+const DEFAULT_ICON_URL = `https://svgs.scryfall.io/sets/default.svg?1772427600`
 /**
  * All scryfall svg urls are: https://svgs.scryfall.io/sets/{set_code}.svg?1772427600
  * scryfall doesn't have icons for some sets, and use 'default' instead of set_code
@@ -50,7 +51,7 @@ export const validIcon = async (setCode : string, setIconCache: Map<string, bool
         return true
     }
     catch (error){
-        console.log(`Icon missing for ${setCode}. applying default`);
+        // console.log(`Icon missing for ${setCode}. applying default`);
         setIconCache.set(url, false)
         return false
     }
