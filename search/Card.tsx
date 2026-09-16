@@ -380,7 +380,6 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
     useEffect(() => {
         if (currentVersion) {
             if (currentVersion?.image_uri) {
-                // setCardFront(currentVersion.image_uri)
                 if (currentVersion.card_faces) { // check for split card
                     const cardText = currentVersion.card_faces[0].printed_text ?
                         checkForFuse(currentVersion.card_faces[0].printed_text, currentVersion.card_faces[1].printed_text) :
@@ -425,6 +424,53 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
         }
     }, [showFront])
 
+    const memoizedCards = useMemo(() => {
+        return versionTreats?.map((vt: TreatmentImage, idx: number) => {
+            if (typeof vt[1] === 'string') {
+                return (
+                    <Image
+                        key={idx}
+                        source={{ uri: vt[1] }}
+                        alt={`${name}`}
+                        style={[styles(deviceType).card_image]}
+                    ></Image>
+                )
+            } else {
+                return (
+                    <View key={idx} testID="flipcard_container"
+                        style={[styles(deviceType).card_image]}
+                    >
+                        <FlipCard
+                            front={{ uri: vt[1][0].image_uri }}
+                            back={{ uri: vt[1][1].image_uri }}
+                            onFlip={() => setShowFront(!showFront)}
+                            buttonStyle={styles().flip_button}
+                            altBack={name.split('//')[1]}
+                            altFront={name.split('//')[0]}
+                        ></FlipCard>
+                    </View>
+                )
+            }
+        })
+    }, [versionTreats, deviceType, name, showFront])
+
+
+    const memoizedCaptions = useMemo(() => {
+        return versionTreats?.map((version: TreatmentImage) => {
+            return (
+                <View style={typeof version[1] === 'string' ? styles(deviceType).caption_container : styles(deviceType).flip_captions_container}>
+                    <Text style={[styles(deviceType).captionText, {
+                        fontSize: version[0].length < 4 ? 16 : 14
+                    }]}>
+                        {version[0].length > 0 ? (version[0] as string[]).join('\n') : ""}
+                        {/* {version[0] !== undefined ? (version[0] as string[]).join('\n') : ""} */}
+                    </Text>
+                </View>
+            )
+        })
+    }, [versionTreats, deviceType])
+
+    // console.log(currentVersion)
     // if(versionTreats){
     //     console.log(versionTreats)
     //     // console.log(typeof versionTreats[0][1], JSON.parse((versionTreats[0][1]) as unknown as { [key: string]: Card }))
@@ -445,51 +491,11 @@ const CardContainer: React.FC<CardContainerProps> = ({ name, cardData }) => {
                     imageHeight={deviceType === 'phone' ? 300 : 500}
                     containerStyle={styles(deviceType).image_container}
                     stackSize={3}
-                    // captions={versionTreats.map(v => v[0].join('\n'))}
-                    captions={versionTreats.map((version: TreatmentImage) => {
-                        return (
-                            // styles(deviceType).caption_container || styles(deviceType).text_wrapper
-                            <View style={ typeof version[1] === 'string' ? styles(deviceType).caption_container : styles(deviceType).flip_captions_container}>
-                                <Text style={[styles(deviceType).captionText, {
-                                    fontSize: version[0].length < 4 ? 16 : 14
-                                }]}>
-                                    {version[0].length > 0 ? (version[0] as string[]).join('\n') : ""}
-                                    {/* {version[0] !== undefined ? (version[0] as string[]).join('\n') : ""} */}
-                                </Text>
-                            </View>
-                        )
-                    })}
+                    captions={ memoizedCaptions ?? [] }
                     captionContainerStyle={styles(deviceType).caption_container}
-                    cards={
-                        versionTreats.map((vt: TreatmentImage, idx: number) => {
-                            if (typeof vt[1] === 'string') {
-                                return (
-                                    <Image
-                                        key={idx}
-                                        source={{ uri: vt[1] }}
-                                        alt={`${name}`}
-                                        style={[styles(deviceType).card_image]}
-                                    ></Image>
-                                )
-                            } else {
-                                return (
-                                    <View testID="flipcard_container"
-                                        // style={styles(deviceType).flipcard_container}
-                                        style={[styles(deviceType).card_image]}
-                                    >
-                                        <FlipCard
-                                            front={{ uri: vt[1][0].image_uri }}
-                                            back={{ uri: vt[1][1].image_uri }}
-                                            onFlip={() => setShowFront(!showFront)}
-                                            buttonStyle={styles().flip_button}
-                                            altBack={name.split('//')[1]}
-                                            altFront={name.split('//')[0]}
-                                        ></FlipCard>
-                                    </View>
-                                )
-                            }
-                        })
-                    }
+                    // cards={memoizedCards ?? []}
+                    cards={versionTreats.map(vt => vt[1] )}
+                    cardName={name}
                 />
             }
 
@@ -619,6 +625,7 @@ const styles = (deviceType?: string) => {
             textDecorationLine: 'underline'
         },
         oracle_text: {
+            marginTop: 8,
             fontFamily: 'Beleren',
             color: 'white',
             fontSize: deviceType === 'phone' ? 18 : 28
@@ -709,7 +716,7 @@ const styles = (deviceType?: string) => {
         },
         card_image: {
             // resizeMode: 'cover',
-            contentFit:'cover',
+            contentFit: 'cover',
             position: 'absolute',
             ...Platform.select({
                 ios: {
