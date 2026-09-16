@@ -24,7 +24,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ front, back, onLayout, onFlip, altF
     const flipVal = useSharedValue(0)
     const imageRef = useRef<Image>(null)
     const image= useImage(front)
-console.log('flip back:', back)
+
     const frontAnimatedStyle = useAnimatedStyle(() => {
         /*Front card spins from 0 - 180 degrees*/
         
@@ -51,7 +51,6 @@ console.log('flip back:', back)
     })
 
     const flipCard = () => {
-        console.log('flipped')
         flipVal.value = flipVal.value ? 0 : 1;
         onFlip && onFlip();
         (altFront && altBack ) && AccessibilityInfo.announceForAccessibility(flipVal.value === 0 ? altBack : altFront);

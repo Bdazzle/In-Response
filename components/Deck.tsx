@@ -1,51 +1,55 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Animated, PanResponder, StyleProp, StyleSheet, TextStyle, View, ViewStyle, Text, Pressable } from "react-native"
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { Animated, PanResponder, StyleProp, StyleSheet, TextStyle, View, ViewStyle, Text, Pressable, Platform } from "react-native"
 import Svg, { Path } from "react-native-svg"
+import { Card } from "../index"
+import { Image } from "expo-image"
+import FlipCard from "./Flipcard"
 
 interface DeckProps {
-    cards: React.ReactElement[],
+    cards: (string | { [key: string]: Card; })[]
+    cardName: string;
     containerStyle: StyleProp<ViewStyle>,
     stackSize: number,
     imageWidth: number,
     imageHeight: number,
     captions: React.ReactElement[],
-    // captions?: string[],
     captionStyles?: StyleProp<TextStyle>
     captionContainerStyle?: StyleProp<ViewStyle>
 }
 
 /**
+ * To prevent blip rerendering of top card after transition animationg, call resetPos AFTER currentIndex changes
+ * visible flash is primarily caused by resetting pan and cardOpacity before the new currentCard has rendered.
+ * When hovering over a card and scrolling, card can transitions Y unintentionally. DON'T FREAK OUT, it's an emulator bug.
  * @param param0 
  * @returns
  */
-const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, imageWidth = 220, imageHeight = 300, captions, captionStyles, captionContainerStyle }) => {
+const ImageDeck: React.FC<DeckProps> = ({ cards, cardName, containerStyle, stackSize = 3, imageWidth = 220, imageHeight = 300, captions, captionStyles, captionContainerStyle }) => {
     const [currentIndex, setCurrentIndex] = useState<number>(0)
     const pan = useRef<Animated.ValueXY>(new Animated.ValueXY()).current
     const cardOpacity = useRef(new Animated.Value(1)).current; //optional
-    const currentCard: React.ReactElement = cards[currentIndex]
     const [swipeThreshold, setSwipeThreshold] = useState<number>(0)
     const swipeOutDuration: number = 300
     const [swipeDirection, setSwipeDirection] = useState<string | null>()
-    const lastCard: boolean = currentIndex >= cards.length - 1
+    const [showFront, setShowFront] = useState<boolean>(true)
 
-    useEffect(() =>{
+    useEffect(() => {
         setCurrentIndex(0)
-    },[cards])
+    }, [cards])
 
     useEffect(() => {
         setSwipeThreshold(imageWidth * .3)
     }, [imageWidth])
 
     const resetPos = useCallback(() => {
-        pan.setValue({ x: 0, y: 0 });
-        cardOpacity.setValue(1);
+        pan.setValue({ x: 0, y: 0 })
+        cardOpacity.setValue(1)
         setSwipeDirection(null)
     }, [])
 
     const moveCard = useCallback((direction: string, velocity: { vx: number, vy: number }) => {
-
-        let xDestination = 0;
-        let yDestination = 0;
+        let xDestination = 0
+        let yDestination = 0
 
         //switch statement instead of if because it requires breaks
         switch (direction) {
@@ -54,24 +58,23 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
                 setSwipeDirection('horizontal')
                 xDestination = imageWidth * 1.5
                 yDestination = velocity ? velocity.vy * .5 : 0
-                break;
+                break
             case 'left':
                 //negative X
                 setSwipeDirection('horizontal')
                 xDestination = -imageWidth * 1.5
                 yDestination = velocity ? velocity.vy * .5 : 0
-                break;
+                break
             case 'top':
                 //negative Y
                 setSwipeDirection('vertical')
-                xDestination = 0
                 yDestination = -imageWidth * 1.5
-                break;
+                break
             case 'bottom':
                 // positive Y
                 setSwipeDirection('vertical')
-                xDestination = 0
                 yDestination = imageWidth * 1.5
+                break
         }
 
         //Fade while swiping animation
@@ -97,27 +100,60 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
             if (currentIndex + 1 === cards.length) {
                 setCurrentIndex(0)
             } else {
-                setCurrentIndex(prevIndex => prevIndex + 1)
+                setCurrentIndex(prevIndex => prevIndex + 1 === cards.length ? 0 : prevIndex + 1)
             }
 
-            resetPos();
+            // resetPos();
         })
-    }, [currentCard, resetPos])
+    }, [cards.length, imageWidth, pan, cardOpacity, swipeOutDuration])
 
     /**
-     * dx/y - accumulated distance of the gesture since the touch started
-     * vx/y - velocity of gesture.
-     * moveX/Y - the latest screen coordinates of the recently-moved touch
-     * Left swipes means -x values, means index goes up.
-     * Right swipes means +x values, means index goes down.
+     * useLayoutEffect is BLOCKING: Nothing else can happen while this runs,
+     * good for making changes BEFORE the user sees the screen,
+     * as opposed to useEffect which is non-blocking
      */
+    useLayoutEffect(() => {
+        resetPos()
+    }, [currentIndex, resetPos])
+
+    const throwCard = (direction: string) => {
+        moveCard(direction, { vx: 1, vy: -0.5 })
+    }
+
+    const renderCardContent = (card: string | { [key: string]: Card; }) => {
+        if (typeof card === 'string') {
+            return <Image source={{ uri: card }} alt={`${cardName}`} style={styles.card_image} />
+        }
+
+        return (
+            <View testID="flipcard_container" style={styles.card_image}>
+                <FlipCard
+                    front={{ uri: card[0].image_uri }}
+                    back={{ uri: card[1].image_uri }}
+                    onFlip={() => setShowFront(!showFront)}
+                    buttonStyle={styles.flip_button}
+                    altBack={cardName.split('//')[1]}
+                    altFront={cardName.split('//')[0]}
+                />
+            </View>
+        )
+    }
+
+       /**
+ * dx/y - accumulated distance of the gesture since the touch started
+ * vx/y - velocity of gesture.
+ * moveX/Y - the latest screen coordinates of the recently-moved touch
+ * Left swipes means -x values, means index goes up.
+ * Right swipes means +x values, means index goes down.
+ */
     const panResponder = PanResponder.create({
         /**
          * onStartShouldSetPanResponderCapture asks whether a parent component wants to claim touch responder status during the capture phase when a touch first starts.
          * Setting it to false will allow child touches (like a Press that triggers card flip animation) to execute (parent won't capture).
          */
         onStartShouldSetPanResponderCapture: () => false,
-        onStartShouldSetPanResponder: () => !lastCard,
+        // onStartShouldSetPanResponder: () => !lastCard,
+        onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: (_, gestureState) => {
             // Activate for omnidirectionaal swipe threshold
             const { dx, dy } = gestureState
@@ -182,44 +218,40 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
         }
     })
 
-    const throwCard = (direction: string) => {
-        moveCard(direction, { vx: 1, vy: -0.5 })
-    }
+    const renderDeckCards = () => cards.map((card, index) => {
+        const isCurrentCard = index === currentIndex
+        const stackIndex = index - currentIndex
 
+        if (stackIndex < 0 || stackIndex > stackSize) {
+            return null
+        }
 
-    /**
-     * Background cards are a changing array instead of a static component, 
-     * so create using a function instead of FC
-     */
-    const renderBGcards = () => {
-        const bgcards: React.ReactElement[] = []
-        //next card + however many borders I want to be seen
-        const remainingCards = cards.slice(currentIndex + 1, currentIndex + 1 + stackSize)
-
-        remainingCards.forEach((card, i) => {
-            //offsets for bg card positioning
-            const translateY = (i + 1) * 7
-            const translateX = (i + 1) * 7
-
-            bgcards.push(
-                <Animated.View key={`bgcard_${i}`}
-                    style={[styles.background_card,
-                    {
-                        transform: [
-                            { translateY: -translateY },
-                            { translateX: translateX }
-                        ],
-                        zIndex: -i,
-                        backgroundColor: 'green'
-                    }
-                    ]}
-                >
-                    {card}
-                </Animated.View>
-            )
-        })
-        return bgcards
-    }
+        return (
+            <Animated.View
+                key={`deckcard_${index}`}
+                testID="animated_image_container"
+                {...(isCurrentCard ? panResponder.panHandlers : {})}
+                style={[isCurrentCard ? styles.image_wrapper : styles.background_card, {
+                    transform: isCurrentCard ? [
+                        { translateX: pan.x },
+                        { translateY: pan.y },
+                        swipeDirection === 'vertical'
+                            ? { rotate: pan.y.interpolate({ inputRange: [-100, 0, 100], outputRange: ['-400deg', '0deg', '400deg'], extrapolate: 'clamp' }) }
+                            : { rotate: pan.x.interpolate({ inputRange: [-200, 0, 200], outputRange: ['-400deg', '0deg', '400deg'], extrapolate: 'clamp' }) }
+                    ] : [
+                         //background card offset of 7 px
+                        { translateY: -(stackIndex * 7) },
+                        { translateX: stackIndex * 7 }
+                    ],
+                    // opacity: isCurrentCard ? cardOpacity : 0.9,
+                    width: imageWidth,
+                    zIndex: isCurrentCard ? stackSize + 1 : stackSize - stackIndex,
+                }]}
+            >
+                {renderCardContent(card)}
+            </Animated.View>
+        )
+    })
 
     return (
         <View style={styles.deck_container}>
@@ -235,42 +267,15 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
                 </Pressable>
             }
             <View style={containerStyle}>
-                {
-                    renderBGcards()
-                }
-                <Animated.View {...panResponder.panHandlers}
-                    style={[styles.image_wrapper, {
-                        transform: [
-                            { translateX: pan.x },
-                            { translateY: pan.y },
-                            swipeDirection === 'vertical' ?
-                                {
-                                    rotate: pan.y.interpolate({
-                                        inputRange: [-100, 0, 100],
-                                        outputRange: ['-400deg', '0deg', '400deg'],
-                                        extrapolate: 'clamp'
-                                    })
-                                }
-                                :
-                                {
-                                    rotate: pan.x.interpolate({
-                                        inputRange: [-200, 0, 200],
-                                        outputRange: ['-400deg', '0deg', '400deg'],
-                                        extrapolate: 'clamp'
-                                    })
-                                }
-                        ],
-                        width: imageWidth
-                    }]}
-                >
-                    {currentCard}
 
-                </Animated.View>
+                {renderDeckCards()}
+
                 {
                     captions && captions[currentIndex]
                 }
-            </View>
-            {cards.length > 1 &&
+            </View >
+            {
+                cards.length > 1 &&
                 <Pressable onPress={() => throwCard('right')}
                     style={[styles.arrows,
                     { right: 0 }
@@ -281,7 +286,7 @@ const ImageDeck: React.FC<DeckProps> = ({ cards, containerStyle, stackSize = 3, 
                     </Svg>
                 </Pressable>
             }
-        </View>
+        </View >
     )
 }
 /*
@@ -304,13 +309,53 @@ const styles = StyleSheet.create({
     },
     background_card: {
         backgroundColor: '#e0e0e0',
-        opacity: 0.9,
+        // opacity: 0.9,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '100%',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
     },
     arrows: {
         width: 60,
         height: 60,
         position: 'absolute',
         top: '50%',
+    },
+    card_image: {
+        resizeMode: 'cover',
+        // contentFit: 'cover',
+        position: 'absolute',
+        ...Platform.select({
+            ios: {
+                shadowColor: 'black',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 5,
+            },
+        }),
+        borderColor: 'black', borderWidth: 1,
+        // ...imageStyle.image_dimensions
+        height: 300,
+        width: 220,
+    },
+    flip_button: {
+        borderColor: 'white',
+        borderRadius: 50,
+        borderWidth: 1,
+        maxWidth: 80,
+        maxHeight: 78,
+        width: '22%',
+        height: '15%',
+        zIndex: 10,
+        backgroundColor: 'black',
+        bottom: '-10%',
+        position: 'absolute'
     },
 })
 
